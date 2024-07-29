@@ -215,7 +215,7 @@ while (diff_joint>diff_joint_max | diff_joint_lag1>diff_joint_max  | diff_joint_
     end
 
 end
-%End timer
+%End timers
 toc
 
 %Check sum of the eplus final distributions
@@ -225,7 +225,7 @@ popplus=sum(eplus_udist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+2*sum(epl
 save('model_solutions','Ve','Vm','Vn','Vt','U','Veh','Vmh','Vnh','Vth','eplus_udist','eplus_edist','eplus_mdist','eplus_ndist','eplus_tdist','nplus','popplus');
 
 
-
+%Test changes
 
 
         
