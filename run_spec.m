@@ -2,10 +2,11 @@ clear all
 close all
 location="local";
 % location="hpc";
-cd('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/JMP_Model_Matlab')
-addpath('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/JMP_Model_Matlab')
-addpath('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/Python_Firm Structure/replication_HLMP/matlab/run_A4_revisit')
-% load('model_solutions.mat')
+if location == "local"
+    cd('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/JMP_Model_Matlab')
+    addpath('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/JMP_Model_Matlab')
+    addpath('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/Python_Firm Structure/replication_HLMP/matlab/run_A4_revisit')
+end
 load('xmin_results_combined.mat')
 
 %Baseline parameters and objects
@@ -44,11 +45,17 @@ bpw  =1-bpf            ; %bpw is bargaining power of worker
 nfirm=1                ; %Measure of firms 
 tpts =3                ; %type point space
 ats=2                  ; %Productivity space 
+if location=="hpc"
+    tpts=7;
+    ats=5;
+end
 spts =tpts+2           ; %state S for updating -- {u,0,{j}} -- dimension of that space is type+2
 cost_p=0                   ; %cost of promoting a non manager to manager
 cost_d=0                   ; %cost of demoting a manager to non manager
 alpha_m=1              ; %Manager returns
 alpha_n=0.1              ; %Non manager returns
+
+
 
 typemin=1; %Lowest type
 typemax=mubar ; %Highest type
@@ -116,22 +123,19 @@ true=0;
 speed=1;
 
 
-%Specification 0
-run run_sp0.m
+% %Specification 0
+% run run_sp0.m
 
-%Specification 1
-run run_sp1.m
+% %Specification 1
+% run run_sp1.m
 
-%Specification 2
-run run_sp2.m
+% %Specification 2
+% run run_sp2.m
 
 %Specification 3
 run run_sp3.m
 
+
 %Specification 4
 run run_sp4.m
 
-
-
-
-%Appendix

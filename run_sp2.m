@@ -1,4 +1,3 @@
-
 %% Specification 2
 % Sp1 but with higher transition to upper shocks in a and lower learning
 

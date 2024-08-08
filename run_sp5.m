@@ -1,7 +1,8 @@
 
-%% Specification 4
+%% Specification 5
 % CES productuion function, with firm with managers producing as if with the lowet type q 
-% % and firm with no managers produce as if with the lowest type z
+% % and firm with no managers  do not produce 
+%Turn off all shocks 
 
 alpha_m=0.7;
 fteam=zeros(ats,tpts,tpts);
@@ -14,19 +15,20 @@ for a=1:ats
             fteam(a,z,q)=A*a_type(a)*((alpha_m*type(z)^fcomp + (1-alpha_m)*type(q)^fcomp))^(1/fcomp);
         end
         fman(a,z)=A*a_type(a)*(alpha_m*type(z)^fcomp+ (1-alpha_m)*type(1)^fcomp)^(1/fcomp);
-        fnman(a,z)=A*a_type(a)*(alpha_m*type(1)^fcomp+ (1-alpha_m)*type(z)^fcomp)^(1/fcomp);
+        fnman(a,z)=0;
     end
     fe(a)=0;
 end
+
 %A transition
 aup=0.1;
-adown=0.3;
+adown=0.1;
 astay=1-aup-adown;
 a_trans=create_trans(adown,astay,aup,ats);
 
 %Q transition
-qup=0.06;
-qdown=0.05;
+qup=0;
+qdown=0;
 qstay=1-qup-qdown;
 q_trans=create_trans(qdown,qstay,qup,tpts);
 
@@ -57,7 +59,7 @@ Vnini=fnman/(1-bt);
 Vtini=fteam/(1-bt);
 Uini=b/(1-bt);
 
-[Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl, Vttl, Utl]= vf_iterationV2(eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist,eplus_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,true,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed);
+[Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl, Vttl, Utl]= vf_iterationV2(eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist,eplus_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,true,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,0.6);
 
 
 update_speed_v=1;
@@ -132,7 +134,7 @@ while (diff_joint>diff_joint_max | diff_joint_lag1>diff_joint_max  | diff_joint_
         fprintf(2,'Joint Failed to converge\n')
     end
     if diff_joint<diff_joint_max
-        fprintf('Sp4 Joint Converged in %d iterations\n',it_joint)
+        fprintf('Sp5 Joint Converged in %d iterations\n',it_joint)
     end
 
 end
@@ -143,6 +145,6 @@ toc
 nplus=sum(eplus_edist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+sum(eplus_tdist,"all");
 popplus=sum(eplus_udist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+2*sum(eplus_tdist,"all");
 
-save('model_solutions_sp4'+location,'Ve','Vm','Vn','Vt','U','Veh','Vmh','Vnh','Vth','eplus_udist','eplus_edist','eplus_mdist','eplus_ndist','eplus_tdist','nplus','popplus');
+save('model_solutions_sp5'+location,'Ve','Vm','Vn','Vt','U','Veh','Vmh','Vnh','Vth','eplus_udist','eplus_edist','eplus_mdist','eplus_ndist','eplus_tdist','nplus','popplus');
 
  

@@ -20,14 +20,14 @@ for a=1:ats
 end
 
 %A transition
-aup=0.2;
-adown=0.1;
+aup=0.1;
+adown=0.3;
 astay=1-aup-adown;
 a_trans=create_trans(adown,astay,aup,ats);
 
 %Q transition
-qup=0.2;
-qdown=0.1;
+qup=0.06;
+qdown=0.05;
 qstay=1-qup-qdown;
 q_trans=create_trans(qdown,qstay,qup,tpts);
 
