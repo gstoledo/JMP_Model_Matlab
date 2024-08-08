@@ -5,6 +5,7 @@
 %Lets for now import some valeus from HLMP code
 clear all
 close all
+cd('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/Python_Firm Structure/replication_HLMP/matlab/run_A4_revisit')
 addpath('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/Python_Firm Structure/replication_HLMP/matlab/run_A4_revisit')
 %load('xmin_results_combined')
 load('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/Python_Firm Structure/replication_HLMP/matlab/run_A4_revisit/xmin_results_combined.mat')
@@ -38,8 +39,8 @@ bt   =1/(1.1^(1/12))   ; %beta, discount factor
 death=1/(35*12)        ; %Probability agent dies  
 bpw  =1-bpf            ; %bpw is bargaining power of worker
 nfirm=1                ; %Measure of firms 
-tpts =7                ; %type point space
-ats=5                  ; %Productivity space 
+tpts =3                ; %type point space
+ats=2                  ; %Productivity space 
 spts =tpts+2           ; %state S for updating -- {u,0,{j}} -- dimension of that space is type+2
 cost_p=0                   ; %cost of promoting a non manager to manager
 cost_d=0                   ; %cost of demoting a manager to non manager
@@ -151,7 +152,7 @@ n_types=ats+2*(ats*tpts)+ats*tpts*tpts;
 % e_ndist=(n/n_types)*ones(ats,tpts);
 % e_tdist=(n/n_types)*ones(ats,tpts,tpts);
 % %Check
-% sum(e_edist)+sum(e_mdist,"all")+sum(e_ndist,"all")+sum(e_tdist,"all");
+% n0=sum(e_edist)+sum(e_mdist,"all")+sum(e_ndist,"all")+sum(e_tdist,"all");
 
 % %Population in the model 
 % pop0=sum(e_udist)+sum(e_mdist,"all")+sum(e_ndist,"all")+2*sum(e_tdist,"all");
@@ -169,7 +170,6 @@ sum(e_edist)+sum(e_mdist,"all")+sum(e_ndist,"all")+sum(e_tdist,"all");
 
 %Population in the model 
 pop0=sum(e_udist)+sum(e_mdist,"all")+sum(e_ndist,"all")+2*sum(e_tdist,"all");
-
 
 
 %For now lets tes with some random values for these distributions (values 0, .25 0.5 .75)
@@ -293,6 +293,13 @@ pop3=sum(e3_udist)+sum(e3_mdist,"all")+sum(e3_ndist,"all")+2*sum(e3_tdist,"all")
 %Check sum
 nplus=sum(eplus_edist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+sum(eplus_tdist,"all"); %This is summing up to one if the fed in dist sums to 1
 popplus=sum(eplus_udist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+2*sum(eplus_tdist,"all");
+
+% %Fake update
+% e3_udist=(1-speed_dist)*e3_udist+speed_dist*eplus_udist;
+% e3_edist=(1-speed_dist)*e3_edist+speed_dist*eplus_edist;
+% e3_mdist=(1-speed_dist)*e3_mdist+speed_dist*eplus_mdist;
+% e3_ndist=(1-speed_dist)*e3_ndist+speed_dist*eplus_ndist;
+% e3_tdist=(1-speed_dist)*e3_tdist+speed_dist*eplus_tdist;
 
 e_udist=(1-speed_dist)*e_udist+speed_dist*eplus_udist;
 e_edist=(1-speed_dist)*e_edist+speed_dist*eplus_edist;
@@ -438,9 +445,4 @@ toc
 %Check sum of the eplus final distributions
 nplus=sum(eplus_edist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+sum(eplus_tdist,"all");
 popplus=sum(eplus_udist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+2*sum(eplus_tdist,"all");
-
-
-
-
-        
 

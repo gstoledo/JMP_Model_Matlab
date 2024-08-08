@@ -5,7 +5,7 @@ function [eplus_udist,eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist]=eplus_dis
     eplus_udist=(1-death)*e3_udist + death*typebirth;
     
     %Empty firms
-    eplus_edist=e3_edist+ death*sum(e3_mdist,2)' + death*sum(e3_ndist,2)' + (death^2)*sum(e3_tdist,[2,3])';
+    eplus_edist=e3_edist + death*sum(e3_mdist,2)' + death*sum(e3_ndist,2)' + (death^2)*sum(e3_tdist,[2,3])';
     
     %Firms with manager
     eplus_mdist= (1-death)*e3_mdist + death*(1-death)*sum(e3_tdist,3);

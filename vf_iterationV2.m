@@ -1,6 +1,6 @@
 %Function to perform the value function iteration
 %Correcting for the u issue
-function [Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl,Vttl,Utl] = vf_iteration(e_edist,e_mdist,e_ndist,e_tdist,e_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,true,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed)
+function [Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl,Vttl,Utl] = vf_iterationV2(e_edist,e_mdist,e_ndist,e_tdist,e_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,true,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed)
     %Use initial guesses for value functions
     Veup = Veini;
     Vmup = Vmini;
