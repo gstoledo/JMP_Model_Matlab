@@ -282,10 +282,10 @@ function [Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl,Vttl,Utl] = vf
         % if mod(it,100)==0
         %     fprintf('Iteration %d, error %f \n', it, diff)
         % end
-        % %In red failed to converge
-        % if it==itmax
-        %     fprintf(2,'Failed to converge\n')
-        % end
+        %In red failed to converge
+        if it==itmax
+            fprintf(2,'Failed to converge\n')
+        end
         % if diff<diffmax
         %     cprintf('green','Converged in %d iterations\n',it)
         % end

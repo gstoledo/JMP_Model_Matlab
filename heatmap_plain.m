@@ -8,6 +8,8 @@ function [h]=heatmap_plain(E1, bluePalette_rgb, titleStr, axisFontSize, titleFon
     h.Title = titleStr;
     h.XLabel = 'Worker type';
     h.YLabel = 'Manager type';
+    h.XDisplayLabels = num2cell(0:(size(E1, 2) - 1));
+    h.YDisplayLabels = num2cell(0:(size(E1, 1) - 1));
 
     % Flip the vertical axis
     h.NodeChildren(3).YDir = 'normal';
@@ -21,6 +23,7 @@ function [h]=heatmap_plain(E1, bluePalette_rgb, titleStr, axisFontSize, titleFon
     % Customize font size and font name
     h.FontSize = axisFontSize;
     h.FontName = 'Helvetica';
+    
 
     % Suppress the warning temporarily
     warning('off', 'MATLAB:structOnObject')

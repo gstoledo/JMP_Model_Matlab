@@ -85,10 +85,10 @@ function [e_udist, e_edist, e_mdist, e_ndist, e_tdist]=lom_iteration(eini_udist,
             % if mod(it_dist,100)==0
             %     fprintf('Dist Iteration %d, error %f \n', it_dist, diff_dist)
             % end 
-            % %In red failed to converge
-            % if it_dist==it_dist_max
-            %     fprintf(2,'Failed to converge\n')
-            % end
+            %In red failed to converge
+            if it_dist==it_dist_max
+                fprintf(2,'Failed to converge\n')
+            end
             % if diff_dist<diff_dist_max
             %     cprintf('green','Distributions Converged in %d iterations\n',it_dist)
             % end

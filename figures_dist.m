@@ -1,10 +1,18 @@
 clear all
 close all
+location="local";
+% location="hpc";
 cd('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/JMP_Model_Matlab')
 addpath('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/JMP_Model_Matlab')
 addpath('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/Python_Firm Structure/replication_HLMP/matlab/run_A4_revisit')
-load('model_solutions.mat')
+% load('model_solutions.mat')
+load('model_solutions_sp1.mat')
 load('xmin_results_combined.mat')
+
+
+%Check sum of the eplus final distributions
+nplus=sum(eplus_edist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+sum(eplus_tdist,"all");
+popplus=sum(eplus_udist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+2*sum(eplus_tdist,"all");
 
 
 x=xmin;
@@ -110,123 +118,129 @@ u_trans=create_trans(ulose,ustay,ugain,tpts);
 % Astethcics settings
 
 
-%% Set default properties for 4:3 figure
+ 
+% %% Set default properties for 4:3
+%  figure
+%  figureWidth = 8.5;
+%  figureHeight = 6.375;
+%  set(groot, 'defaultFigureUnits', 'inches')
+%  set(groot, 'defaultFigurePosition', [1,1,figureWidth,figureHeight]);
+%  set(groot, 'defaultFigurePaperPosition', [0, 0, figureWidth,figureHeight]);
+%  set(groot, 'defaultFigurePaperSize', [figureWidth,figureHeight]);
+ 
+%  %% Set default properties for axes
+ 
+%  set(groot, 'defaultAxesFontName', 'Helvetica')
+%  set(groot, 'defaultAxesFontSize', 24)
+%  set(groot, 'defaultAxesLabelFontSizeMultiplier', 1)
+%  set(groot, 'defaultAxesTitleFontSizeMultiplier', 1)
+%  set(groot, 'defaultAxesTitleFontWeight', 'normal')
+%  set(groot, 'defaultAxesXColor', 'k')
+%  set(groot, 'defaultAxesYColor', 'k')
+%  set(groot, 'defaultAxesGridColor', 'k')
+%  set(groot, 'defaultAxesLineWidth', 1)
+%  set(groot, 'defaultAxesYGrid', 'on')
+%  set(groot, 'defaultAxesXGrid', 'off')
+%  set(groot, 'defaultAxesTickDirMode', 'manual')
+%  set(groot, 'defaultAxesTickDir', 'out')
+%  set(groot, 'defaultAxesTickLength',[0.005, 0.005])
+%  set(groot, 'defaultAxesBox','off')
+ 
+ %% Predefine qualitative color palettes
+ 
+ % Dark colors
+ 
+ darkPalette = ['#1b9e77';'#d95f02';'#7570b3';'#e7298a';'#66a61e';'#e6ab02';'#a6761d';'#666666'];
+ 
+ greenColor = darkPalette(1,:);
+ orangeColor = darkPalette(2,:);
+ purpleColor = darkPalette(3,:);
+ pinkColor = darkPalette(4,:);
+ appleColor = darkPalette(5,:);
+ yellowColor = darkPalette(6,:);
+ brownColor = darkPalette(7,:);
+ grayColor = darkPalette(8,:);
+ 
+ % Paired colors
+ 
+ pairedPalette = ['#a6cee3';'#1f78b4';'#b2df8a';'#33a02c';'#fb9a99';'#e31a1c';'#fdbf6f';'#ff7f00';'#cab2d6';'#6a3d9a';'#ffff99';'#b15928'];
+ 
+ blueLight = pairedPalette(1,:);
+ blueDark = pairedPalette(2,:);
+ greenLight = pairedPalette(3,:);
+ greenDark = pairedPalette(4,:);
+ redLight = pairedPalette(5,:);
+ redDark = pairedPalette(6,:);
+ orangeLight = pairedPalette(7,:);
+ orangeDark = pairedPalette(8,:);
+ purpleLight = pairedPalette(9,:);
+ purpleDark = pairedPalette(10,:);
+ yellowLight = pairedPalette(11,:);
+ yellowDark = pairedPalette(12,:);
+ 
+ %% Predefine sequential color palettes
+ 
+ % Orange
+ 
+ orangePalette = ['#fff5eb';'#fee6ce';'#fdd0a2';'#fdae6b';'#fd8d3c';'#f16913';'#d94801';'#a63603';'#7f2704'];
+ 
+ orange1 = orangePalette(1,:);
+ orange2 = orangePalette(2,:);
+ orange3 = orangePalette(3,:);
+ orange4 = orangePalette(4,:);
+ orange5 = orangePalette(5,:);
+ orange6 = orangePalette(6,:);
+ orange7 = orangePalette(7,:);
+ orange8 = orangePalette(8,:);
+ 
+ % Blue
+ 
+ bluePalette = ['#f7fbff';'#deebf7';'#c6dbef';'#9ecae1';'#6baed6';'#4292c6';'#2171b5';'#08519c';'#08306b'];
+ bluePalette_rgb=[247 251 255; 222 235 247; 198 219 239; 158 202 225; 107 174 214; 66 146 198; 33 113 181;8 81 156; 8 48 107]/255;
+ 
+ bluetoorange=[16 91 143; 70 114 159; 107 138 175; 141 162 191; 174 188 208; 207 214 224; 241 241 241; 243 222 208; 242 203 176; 240 185 144; 235 167 113; 229 149 82; 222 131 49];
+ 
+ bluepurplePalette_rgb=[247 252 253; 224 236 244; 191 211 230; 158 188 218; 140 150 198; 140 107 177; 136 65 157; 129 15 124; 77 0 75]/255;
+ 
+ 
+ 
+ blue1 = bluePalette(1,:);
+ blue2 = bluePalette(2,:);
+ blue3 = bluePalette(3,:);
+ blue4 = bluePalette(4,:);
+ blue5 = bluePalette(5,:);
+ blue6 = bluePalette(6,:);
+ blue7 = bluePalette(7,:);
+ blue8 = bluePalette(8,:);
+ 
+ % Purple
+ 
+ purplePalette = ['#fcfbfd';'#efedf5';'#dadaeb';'#bcbddc';'#9e9ac8';'#807dba';'#6a51a3';'#54278f';'#3f007d'];
+ 
+ purple1 = purplePalette(1,:);
+ purple2 = purplePalette(2,:);
+ purple3 = purplePalette(3,:);
+ purple4 = purplePalette(4,:);
+ purple5 = purplePalette(5,:);
+ purple6 = purplePalette(6,:);
+ purple7 = purplePalette(7,:);
+ purple8 = purplePalette(8,:);
+ 
+ % Gray
+ 
+ grayPalette = ['#ffffff';'#f0f0f0';'#d9d9d9';'#bdbdbd';'#969696';'#737373';'#525252';'#252525';'#000000'];
+ 
+ gray1 = grayPalette(1,:);
+ gray2 = grayPalette(2,:);
+ gray3 = grayPalette(3,:);
+ gray4 = grayPalette(4,:);
+ gray5 = grayPalette(5,:);
+ gray6 = grayPalette(6,:);
+ gray7 = grayPalette(7,:);
+ gray8 = grayPalette(8,:);
+ 
+  
 
-figureWidth = 8.5;
-figureHeight = 6.375;
-set(groot, 'defaultFigureUnits', 'inches')
-set(groot, 'defaultFigurePosition', [1,1,figureWidth,figureHeight]);
-set(groot, 'defaultFigurePaperPosition', [0, 0, figureWidth,figureHeight]);
-set(groot, 'defaultFigurePaperSize', [figureWidth,figureHeight]);
-
-%% Set default properties for axes
-
-set(groot, 'defaultAxesFontName', 'Helvetica')
-set(groot, 'defaultAxesFontSize', 24)
-set(groot, 'defaultAxesLabelFontSizeMultiplier', 1)
-set(groot, 'defaultAxesTitleFontSizeMultiplier', 1)
-set(groot, 'defaultAxesTitleFontWeight', 'normal')
-set(groot, 'defaultAxesXColor', 'k')
-set(groot, 'defaultAxesYColor', 'k')
-set(groot, 'defaultAxesGridColor', 'k')
-set(groot, 'defaultAxesLineWidth', 1)
-set(groot, 'defaultAxesYGrid', 'on')
-set(groot, 'defaultAxesXGrid', 'off')
-set(groot, 'defaultAxesTickDirMode', 'manual')
-set(groot, 'defaultAxesTickDir', 'out')
-set(groot, 'defaultAxesTickLength',[0.005, 0.005])
-set(groot, 'defaultAxesBox','off')
-
-%% Predefine qualitative color palettes
-
-% Dark colors
-
-darkPalette = ['#1b9e77';'#d95f02';'#7570b3';'#e7298a';'#66a61e';'#e6ab02';'#a6761d';'#666666'];
-
-greenColor = darkPalette(1,:);
-orangeColor = darkPalette(2,:);
-purpleColor = darkPalette(3,:);
-pinkColor = darkPalette(4,:);
-appleColor = darkPalette(5,:);
-yellowColor = darkPalette(6,:);
-brownColor = darkPalette(7,:);
-grayColor = darkPalette(8,:);
-
-% Paired colors
-
-pairedPalette = ['#a6cee3';'#1f78b4';'#b2df8a';'#33a02c';'#fb9a99';'#e31a1c';'#fdbf6f';'#ff7f00';'#cab2d6';'#6a3d9a';'#ffff99';'#b15928'];
-
-blueLight = pairedPalette(1,:);
-blueDark = pairedPalette(2,:);
-greenLight = pairedPalette(3,:);
-greenDark = pairedPalette(4,:);
-redLight = pairedPalette(5,:);
-redDark = pairedPalette(6,:);
-orangeLight = pairedPalette(7,:);
-orangeDark = pairedPalette(8,:);
-purpleLight = pairedPalette(9,:);
-purpleDark = pairedPalette(10,:);
-yellowLight = pairedPalette(11,:);
-yellowDark = pairedPalette(12,:);
-
-%% Predefine sequential color palettes
-
-% Orange
-
-orangePalette = ['#fff5eb';'#fee6ce';'#fdd0a2';'#fdae6b';'#fd8d3c';'#f16913';'#d94801';'#a63603';'#7f2704'];
-
-orange1 = orangePalette(1,:);
-orange2 = orangePalette(2,:);
-orange3 = orangePalette(3,:);
-orange4 = orangePalette(4,:);
-orange5 = orangePalette(5,:);
-orange6 = orangePalette(6,:);
-orange7 = orangePalette(7,:);
-orange8 = orangePalette(8,:);
-
-% Blue
-
-bluePalette = ['#f7fbff';'#deebf7';'#c6dbef';'#9ecae1';'#6baed6';'#4292c6';'#2171b5';'#08519c';'#08306b'];
-bluePalette_rgb=[247 251 255; 222 235 247; 198 219 239; 158 202 225; 107 174 214; 66 146 198; 33 113 181;8 81 156; 8 48 107]/255;
-
-bluetoorange=[16 91 143; 70 114 159; 107 138 175; 141 162 191; 174 188 208; 207 214 224; 241 241 241; 243 222 208; 242 203 176; 240 185 144; 235 167 113; 229 149 82; 222 131 49];
-
-
-
-blue1 = bluePalette(1,:);
-blue2 = bluePalette(2,:);
-blue3 = bluePalette(3,:);
-blue4 = bluePalette(4,:);
-blue5 = bluePalette(5,:);
-blue6 = bluePalette(6,:);
-blue7 = bluePalette(7,:);
-blue8 = bluePalette(8,:);
-
-% Purple
-
-purplePalette = ['#fcfbfd';'#efedf5';'#dadaeb';'#bcbddc';'#9e9ac8';'#807dba';'#6a51a3';'#54278f';'#3f007d'];
-
-purple1 = purplePalette(1,:);
-purple2 = purplePalette(2,:);
-purple3 = purplePalette(3,:);
-purple4 = purplePalette(4,:);
-purple5 = purplePalette(5,:);
-purple6 = purplePalette(6,:);
-purple7 = purplePalette(7,:);
-purple8 = purplePalette(8,:);
-
-% Gray
-
-grayPalette = ['#ffffff';'#f0f0f0';'#d9d9d9';'#bdbdbd';'#969696';'#737373';'#525252';'#252525';'#000000'];
-
-gray1 = grayPalette(1,:);
-gray2 = grayPalette(2,:);
-gray3 = grayPalette(3,:);
-gray4 = grayPalette(4,:);
-gray5 = grayPalette(5,:);
-gray6 = grayPalette(6,:);
-gray7 = grayPalette(7,:);
-gray8 = grayPalette(8,:);
 
 
 
@@ -234,48 +248,49 @@ gray8 = grayPalette(8,:);
 % E = randi(100, 10, 10); % Example: a 10x10 matrix with random integers between 1 and 100
 
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Using imagesc
-% % Create a figure and axes
-% figure;
-% ax = axes;
+ % % Create a figure and axes
+ % % figure;
+ % ax = axes;
 
-% % Display heatmap using imagesc
-% imagesc(ax, E);
+ % % Display heatmap using imagesc
+ % imagesc(ax, E);
 
-% % Customize the colorbar
-% cb = colorbar(ax, 'southoutside');
-% cb.TickLength = 0;
+ % % Customize the colorbar
+ % cb = colorbar(ax, 'southoutside');
+ % cb.TickLength = 0;
 
-% % cb.Position(3)=0.5*cb.Position(3);
-% % cb.Position(1) = 0.25 + 0.5 * cb.Position(1);  % Center the colorbar
-% % cb.Position(2) = cb.Position(2) - 0.05;  % Move it further down
-
-
-% % Invert the direction of the vertical axis
-% set(ax, 'YDir', 'normal');
-
-% % Remove all gridlines
-% ax.XGrid = 'off';
-% ax.YGrid = 'off';
-% ax.TickLength = [0, 0];  % Remove tick marks
-% % Ensure all cells are labeled
-% ax.XTick = 1:size(E, 2);  % Label all columns
-% ax.YTick = 1:size(E, 1);  % Label all rows
-% % Reduce the size of the tick labels
-% ax.FontSize = 14;  % Adjust the font size as needed
-
-% % Customize the title and labels
-% title(ax, 'Firm distribution conditional on Productivity level a', 'FontSize', 20, 'FontName', 'Helvetica', 'FontWeight', 'normal');
-% xlabel(ax, 'Worker type', 'FontSize', 16, 'FontName', 'Helvetica');
-% ylabel(ax, 'Manager type', 'FontSize', 16, 'FontName', 'Helvetica');
-% % Apply the custom colormap
-% colormap(ax, bluePalette_rgb / 255);
-
-% % Print figure
-% print('-dpdf', 'basic4.pdf');
+ % % cb.Position(3)=0.5*cb.Position(3);
+ % % cb.Position(1) = 0.25 + 0.5 * cb.Position(1);  % Center the colorbar
+ % % cb.Position(2) = cb.Position(2) - 0.05;  % Move it further down
 
 
+ % % Invert the direction of the vertical axis
+ % set(ax, 'YDir', 'normal');
+
+ % % Remove all gridlines
+ % ax.XGrid = 'off';
+ % ax.YGrid = 'off';
+ % ax.TickLength = [0, 0];  % Remove tick marks
+ % % Ensure all cells are labeled
+ % ax.XTick = 1:size(E, 2);  % Label all columns
+ % ax.YTick = 1:size(E, 1);  % Label all rows
+ % % Reduce the size of the tick labels
+ % ax.FontSize = 14;  % Adjust the font size as needed
+
+ % % Customize the title and labels
+ % title(ax, 'Firm distribution conditional on Productivity level a', 'FontSize', 20, 'FontName', 'Helvetica', 'FontWeight', 'normal');
+ % xlabel(ax, 'Worker type', 'FontSize', 16, 'FontName', 'Helvetica');
+ % ylabel(ax, 'Manager type', 'FontSize', 16, 'FontName', 'Helvetica');
+ % % Apply the custom colormap
+ % colormap(ax, bluePalette_rgb / 255);
+
+ % % Print figure
+ % print('-dpdf', 'basic4.pdf');
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Using heatmap
 % clear h
 % % Create the heatmap
@@ -391,7 +406,7 @@ hs.Colorbar.Ticks = linspace(minValue, maxValue, 5); % Adjust the number of tick
 warning('on', 'MATLAB:structOnObject')
 
 % Apply the custom colormap
-colormap(bluePalette_rgb);
+colormap(bluepurplePalette_rgb);
 
 % Print figure  
 print('-dpdf', 'basicE1.pdf');
@@ -399,17 +414,19 @@ print('-dpdf', 'basicE1.pdf');
 
 %% Using heatmap (plain one) for each a type as a function
 clear h1 h2
-h1=heatmap_plain(E1, bluePalette_rgb, 'Firm distribution conditional on Productivity level a', 16, 20,'basicE1.pdf');
-h2=heatmap_plain(E2, bluePalette_rgb, 'Firm distribution conditional on Productivity level a', 16, 20,'basicE2.pdf');
+h1=heatmap_plain(E1, bluepurplePalette_rgb, 'Firm distribution conditional on Productivity level a', 16, 20,'basicE1.pdf');
+h2=heatmap_plain(E2, bluepurplePalette_rgb, 'Firm distribution conditional on Productivity level a', 16, 20,'basicE2.pdf');
 
 % In a loop for each a type
 for a=1:ats
-    clear h
+    clear h e s normalized
     e=E(:,:,a);
-    h=heatmap_plain(e, bluePalette_rgb, 'Firm distribution conditional on Productivity level a='+string(a)+'', 16, 20,'basicE_'+string(a)+'.pdf');
+    s=sum(E(:,:,a),'all');
+    normalized=e/s;
+    h=heatmap_plain(normalized, bluepurplePalette_rgb, 'Firm distribution conditional on Productivity level a='+string(a)+'', 16, 20,'basicE_'+string(a)+'.pdf');
 end
     
-eplus_mdist
+
 
 %% Using heatmap (skeewed colorbar)
 % h = heatmap(E1);
@@ -475,97 +492,103 @@ eplus_mdist
 
 
 %% Combined heatmaps
-% clear h1 h2
-% % Determine the common color limits for both heatmaps
-% minValue = min(min(E1(:)), min(E2(:)));
-% maxValue = max(max(E1(:)), max(E2(:)));
-
-% % Create a tiled layout for better control over the layout
-% t = tiledlayout(1, 2, 'TileSpacing', 'Compact', 'Padding', 'Compact');
-
-% % Plot the first heatmap
-% nexttile;
-% h1 = heatmap(E1);
-% h1.Title = 'Heatmap of E1';
-% %h1.XLabel = 'Worker type';
-% h1.YLabel = 'Manager type';
-% h1.NodeChildren(3).YDir = 'normal';
-% h1.CellLabelColor = 'none';
-% h1.GridVisible = 'off';
-% h1.FontSize = 16;
-% h1.FontName = 'Helvetica';
-% h1.ColorLimits = [minValue, maxValue];
-% h1.ColorbarVisible = 'off';
-% % Relabel the axes to start at 0
-% h1.XDisplayLabels = num2cell(0:(size(E1, 2) - 1));
-% h1.YDisplayLabels = num2cell(0:(size(E1, 1) - 1));
-
-% % Suppress the warning temporarily
-% warning('off', 'MATLAB:structOnObject')
-% hs1 = struct(h1);
-% hs1.Axes.Title.FontWeight = 'normal';
-% hs1.Axes.Title.FontSize = 20;
-% hs1.Axes.XAxis.FontSize = 16;
-% hs1.Axes.YAxis.FontSize = 16;
-% warning('on', 'MATLAB:structOnObject')
-
-% % Adjust the heatmap to be square
-% originalUnits = h1.Units;
-% h1.Units = 'centimeters';
-% sz1 = size(h1.ColorData);
-% h1.Position(3:4) = min(h1.Position(3:4)) * [1, 1];
-% if sz1(1) > sz1(2)
-%     h1.Position(3) = h1.Position(3) * (sz1(2) / sz1(1));
-% else
-%     h1.Position(4) = h1.Position(4) * (sz1(1) / sz1(2));
-% end
-% h1.Units = originalUnits;
-
-% % Plot the second heatmap
-% nexttile;
-% h2 = heatmap(E2);
-% h2.Title = 'Heatmap of E2';
-% h2.NodeChildren(3).YDir = 'normal';
-% h2.CellLabelColor = 'none';
-% h2.GridVisible = 'off';
-% h2.FontSize = 16;
-% h2.FontName = 'Helvetica';
-% h2.ColorLimits = [minValue, maxValue];
-% % Relabel the axes to start at 0
-% h2.XDisplayLabels = num2cell(0:(size(E2, 2) - 1));
-% h2.YDisplayLabels = num2cell(0:(size(E2, 1) - 1));
-
-% % Suppress the warning temporarily
-% warning('off', 'MATLAB:structOnObject')
-% hs2 = struct(h2);
-% hs2.Colorbar.TickLength = 0;
-% hs2.Axes.Title.FontWeight = 'normal';
-% hs2.Axes.Title.FontSize = 20;
-% hs2.Axes.XAxis.FontSize = 16;
-% hs2.Axes.YAxis.FontSize = 16;
-% warning('on', 'MATLAB:structOnObject')
-
-% % Adjust the second heatmap to be square
-% originalUnits = h2.Units;
-% h2.Units = 'centimeters';
-% sz2 = size(h2.ColorData);
-% h2.Position(3:4) = min(h2.Position(3:4)) * [1, 1];
-% if sz2(1) > sz2(2)
-%     h2.Position(3) = h2.Position(3) * (sz2(2) / sz2(1));
-% else
-%     h2.Position(4) = h2.Position(4) * (sz2(1) / sz2(2));
-% end
-% h2.Units = originalUnits;
-
-% % Apply the custom colormap to both heatmaps
-% colormap(bluePalette_rgb);
-
-% % Add a centralized xlabel for the entire layout
-% xlabel(t, 'Worker type', 'FontSize', 16, 'FontName', 'Helvetica');
-
-% % Print the figure
-% print('-dpdf', 'sideBySideHeatmaps.pdf');
+%Normalized E1 and E2
+sum1=sum(E1,'all');
+sum2=sum(E2,'all');
+En1=E1/sum1;
+En2=E2/sum2;
 
 
+clear h1 h2
+% Determine the common color limits for both heatmaps
+minValue = min(min(En1(:)), min(En2(:)));
+maxValue = max(max(En1(:)), max(En2(:)));
+
+% Create a tiled layout for better control over the layout
+t = tiledlayout(1, 2, 'TileSpacing', 'Compact', 'Padding', 'Compact');
+
+% Plot the first heatmap
+nexttile;
+h1 = heatmap(En1);
+h1.Title = 'Heatmap of E1';
+%h1.XLabel = 'Worker type';
+h1.YLabel = 'Manager type';
+h1.NodeChildren(3).YDir = 'normal';
+h1.CellLabelColor = 'none';
+h1.GridVisible = 'off';
+h1.FontSize = 16;
+h1.FontName = 'Helvetica';
+h1.ColorLimits = [minValue, maxValue];
+h1.ColorbarVisible = 'off';
+% Relabel the axes to start at 0
+h1.XDisplayLabels = num2cell(0:(size(E1, 2) - 1));
+h1.YDisplayLabels = num2cell(0:(size(E1, 1) - 1));
+
+% Suppress the warning temporarily
+warning('off', 'MATLAB:structOnObject')
+hs1 = struct(h1);
+hs1.Axes.Title.FontWeight = 'normal';
+hs1.Axes.Title.FontSize = 20;
+hs1.Axes.XAxis.FontSize = 16;
+hs1.Axes.YAxis.FontSize = 16;
+warning('on', 'MATLAB:structOnObject')
+
+% Adjust the heatmap to be square
+originalUnits = h1.Units;
+h1.Units = 'centimeters';
+sz1 = size(h1.ColorData);
+h1.Position(3:4) = min(h1.Position(3:4)) * [1, 1];
+if sz1(1) > sz1(2)
+    h1.Position(3) = h1.Position(3) * (sz1(2) / sz1(1));
+else
+    h1.Position(4) = h1.Position(4) * (sz1(1) / sz1(2));
+end
+h1.Units = originalUnits;
+
+% Plot the second heatmap
+nexttile;
+h2 = heatmap(En2);
+h2.Title = 'Heatmap of E2';
+h2.NodeChildren(3).YDir = 'normal';
+h2.CellLabelColor = 'none';
+h2.GridVisible = 'off';
+h2.FontSize = 16;
+h2.FontName = 'Helvetica';
+h2.ColorLimits = [minValue, maxValue];
+% Relabel the axes to start at 0
+h2.XDisplayLabels = num2cell(0:(size(E2, 2) - 1));
+h2.YDisplayLabels = num2cell(0:(size(E2, 1) - 1));
+
+% Suppress the warning temporarily
+warning('off', 'MATLAB:structOnObject')
+hs2 = struct(h2);
+hs2.Colorbar.TickLength = 0;
+hs2.Axes.Title.FontWeight = 'normal';
+hs2.Axes.Title.FontSize = 20;
+hs2.Axes.XAxis.FontSize = 16;
+hs2.Axes.YAxis.FontSize = 16;
+warning('on', 'MATLAB:structOnObject')
+
+% Adjust the second heatmap to be square
+originalUnits = h2.Units;
+h2.Units = 'centimeters';
+sz2 = size(h2.ColorData);
+h2.Position(3:4) = min(h2.Position(3:4)) * [1, 1];
+if sz2(1) > sz2(2)
+    h2.Position(3) = h2.Position(3) * (sz2(2) / sz2(1));
+else
+    h2.Position(4) = h2.Position(4) * (sz2(1) / sz2(2));
+end
+h2.Units = originalUnits;
+
+% Apply the custom colormap to both heatmaps
+colormap(bluepurplePalette_rgb);
+
+% Add a centralized xlabel for the entire layout
+xlabel(t, 'Worker type', 'FontSize', 16, 'FontName', 'Helvetica');
+
+% Print the figure
+print('-dpdf', 'sideBySideHeatmaps.pdf');
 
 
+% Get masses of firm in every level a
