@@ -25,8 +25,8 @@ astay=1-aup-adown;
 a_trans=create_trans(adown,astay,aup,ats);
 
 %Q transition
-qup=0.06;
-qdown=0.05;
+qup=0.3;
+qdown=0.25;
 qstay=1-qup-qdown;
 q_trans=create_trans(qdown,qstay,qup,tpts);
 

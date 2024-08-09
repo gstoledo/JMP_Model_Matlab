@@ -68,15 +68,16 @@ type=[typemin:(typemax-typemin)/(tpts-1):typemax]; %Types
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+
+% Define a tiled layout with 3 rows and 2 columns
 % Distribution of firms by type a 
 e_a=zeros(1,ats);
-i=1;
 for i=1:ats
     e_a(i)=eplus_edist(1,i) + sum(eplus_mdist(i,:),'all') + sum(eplus_ndist(i,:),'all')+ sum(eplus_tdist(i,:,:),'all');
 end 
 
 %PLot e_a 
-figure;
 bar(e_a, 'FaceColor', [0, 0.4470, 0.7410]); % MATLAB default blue
 % Customize appearance
 ax = gca;
@@ -97,13 +98,11 @@ exportgraphics(gcf, 'Figures_dist_uni/figures_dist_a.png', 'Resolution', 300);
 
 % Distribution of talen in manager positions
 e_m=zeros(1,tpts);
-i=1;
 for i=1:tpts
     e_m(i)=sum(eplus_mdist(:,i),'all') + sum(eplus_tdist(:,i,:),'all');
 end
 
 %PLot e_m
-figure
 bar(e_m, 'FaceColor', [0.8500, 0.3250, 0.0980]); % MATLAB default orange
 % Customize appearance
 ax = gca;
@@ -124,13 +123,11 @@ exportgraphics(gcf, 'Figures_dist_uni/figures_dist_m.png', 'Resolution', 300);
 
 % Distribution of talent in non-manager positions
 e_n=zeros(1,tpts);
-
 for i=1:tpts
     e_n(i)=sum(eplus_ndist(:,i),'all') + sum(eplus_tdist(:,:,i),'all');
 end
 
 %PLot e_n
-figure
 bar(e_n, 'FaceColor', [0.9290, 0.6940, 0.1250]); % MATLAB default yellow
 % Customize appearance
 ax = gca;
@@ -183,7 +180,6 @@ typebirth=zeros(1,tpts);
 for i=1:mnew_high
     typebirth(i)= mnew*exp(-type(i)*mnew)./sum(mnew*exp(-type(1:mnew_high)*mnew)); %Birth rate
 end
-figure
 bar(typebirth,'FaceColor', [0.4940, 0.1840, 0.5560]); % MATLAB default purple
 % Customize appearance
 ax = gca;

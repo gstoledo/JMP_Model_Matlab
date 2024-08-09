@@ -6,7 +6,7 @@ cd('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmai
 addpath('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/JMP_Model_Matlab')
 addpath('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/Python_Firm Structure/replication_HLMP/matlab/run_A4_revisit')
 % load('model_solutions.mat')
-load('model_solutions_sp4hpc.mat')
+load('model_solutions_sp1hpc.mat')
 load('xmin_results_combined.mat')
 
 
@@ -372,79 +372,22 @@ E2=E(:,:,2);
 % % Print the figure
 % print('-dpdf', 'sideBySideHeatmaps.pdf');
 
-%% Combining all heatmaps in a loop 
-%GIven a total matrix E with dimensions (tpts+1,tpts+1,ats) run for all possible ats  
-% show the colorbar only for the last one
-% Total min and max values for all heatmaps
-% Normalize the matrix E and calculate min and max values
-En = zeros(tpts+1, tpts+1, ats);
-for a = 1:ats
-    s = sum(E(:,:,a), 'all');
-    En(:,:,a) = E(:,:,a) / s;
+
+heatmap_combined(E,1,bluepurplePalette_rgb, ats,tpts, 'Firm Distribution Conditional on a' , 'Worker type', 'Manager type', 'Figures_heatmaps/dist_cond_a.pdf');
+
+
+%% Same can be dine with the value functions
+V=zeros(tpts+1,tpts+1,ats);
+
+for a=1:ats
+    V(1,1,a)=Ve(1,a);
+    for z=2:tpts+1
+        for q=2:tpts+1
+            V(z,1,a)=Vm(a,z-1);
+            V(1,q,a)=Vn(a,q-1);
+            V(z,q,a)=Vt(a,z-1,q-1);
+        end
+    end
 end
 
-minValue = min(En(:));
-maxValue = max(En(:));
-
-% Determine number of rows and columns for the layout
-numCols = min(ats, 3); % Max 3 columns per row
-numRows = ceil(ats / numCols);
-
-% Create a tiled layout for better control over the layout
-t = tiledlayout(numRows, numCols, 'TileSpacing', 'Compact', 'Padding', 'Compact');
-
-for a = 1:ats
-    nexttile;
-    h1 = heatmap(En(:,:,a));
-    h1.Title = 'a=' + string(a);
-    h1.XLabel = 'Worker type';
-    h1.YLabel = 'Manager type';
-    h1.NodeChildren(3).YDir = 'normal';
-    h1.CellLabelColor = 'none';
-    h1.GridVisible = 'off';
-    h1.FontSize = 16;
-    h1.FontName = 'Helvetica';
-    h1.ColorLimits = [minValue, maxValue];
-    
-    if a < ats
-        h1.ColorbarVisible = 'off';
-    end
-    
-    % Relabel the axes to start at 0
-    h1.XDisplayLabels = num2cell(0:(size(En(:,:,a), 2) - 1));
-    h1.YDisplayLabels = num2cell(0:(size(En(:,:,a), 1) - 1));
-    
-    % Suppress the warning temporarily
-    warning('off', 'MATLAB:structOnObject')
-    hs1 = struct(h1);
-    hs1.Axes.Title.FontWeight = 'normal';
-    hs1.Axes.Title.FontSize = 12;
-    hs1.Axes.XAxis.FontSize = 12;
-    hs1.Axes.YAxis.FontSize = 12;
-    warning('on', 'MATLAB:structOnObject')
-    
-    % Adjust the heatmap to be square
-    originalUnits = h1.Units;
-    h1.Units = 'centimeters';
-    sz1 = size(h1.ColorData);
-    h1.Position(3:4) = min(h1.Position(3:4)) * [1, 1];
-    if sz1(1) > sz1(2)
-        h1.Position(3) = h1.Position(3) * (sz1(2) / sz1(1));
-    else
-        h1.Position(4) = h1.Position(4) * (sz1(1) / sz1(2));
-    end
-    h1.Units = originalUnits;
-    colormap(bluepurplePalette_rgb);
-end
-% Add a title to the entire tiled layout
-title(t, 'Firm Distribution Conditional on a','FontSize', 20, 'FontName', 'Helvetica');
-% Adjust the figure's PaperPosition property for printing
-fig = gcf;
-fig.PaperPositionMode = 'auto';
-fig.PaperUnits = 'centimeters';
-fig.PaperPosition = [0 0 30 20]; % Adjust these values as needed for better fit
-
-% Save the figure to a PDF file using the -bestfit option
-print(fig, 'sideBySideHeatmaps_All.pdf', '-dpdf', '-bestfit');
-
-
+heatmap_combined(V,0,bluePalette_rgb, ats,tpts, 'Value Functions Conditional on a' , 'Worker type', 'Manager type', 'Figures_heatmaps/VFs_cond_a.pdf');
