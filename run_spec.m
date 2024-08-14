@@ -16,9 +16,8 @@ load('xmin_results_combined.mat')
 x=xmin;
 
 
-
-lamu                    =x(1);
-% lamu=0.1;
+% lamu                    =x(1);
+lamu=0.1;
 lam                    =x(2);
 % lam=0.1;
 fcomp                   =x(3); %Complementarity in F
@@ -50,8 +49,8 @@ if location=="hpc"
     ats=5;
 end
 spts =tpts+2           ; %state S for updating -- {u,0,{j}} -- dimension of that space is type+2
-cost_p=0                   ; %cost of promoting a non manager to manager
-cost_d=0                   ; %cost of demoting a manager to non manager
+cost_p=0.1                   ; %cost of promoting a non manager to manager
+cost_d=0.1                   ; %cost of demoting a manager to non manager
 alpha_m=1              ; %Manager returns
 alpha_n=0.1              ; %Non manager returns
 
@@ -124,6 +123,8 @@ speed=1;
 
 
 % %Specification 0
+
+
 % run run_sp0.m
 
 % %Specification 1
@@ -135,7 +136,12 @@ speed=1;
 %Specification 3
 run run_sp3.m
 
-
 %Specification 4
 run run_sp4.m
+
+%Specification 5 - Did not converge
+% run run_sp5.m 
+
+%Specification 6
+run run_sp6.m
 

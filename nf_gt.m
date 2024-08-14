@@ -1,5 +1,6 @@
 % Compute all gains from trade from firms with non-managers
 function [gt_meet_u, gt_meet_m, gt_meet_nm, gt_meet_t_m, gt_meet_t_nm, gt_meet_t] = nf_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,true,cost_p)
+    tol=1e-8;
     %Gains from trade from meeting unemployed
     gt_meet_u = zeros(tpts,ats,tpts);
     % Compute gt_meet_u
@@ -8,7 +9,7 @@ function [gt_meet_u, gt_meet_m, gt_meet_nm, gt_meet_t_m, gt_meet_t_nm, gt_meet_t
         for q = 1:tpts
             for z_tilda = 1:tpts
                 nu= [Vnh(a,z_tilda)+Uh(q), Vth(a,q,z_tilda)-cost_p ,Vth(a,z_tilda,q)];
-                gt_meet_u(z_tilda,a,q) = max(max(nu) - Vnh(a,q)   -Uh(z_tilda),0);
+                gt_meet_u(z_tilda,a,q) = max(max(nu) - Vnh(a,q)   -Uh(z_tilda),tol);
             end
         end
     end
@@ -22,7 +23,7 @@ function [gt_meet_u, gt_meet_m, gt_meet_nm, gt_meet_t_m, gt_meet_t_nm, gt_meet_t
             for z_tilda = 1:tpts
                 for a_tilda = 1:ats
                     nu=[Vnh(a,z_tilda)+Uh(q), Vth(a,q,z_tilda)-cost_p ,Vth(a,z_tilda,q)];
-                    gt_meet_m(a_tilda,z_tilda,a,q) = max(max(nu) - Vnh(a,q) - Vmh(a_tilda,z_tilda) + Veh(a_tilda), 0);
+                    gt_meet_m(a_tilda,z_tilda,a,q) = max(max(nu) - Vnh(a,q) - Vmh(a_tilda,z_tilda) + Veh(a_tilda), tol);
                 end
             end
         end
@@ -41,7 +42,7 @@ function [gt_meet_u, gt_meet_m, gt_meet_nm, gt_meet_t_m, gt_meet_t_nm, gt_meet_t
             for z_tilda = 1:tpts
                 for a_tilda = 1:ats
                     nu=[Vnhp(a,z_tilda)+Uh(q),Vthpm(a,z_tilda,q),Vthpn(a,q,z_tilda)-cost_p];
-                    gt_meet_nm(a_tilda,z_tilda,a,q) = max(max(nu) - Vnh(a,q) - Vnh(a_tilda,z_tilda) + Veh(a_tilda), 0);
+                    gt_meet_nm(a_tilda,z_tilda,a,q) = max(max(nu) - Vnh(a,q) - Vnh(a_tilda,z_tilda) + Veh(a_tilda), tol);
                 end
             end
         end
@@ -58,7 +59,7 @@ function [gt_meet_u, gt_meet_m, gt_meet_nm, gt_meet_t_m, gt_meet_t_nm, gt_meet_t
                 for z_tilda = 1:tpts
                     for a_tilda = 1:ats
                         nu=[Vnh(a,z_tilda)+Uh(q),Vth(a,q,z_tilda)-cost_p,Vth(a,z_tilda,q)];
-                        gt_meet_t_m(a_tilda,z_tilda,q_tilda,a,q) = max(max(nu) - Vnh(a,q) - Vth(a_tilda,z_tilda,q_tilda) + Vnh(a_tilda,q_tilda), 0);
+                        gt_meet_t_m(a_tilda,z_tilda,q_tilda,a,q) = max(max(nu) - Vnh(a,q) - Vth(a_tilda,z_tilda,q_tilda) + Vnh(a_tilda,q_tilda), tol);
                     end
                 end
             end
@@ -74,7 +75,7 @@ function [gt_meet_u, gt_meet_m, gt_meet_nm, gt_meet_t_m, gt_meet_t_nm, gt_meet_t
                 for z_tilda = 1:tpts
                     for a_tilda = 1:ats
                         nu=[Vnhp(a,z_tilda)+Uh(q),Vthpn(a,q,z_tilda)-cost_p,Vthpm(a,z_tilda,q)];
-                        gt_meet_t_nm(a_tilda,z_tilda,q_tilda,a,q) = max(max(nu) - Vnh(a,q) - Vth(a_tilda,z_tilda,q_tilda) + Vmh(a_tilda,z_tilda), 0);
+                        gt_meet_t_nm(a_tilda,z_tilda,q_tilda,a,q) = max(max(nu) - Vnh(a,q) - Vth(a_tilda,z_tilda,q_tilda) + Vmh(a_tilda,z_tilda), tol);
                     end
                 end
             end

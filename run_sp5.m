@@ -1,10 +1,8 @@
 
 %% Specification 5
-% CES productuion function, with firm with managers producing as if with the lowet type q 
-% % and firm with no managers  do not produce 
-%Turn off all shocks 
+% Simmetrical case
 
-alpha_m=0.7;
+alpha_m=0.5;
 fteam=zeros(ats,tpts,tpts);
 fman=zeros(ats,tpts);
 fnman=zeros(ats,tpts);
@@ -15,20 +13,19 @@ for a=1:ats
             fteam(a,z,q)=A*a_type(a)*((alpha_m*type(z)^fcomp + (1-alpha_m)*type(q)^fcomp))^(1/fcomp);
         end
         fman(a,z)=A*a_type(a)*(alpha_m*type(z)^fcomp+ (1-alpha_m)*type(1)^fcomp)^(1/fcomp);
-        fnman(a,z)=0;
+        fnman(a,z)=A*a_type(a)*(alpha_m*type(1)^fcomp+ (1-alpha_m)*type(z)^fcomp)^(1/fcomp);
     end
     fe(a)=0;
 end
-
 %A transition
 aup=0.1;
-adown=0.1;
+adown=0.3;
 astay=1-aup-adown;
 a_trans=create_trans(adown,astay,aup,ats);
 
 %Q transition
-qup=0;
-qdown=0;
+qup=0.3;
+qdown=0.25;
 qstay=1-qup-qdown;
 q_trans=create_trans(qdown,qstay,qup,tpts);
 

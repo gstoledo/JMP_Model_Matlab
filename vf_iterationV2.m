@@ -278,17 +278,17 @@ function [Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl,Vttl,Utl] = vf
         %diff=max([max(abs(V0 - V0up)),max(max(abs(V1 - V1up))),max(max(abs(V2 - V2up))),max(abs(U-Uup))]);
         diff=max([max(abs(Ve-Veup)), max(abs(Vm-Vmup),[],[1 2]), max(abs(Vn-Vnup),[],[1 2]), max(abs(Vt-Vtup),[],[1 2 3]), max(abs(U-Uup))]);  
     
-        % %Print every 50 iterations the difference and some text
-        % if mod(it,100)==0
-        %     fprintf('Iteration %d, error %f \n', it, diff)
-        % end
+        %Print every 50 iterations the difference and some text
+        if mod(it,100)==0
+            fprintf('Iteration %d, error %f \n', it, diff)
+        end
         %In red failed to converge
         if it==itmax
             fprintf(2,'Failed to converge\n')
         end
-        % if diff<diffmax
-        %     cprintf('green','Converged in %d iterations\n',it)
-        % end
+        if diff<diffmax
+            cprintf('green','Converged in %d iterations\n',it)
+        end
     end
     end 
     
