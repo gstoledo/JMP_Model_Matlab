@@ -5,7 +5,8 @@
 %Lets for now import some valeus from HLMP code
 clear all
 close all
-cd('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/Python_Firm Structure/replication_HLMP/matlab/run_A4_revisit')
+cd('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/JMP_Model_Matlab')
+addpath('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/JMP_Model_Matlab')
 addpath('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/Python_Firm Structure/replication_HLMP/matlab/run_A4_revisit')
 %load('xmin_results_combined')
 load('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/Python_Firm Structure/replication_HLMP/matlab/run_A4_revisit/xmin_results_combined.mat')
@@ -16,7 +17,7 @@ x=xmin;
 lamu                    =x(1);
 % lamu=0.1;
 lam                    =x(2);
-% lam=0.1;
+lam=lamu;
 fcomp                   =x(3); %Complementarity in F
 mubar                   =x(4);
 del                     =x(5); %Delta 
@@ -32,18 +33,18 @@ A                       =x(14);
 team_learn_param_down   =0;
 mnew_high               =floor(x(15)); 
 
-
+%% Simplifying to get the mistake
 
 %Fundamentals
 bt   =1/(1.1^(1/12))   ; %beta, discount factor
 death=1/(35*12)        ; %Probability agent dies  
 bpw  =1-bpf            ; %bpw is bargaining power of worker
 nfirm=1                ; %Measure of firms 
-tpts =3                ; %type point space
-ats=2                  ; %Productivity space 
+tpts =5                ; %type point space
+ats=2                ; %Productivity space 
 spts =tpts+2           ; %state S for updating -- {u,0,{j}} -- dimension of that space is type+2
-cost_p=0                   ; %cost of promoting a non manager to manager
-cost_d=0                   ; %cost of demoting a manager to non manager
+cost_p=1                   ; %cost of promoting a non manager to manager
+cost_d=1                   ; %cost of demoting a manager to non manager
 alpha_m=1              ; %Manager returns
 alpha_n=0.1              ; %Non manager returns
 
@@ -86,6 +87,10 @@ end
 
 b=homeprod*fman(1,:) ; %Type home production vector
 
+
+a_trans=1;
+% q_trans=1;
+u_trans=1;
 
 %Transtion matrices (They are not perfect yet just to write it all down)
 %A transition
@@ -144,21 +149,27 @@ n=1; %mass of firms
 % e_udist=1*ones(1,tpts);
 % u=sum(e_udist); %mass of unemployed
 
-% %We have (a)+2(a,z)x(a,z,q) type sof firm
-n_types=ats+2*(ats*tpts)+ats*tpts*tpts;
+% % %We have (a)+2(a,z)x(a,z,q) type sof firm
+% n_types=ats+2*(ats*tpts)+ats*tpts*tpts;
 % %Split n into the n_types
 % e_edist=(n/n_types)*ones(1,ats);
 % e_mdist=(n/n_types)*ones(ats,tpts);
 % e_ndist=(n/n_types)*ones(ats,tpts);
 % e_tdist=(n/n_types)*ones(ats,tpts,tpts);
+
+% %Need to guartee one of popoulation as well
+% temp_u= 1 - sum(e_mdist,"all")+sum(e_ndist,"all")+2*sum(e_tdist,"all");
+% e_udist=(temp_u/tpts)*ones(1,tpts);
 % %Check
 % n0=sum(e_edist)+sum(e_mdist,"all")+sum(e_ndist,"all")+sum(e_tdist,"all");
-
+% %Split into
 % %Population in the model 
 % pop0=sum(e_udist)+sum(e_mdist,"all")+sum(e_ndist,"all")+2*sum(e_tdist,"all");
 
 
-%%%%Alternative, start with all empty firms and mass 1 of unemployed
+
+
+% %%%%Alternative, start with all empty firms and mass 1 of unemployed
 e_udist=(1/tpts)*ones(1,tpts);
 e_edist=(n/ats)*ones(1,ats);
 e_mdist=zeros(ats,tpts); %Distribution of firms with manager e_m(a,z)
@@ -215,6 +226,7 @@ pop0=sum(e_udist)+sum(e_mdist,"all")+sum(e_ndist,"all")+2*sum(e_tdist,"all");
 % U=Uh;
 
 
+
 %Inital guesses for value functions
 Veini=zeros(1,ats);
 Vmini=fman/(1-bt);
@@ -246,14 +258,14 @@ Uh=U;
 =reallocation_policies(Ve,Vm,Vn,Vt,U,ats,tpts,cost_d,cost_p);
 
 
+
 speed_dist=1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Distributions and LOMs 
 
 % Distributions after the SM (implied by hiring and allocation policies)   
 % e1 distributions
-[e1_udist,e1_edist, e1_mdist, e1_ndist,e1_tdist]=e1_distV3(Veh,Vmh,Vnh,U,Vth,ats,tpts,cost_d,cost_p,e_udist,e_edist,e_mdist,e_ndist,e_tdist,lamu,lam,n,del);
-
+[e1_udist,e1_edist, e1_mdist, e1_ndist,e1_tdist] =e1_distV3(Veh,Vmh,Vnh,U,Vth,ats,tpts,cost_d,cost_p,e_udist,e_edist,e_mdist,e_ndist,e_tdist,lamu,lam,n,del);
 %It is not really getting to one...
 n1=sum(e1_edist)+sum(e1_mdist,"all")+sum(e1_ndist,"all")+sum(e1_tdist,"all"); % We are probabily missing a flow somewhere, that we will check later 
 pop1=sum(e1_udist)+sum(e1_mdist,"all")+sum(e1_ndist,"all")+2*sum(e1_tdist,"all");
@@ -330,15 +342,25 @@ pop0=sum(eini_udist)+sum(eini_mdist,"all")+sum(eini_ndist,"all")+2*sum(eini_tdis
 
 
 joint_it=0;
-[e_udist, e_edist, e_mdist, e_ndist, e_tdist]=lom_iteration(eini_udist,eini_edist,eini_mdist,eini_ndist,eini_tdist,ats,tpts,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,true,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,joint_it);
+[e_udist, e_edist, e_mdist, e_ndist, e_tdist,store_n,store_p]=lom_iteration(eini_udist,eini_edist,eini_mdist,eini_ndist,eini_tdist,ats,tpts,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,true,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,joint_it);
 % %Need to fix the e1
 % %Check sum
+%Plot store_n and store_pop
+figure 
+plot(store_n)
+title('Mass of Firms')
+
+figure
+plot(store_p)
+title('Population')
+
 
 n_post=sum(e_edist)+sum(e_mdist,"all")+sum(e_ndist,"all")+sum(e_tdist,"all");   
 pop_post=sum(e_udist)+sum(e_mdist,"all")+sum(e_ndist,"all")+2*sum(e_tdist,"all");
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Joint Loop
 % Lets try the joint loop
 %Initial guesses for the LOM
 %Alternative, start with all empty firms and mass 1 of unemployed
@@ -363,8 +385,8 @@ Uini=b/(1-bt);
 [Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl, Vttl, Utl]= vf_iterationV2(eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist,eplus_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,true,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed);
 
 
-update_speed_v=1;
-update_speed=1;
+update_speed_v=0.3;
+update_speed=0.3;
 
 diff_joint_lag1=0;
 diff_joint_lag2=0;
@@ -377,6 +399,19 @@ it_joint      =0;
 it_joint_min  =250;
 it_joint_max  =2000;
 
+store_n_outer=zeros(1,it_joint_min);
+store_pop_outer=zeros(1,it_joint_min);
+store_e_outer=zeros(1,it_joint_min);
+store_u_outer=zeros(1,it_joint_min);
+store_m_outer=zeros(1,it_joint_min);
+store_nm_outer=zeros(1,it_joint_min);
+store_t_outer=zeros(1,it_joint_min);
+
+
+figure 
+plot(store_n);
+title('Mass of Firms');
+hold on;
 %Start timer
 tic;
 while (diff_joint>diff_joint_max | diff_joint_lag1>diff_joint_max  | diff_joint_lag2>diff_joint_max | it_joint<it_joint_min ) &&  it_joint<it_joint_max
@@ -397,7 +432,7 @@ while (diff_joint>diff_joint_max | diff_joint_lag1>diff_joint_max  | diff_joint_
     end
 
     %Value function iteration
-    [Veplus, Vmplus, Vnplus, Vtplus, Uplus, Vehplus, Vmhplus, Vnhplus, Vthplus, Vetlplus, Vmtlplus, Vntlplus, Vttlplus, Utlplus] = vf_iterationV2(e_edist,e_mdist,e_ndist,e_tdist,e_udist,Ve,Vm,Vn,Vt,U,ats,tpts,cost_d,cost_p,true,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed);
+    [Veplus, Vmplus, Vnplus, Vtplus, Uplus, Vehplus, Vmhplus, Vnhplus, Vthplus, Vetlplus, Vmtlplus, Vntlplus, Vttlplus, Utlplus] = vf_iterationV2(e_edist,e_mdist,e_ndist,e_tdist,e_udist,Ve,Vm,Vn,Vt,U,ats,tpts,cost_d,cost_p,true,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,update_speed_v);
     %Update the values
     Ve=(1-update_speed_v)*Ve+update_speed_v*Veplus;
     Vm=(1-update_speed_v)*Vm+update_speed_v*Vmplus;
@@ -419,7 +454,17 @@ while (diff_joint>diff_joint_max | diff_joint_lag1>diff_joint_max  | diff_joint_
     eouter_tdist=e_tdist;
 
     %Iterate on masses of workers
-    [eplus_udist,eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist]=lom_iteration(e_udist,e_edist,e_mdist,e_ndist,e_tdist,ats,tpts,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,true,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,it_joint);
+    [eplus_udist,eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist,store_n,store_p]=lom_iteration(e_udist,e_edist,e_mdist,e_ndist,e_tdist,ats,tpts,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,true,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,it_joint);
+    nplus=sum(eplus_edist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+sum(eplus_tdist,"all");
+    popplus=sum(eplus_udist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+2*sum(eplus_tdist,"all");
+    store_n_outer(it_joint)=nplus;
+    store_pop_outer(it_joint)=popplus;
+    store_e_outer(it_joint)=sum(eplus_edist);
+    store_u_outer(it_joint)=sum(eplus_udist);
+    store_m_outer(it_joint)=sum(eplus_mdist,"all");
+    store_nm_outer(it_joint)=sum(eplus_ndist,"all");
+    store_t_outer(it_joint)=sum(eplus_tdist,"all");
+
 
     %Compare Outer and Inner
     diff_joint_store=max([max(abs(eplus_udist-eouter_udist)),max(abs(eplus_edist-eouter_edist)),max(abs(eplus_mdist-eouter_mdist),[],[1 2]),max(abs(eplus_ndist-eouter_ndist),[],[1 2]),max(abs(eplus_tdist-eouter_tdist),[],[1 2 3])]);
@@ -430,6 +475,8 @@ while (diff_joint>diff_joint_max | diff_joint_lag1>diff_joint_max  | diff_joint_
     %Print every 100 iterations
     if mod(it_joint,10)==0
         fprintf('Joint Iteration %d, error %f \n', it_joint, diff_joint)
+        plot(store_n, 'DisplayName', ['Iteration ' num2str(it_joint)]);
+        drawnow;
     end
     if it_joint==it_joint_max
         fprintf(2,'Joint Failed to converge\n')
@@ -437,12 +484,67 @@ while (diff_joint>diff_joint_max | diff_joint_lag1>diff_joint_max  | diff_joint_
     if diff_joint<diff_joint_max
         cprintf('green','Joint Converged in %d iterations\n',it_joint)
     end
-
+    % if it_joint==46
+    %     break
+    % end
 end
 %End timer
 toc
+
+
+
 
 %Check sum of the eplus final distributions
 nplus=sum(eplus_edist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+sum(eplus_tdist,"all");
 popplus=sum(eplus_udist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+2*sum(eplus_tdist,"all");
 
+
+%Plot store_n and store_pop
+% figure
+% plot(store_n_outer)
+% title('Mass of Firms')
+
+% figure
+% plot(store_pop_outer)
+% title('Population')
+
+%Plot together
+figure
+plot(store_n_outer)
+hold on
+plot(store_pop_outer)
+title('Mass of Firms and Population')
+xlabel('Iterations')
+legend('Mass of Firms','Population')
+
+%Plot all together
+figure
+plot(store_e_outer)
+hold on
+% plot(store_pop_outer)
+% plot(store_e_outer)
+plot(store_u_outer)
+plot(store_m_outer)
+plot(store_nm_outer)
+plot(store_t_outer)
+title('Mass of Firms and Population')
+xlabel('Iterations')
+legend('Empty Firms','Unemployed','Managers','Non Managers','Teams')
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Policy functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Hiring policies, looking at origins not allocations yet 
+[h_e_u, h_e_m, h_e_nm, h_e_t_m, h_e_t_nm, h_m_u, h_m_m, h_m_nm, h_m_t_m, h_m_t_nm, h_nm_u, h_nm_m, h_nm_nm, h_nm_t_m, h_nm_t_nm, h_t_u, h_t_m, h_t_nm, h_t_t_m, h_t_t_nm]...
+=hire_policies(Vmh,Vnh,Veh,U,Vth,ats,tpts,true,cost_d,cost_p);
+
+% Allocation Policies after hiring at SM
+[p_e_m, p_e_n, p_m_m_u, p_m_m_d, p_m_n, p_n_n_u, p_n_n_p, p_n_m, p_t_m_u, p_t_m_d, p_t_n_u, p_t_n_p]...
+=alloc_policies(Vmh,Vnh,U,Vth,ats,tpts,cost_d,cost_p);
+
+%Reallocation Policies, before producing (using Vs not Vh)
+% Notation here follows the paper, a bit wierd with previous notation in the code
+[d_m, r_m, d_n, r_n, d_t_m, d_t_n, r_t_m, r_t_n, d_t_b]...
+=reallocation_policies(Ve,Vm,Vn,Vt,U,ats,tpts,cost_d,cost_p);

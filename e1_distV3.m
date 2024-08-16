@@ -31,10 +31,10 @@ function [e1_udist,e1_edist,e1_mdist,e1_ndist,e1_tdist]=e1_distV3(Veh,Vmh,Vnh,Uh
                 store_u(z_tilda)= e_udist(z_tilda)*h_m_u(z_tilda,a,z)*p_m_m_u(a,z,z_tilda);
                 for a_tilda=1:ats
                     %From firm with manager
-                    store_m(a_tilda,z_tilda)=e_mdist(a_tilda,z_tilda)*h_m_m(a_tilda,z_tilda,a,z)*p_m_m_u(a,z,z_tilda);
+                    store_m(a_tilda,z_tilda)=e_mdist(a_tilda,z_tilda)*h_m_m(a_tilda,z_tilda,a,z)*p_m_m_u(a,z,z_tilda);                        
+                    %From firm with no manager
+                    store_n(a_tilda,z_tilda)=e_ndist(a_tilda,z_tilda)*h_m_nm(a_tilda,z_tilda,a,z)*p_m_m_u(a,z,z_tilda);
                     for q_tilda=1:tpts
-                        %From firm with no manager
-                        store_n(a_tilda,q_tilda)=e_ndist(a_tilda,q_tilda)*h_m_nm(a_tilda,q_tilda,a,z)*p_m_m_u(a,z,q_tilda);
                         %From team
                         store_t(a_tilda,z_tilda,q_tilda)=e_tdist(a_tilda,z_tilda,q_tilda)*(h_m_t_m(a_tilda,z_tilda,q_tilda,a,z)*p_m_m_u(a,z,z_tilda)+h_m_t_nm(a_tilda,z_tilda,q_tilda,a,z)*p_m_m_u(a,z,q_tilda));
                     end    
@@ -48,10 +48,7 @@ function [e1_udist,e1_edist,e1_mdist,e1_ndist,e1_tdist]=e1_distV3(Veh,Vmh,Vnh,Uh
             store_m_a(a)=e_mdist(a,z)*(del +m_RH_u+ m_RH_m + m_RH_n + m_RH_t);
         end
     
-    
-                    
-                    
-                    
+       
                     
         %Firm with team (a,z,q) replaces z with hires
         store_tm_aq=zeros(ats,tpts);
@@ -66,10 +63,9 @@ function [e1_udist,e1_edist,e1_mdist,e1_ndist,e1_tdist]=e1_distV3(Veh,Vmh,Vnh,Uh
                     store_u(z_tilda)= e_udist(z_tilda)*h_t_u(z_tilda,a,z,q)*(p_t_m_u(a,z,q,z_tilda)+p_t_n_p(a,z,q,z_tilda));
                     for a_tilda=1:ats
                         %From firm with manager
-                        store_m(a_tilda,z_tilda)=e_mdist(a_tilda,z_tilda)*h_t_m(a_tilda,z_tilda,a,z,q)*(p_t_m_u(a,z,q,z_tilda)+p_t_n_p(a,z,q,z_tilda));
+                        store_m(a_tilda,z_tilda)=e_mdist(a_tilda,z_tilda)*h_t_m(a_tilda,z_tilda,a,z,q)*(p_t_m_u(a,z,q,z_tilda)+p_t_n_p(a,z,q,z_tilda));                            %From firm with no manager
+                        store_n(a_tilda,z_tilda)=e_ndist(a_tilda,z_tilda)*h_t_nm(a_tilda,z_tilda,a,z,q)*(p_t_m_u(a,z,q,z_tilda)+p_t_n_p(a,z,q,z_tilda));
                         for q_tilda=1:tpts
-                            %From firm with no manager
-                            store_n(a_tilda,q_tilda)=e_ndist(a_tilda,q_tilda)*h_t_nm(a_tilda,q_tilda,a,z,q)*(p_t_m_u(a,z,q,z_tilda)+p_t_n_p(a,z,q,z_tilda));
                             %From team
                             store_t(a_tilda,z_tilda,q_tilda)=e_tdist(a_tilda,z_tilda,q_tilda)*(h_t_t_m(a_tilda,z_tilda,q_tilda,a,z,q)*(p_t_m_u(a,z,q,z_tilda)+p_t_n_p(a,z,q,z_tilda))+h_t_t_nm(a_tilda,z_tilda,q_tilda,a,z,q)*(p_t_m_u(a,z,q,q_tilda)+p_t_n_p(a,z,q,q_tilda)));
                         end
@@ -133,10 +129,10 @@ function [e1_udist,e1_edist,e1_mdist,e1_ndist,e1_tdist]=e1_distV3(Veh,Vmh,Vnh,Uh
                     store_u(z_tilda)= e_udist(z_tilda)*h_t_u(z_tilda,a,q,z)*(p_t_n_u(a,q,z,z_tilda)+p_t_m_d(a,q,z,z_tilda));
                     for a_tilda=1:ats
                         %From firm with manager
-                        store_m(a_tilda,z_tilda)=e_mdist(a_tilda,z_tilda)*h_t_m(a_tilda,z_tilda,a,q,z)*(p_t_n_u(a,q,z,z_tilda)+p_t_m_d(a,q,z,z_tilda));
+                        store_m(a_tilda,z_tilda)=e_mdist(a_tilda,z_tilda)*h_t_m(a_tilda,z_tilda,a,q,z)*(p_t_n_u(a,q,z,z_tilda)+p_t_m_d(a,q,z,z_tilda));                            
+                        %From firm with no manager
+                        store_n(a_tilda,z_tilda)=e_ndist(a_tilda,z_tilda)*h_t_nm(a_tilda,z_tilda,a,q,z)*(p_t_n_u(a,q,z,z_tilda)+p_t_m_d(a,q,z,z_tilda));
                         for q_tilda=1:tpts
-                            %From firm with no manager
-                            store_n(a_tilda,q_tilda)=e_ndist(a_tilda,q_tilda)*h_t_nm(a_tilda,q_tilda,a,q,z)*(p_t_n_u(a,q,z,q_tilda)+p_t_m_d(a,q,z,q_tilda));
                             %From team
                             store_t(a_tilda,z_tilda,q_tilda)=e_tdist(a_tilda,z_tilda,q_tilda)*(h_t_t_m(a_tilda,z_tilda,q_tilda,a,q,z)*(p_t_n_u(a,q,z,z_tilda)+p_t_m_d(a,q,z,z_tilda))+h_t_t_nm(a_tilda,z_tilda,q_tilda,a,q,z)*(p_t_n_u(a,q,z,q_tilda)+p_t_m_d(a,q,z,q_tilda)));
                         end
@@ -169,7 +165,7 @@ function [e1_udist,e1_edist,e1_mdist,e1_ndist,e1_tdist]=e1_distV3(Veh,Vmh,Vnh,Uh
                     store_hire_n(a_tilda,z_tilda)=e_ndist(a_tilda,z_tilda)*h_nm_u(z,a_tilda,z_tilda);
                     for q_tilda=1:tpts
                         %Team hires from unemployed
-                        store_hire_team(a_tilda,z_tilda,q_tilda)=e_tdist(a_tilda,z_tilda,q_tilda)*h_t_u(z,a_tilda,q_tilda,z_tilda);
+                        store_hire_team(a_tilda,z_tilda,q_tilda)=e_tdist(a_tilda,z_tilda,q_tilda)*h_t_u(z,a_tilda,z_tilda,q_tilda);
                     end
                 end
             end
@@ -196,10 +192,10 @@ function [e1_udist,e1_edist,e1_mdist,e1_ndist,e1_tdist]=e1_distV3(Veh,Vmh,Vnh,Uh
             store_u(z_tilda)= e_udist(z_tilda)*h_e_u(z_tilda,a);
             for a_tilda=1:ats
                 %From firm with manager
-                store_m(a_tilda,z_tilda)=e_mdist(a_tilda,z_tilda)*h_e_m(a_tilda,z_tilda,a);
+                store_m(a_tilda,z_tilda)=e_mdist(a_tilda,z_tilda)*h_e_m(a_tilda,z_tilda,a);                    
+                %From firm with no manager
+                store_n(a_tilda,z_tilda)=e_ndist(a_tilda,z_tilda)*h_e_nm(a_tilda,z_tilda,a);
                 for q_tilda=1:tpts
-                    %From firm with no manager
-                    store_n(a_tilda,q_tilda)=e_ndist(a_tilda,q_tilda)*h_e_nm(a_tilda,q_tilda,a);
                     %From team
                     store_t(a_tilda,z_tilda,q_tilda)=e_tdist(a_tilda,z_tilda,q_tilda)*(h_e_t_m(a_tilda,z_tilda,q_tilda,a)+h_e_t_nm(a_tilda,z_tilda,q_tilda,a));
                 end    
@@ -282,10 +278,10 @@ function [e1_udist,e1_edist,e1_mdist,e1_ndist,e1_tdist]=e1_distV3(Veh,Vmh,Vnh,Uh
                 store_u(z_tilda)= e_udist(z_tilda)*h_m_u(z_tilda,a,z);
                 for a_tilda=1:ats
                     %From firm with manager
-                    store_m(a_tilda,z_tilda)=e_mdist(a_tilda,z_tilda)*h_m_m(a_tilda,z_tilda,a,z);
+                    store_m(a_tilda,z_tilda)=e_mdist(a_tilda,z_tilda)*h_m_m(a_tilda,z_tilda,a,z);                        
+                    %From firm with no manager
+                    store_n(a_tilda,z_tilda)=e_ndist(a_tilda,z_tilda)*h_m_nm(a_tilda,z_tilda,a,z);
                     for q_tilda=1:tpts
-                        %From firm with no manager
-                        store_n(a_tilda,q_tilda)=e_ndist(a_tilda,q_tilda)*h_m_nm(a_tilda,q_tilda,a,z);
                         %From team
                         store_t(a_tilda,z_tilda,q_tilda)=e_tdist(a_tilda,z_tilda,q_tilda)*(h_m_t_m(a_tilda,z_tilda,q_tilda,a,z)+h_m_t_nm(a_tilda,z_tilda,q_tilda,a,z));
                     end    
@@ -349,7 +345,7 @@ function [e1_udist,e1_edist,e1_mdist,e1_ndist,e1_tdist]=e1_distV3(Veh,Vmh,Vnh,Uh
             inflow_u=(lamu/n)*(e_edist(a)*h_e_u(z,a)*p_e_m(a,z)+sum(store_ztilda));
             
             
-            
+    
             %InFlows from z's out there ending up in the right firm (ending up in a,z)
             store_atilda_z=zeros(1,ats); % From manager firms (a_tilde,z)
             for a_tilda=1:ats
@@ -386,9 +382,9 @@ function [e1_udist,e1_edist,e1_mdist,e1_ndist,e1_tdist]=e1_distV3(Veh,Vmh,Vnh,Uh
                 for q_tilda=1:tpts
                     store_ztilda=zeros(1,tpts);
                     for z_tilda=1:tpts
-                        store_ztilda(z_tilda)=e_mdist(a,z_tilda)*h_m_t_nm(a_tilda,z,q_tilda,a,z_tilda)*p_m_m_u(a,z_tilda,z);
+                        store_ztilda(z_tilda)=e_mdist(a,z_tilda)*h_m_t_nm(a_tilda,q_tilda,z,a,z_tilda)*p_m_m_u(a,z_tilda,z);
                     end
-                    store_atilda_qtilda_z(a_tilda,q_tilda)=(lam/n)*(e_edist(a)*h_e_t_nm(a_tilda,z,q_tilda,a)*p_e_m(a,z)+sum(store_ztilda));
+                    store_atilda_qtilda_z(a_tilda,q_tilda)=(lam/n)*(e_edist(a)*h_e_t_nm(a_tilda,q_tilda,z,a)*p_e_m(a,z)+sum(store_ztilda));
                 end
             end 
             
@@ -421,10 +417,10 @@ function [e1_udist,e1_edist,e1_mdist,e1_ndist,e1_tdist]=e1_distV3(Veh,Vmh,Vnh,Uh
                 store_u(z_tilda)= e_udist(z_tilda)*h_nm_u(z_tilda,a,q);
                 for a_tilda=1:ats
                     %From firm with manager
-                    store_m(a_tilda,z_tilda)=e_mdist(a_tilda,z_tilda)*h_nm_m(a_tilda,z_tilda,a,q);
+                    store_m(a_tilda,z_tilda)=e_mdist(a_tilda,z_tilda)*h_nm_m(a_tilda,z_tilda,a,q);                        
+                    %From firm with no manager
+                    store_n(a_tilda,z_tilda)=e_ndist(a_tilda,z_tilda)*h_nm_nm(a_tilda,z_tilda,a,q);
                     for q_tilda=1:tpts
-                        %From firm with no manager
-                        store_n(a_tilda,q_tilda)=e_ndist(a_tilda,q_tilda)*h_nm_nm(a_tilda,q_tilda,a,q);
                         %From team
                         store_t(a_tilda,z_tilda,q_tilda)=e_tdist(a_tilda,z_tilda,q_tilda)*(h_nm_t_m(a_tilda,z_tilda,q_tilda,a,q)+h_nm_t_nm(a_tilda,z_tilda,q_tilda,a,q));
                     end    
@@ -539,7 +535,8 @@ function [e1_udist,e1_edist,e1_mdist,e1_ndist,e1_tdist]=e1_distV3(Veh,Vmh,Vnh,Uh
             +sum(reshape(e_tdist(:,:,q),ats,tpts).*store_atilda_ztilda_q,"all");
         end
     end
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% For firms with team (a,z,q)
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % % For firms with team (a,z,q)
     e1_tdist=zeros(ats,tpts,tpts);%Now the most complicated one and the logic is a bit different
     for a=1:ats
         for z=1:tpts
@@ -684,10 +681,10 @@ function [e1_udist,e1_edist,e1_mdist,e1_ndist,e1_tdist]=e1_distV3(Veh,Vmh,Vnh,Uh
                     store_u(z_tilda)= e_udist(z_tilda)*h_t_u(z_tilda,a,z,q);
                     for a_tilda=1:ats
                         %From firm with manager
-                        store_m(a_tilda,z_tilda)=e_mdist(a_tilda,z_tilda)*h_t_m(a_tilda,z_tilda,a,z,q);
+                        store_m(a_tilda,z_tilda)=e_mdist(a_tilda,z_tilda)*h_t_m(a_tilda,z_tilda,a,z,q);                            
+                        %From firm with no manager
+                        store_n(a_tilda,z_tilda)=e_ndist(a_tilda,z_tilda)*h_t_nm(a_tilda,z_tilda,a,z,q);
                         for q_tilda=1:tpts
-                            %From firm with no manager
-                            store_n(a_tilda,q_tilda)=e_ndist(a_tilda,q_tilda)*h_t_nm(a_tilda,q_tilda,a,z,q);
                             %From team
                             store_t(a_tilda,z_tilda,q_tilda)=e_tdist(a_tilda,z_tilda,q_tilda)*(h_t_t_m(a_tilda,z_tilda,q_tilda,a,z,q)+h_t_t_nm(a_tilda,z_tilda,q_tilda,a,z,q));
                         end

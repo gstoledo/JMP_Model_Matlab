@@ -7,6 +7,7 @@ addpath('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt
 addpath('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/Python_Firm Structure/replication_HLMP/matlab/run_A4_revisit')
 % load('model_solutions.mat')
 load('model_solutions_sp3local.mat')
+load('model_solutions_sp3hpc.mat')
 load('xmin_results_combined.mat')
 
 

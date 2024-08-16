@@ -1,5 +1,5 @@
 %LOM interation for SS 
-function [e_udist, e_edist, e_mdist, e_ndist, e_tdist]=lom_iteration(eini_udist,eini_edist,eini_mdist,eini_ndist,eini_tdist,ats,tpts,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,true,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,it_joint)
+function [e_udist, e_edist, e_mdist, e_ndist, e_tdist,store_n,store_p]=lom_iteration(eini_udist,eini_edist,eini_mdist,eini_ndist,eini_tdist,ats,tpts,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,true,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,it_joint)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     %Lets do the iteration of the LOMs
@@ -27,7 +27,7 @@ function [e_udist, e_edist, e_mdist, e_ndist, e_tdist]=lom_iteration(eini_udist,
     else
         min_it=25;
     end
-    
+
     while (diff_dist>diff_dist_max  | it_dist<min_it) && it_dist<it_dist_max
         it_dist=it_dist+1;
         if it_dist==1
@@ -75,9 +75,12 @@ function [e_udist, e_edist, e_mdist, e_ndist, e_tdist]=lom_iteration(eini_udist,
             [eplus_udist,eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist]=eplus_dist(ats,tpts,e3_udist,e3_edist,e3_mdist,e3_ndist,e3_tdist,death,typebirth);
             
             %Check sum
-            sum(eplus_edist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+sum(eplus_tdist,"all"); %This is summing up to one if the fed in dist sums to 1
-            
-            
+            nplus=sum(eplus_edist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+sum(eplus_tdist,"all"); %This is summing up to one if the fed in dist sums to 1
+            popplus=sum(eplus_udist)+ sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+2*sum(eplus_tdist,"all");
+            store_n(it_dist-1)=nplus;
+            store_p(it_dist-1)=popplus;
+
+
             %%Error
             diff_dist=max([max(abs(eplus_udist-e_udist)),max(abs(eplus_edist-e_edist)),max(abs(eplus_mdist-e_mdist),[],[1 2]),max(abs(eplus_ndist-e_ndist),[],[1 2]),max(abs(eplus_tdist-e_tdist),[],[1 2 3])]);
     
@@ -87,7 +90,7 @@ function [e_udist, e_edist, e_mdist, e_ndist, e_tdist]=lom_iteration(eini_udist,
             % end 
             %In red failed to converge
             if it_dist==it_dist_max
-                fprintf(2,'Failed to converge\n')
+                fprintf(2,'LOM Failed to converge\n')
             end
             % if diff_dist<diff_dist_max
             %     cprintf('green','Distributions Converged in %d iterations\n',it_dist)
