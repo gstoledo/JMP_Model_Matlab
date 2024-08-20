@@ -16,8 +16,8 @@ load('xmin_results_combined.mat')
 x=xmin;
 
 
-% lamu                    =x(1);
-lamu=0.1;
+lamu                    =x(1);
+% lamu=0.1;
 lam                    =x(2);
 % lam=0.1;
 fcomp                   =x(3); %Complementarity in F
@@ -49,8 +49,8 @@ if location=="hpc"
     ats=5;
 end
 spts =tpts+2           ; %state S for updating -- {u,0,{j}} -- dimension of that space is type+2
-cost_p=0.1                   ; %cost of promoting a non manager to manager
-cost_d=0.1                   ; %cost of demoting a manager to non manager
+cost_p=1                   ; %cost of promoting a non manager to manager
+cost_d=1                   ; %cost of demoting a manager to non manager
 alpha_m=1              ; %Manager returns
 alpha_n=0.1              ; %Non manager returns
 
@@ -60,7 +60,7 @@ typemin=1; %Lowest type
 typemax=mubar ; %Highest type
 
 amin=1; %Lowest productivity
-amax=2; %Highest productivity
+amax=10; %Highest productivity
 
 type=[typemin:(typemax-typemin)/(tpts-1):typemax]; %Types
 a_type=[amin:(amax-amin)/(ats-1):amax]; %Productivity
@@ -99,14 +99,14 @@ n=1; %mass of firms
 
 %Transtion matrices (They are not perfect yet just to write it all down)
 %A transition
-aup=0.1;
+aup=0.01;
 adown=0.3;
 astay=1-aup-adown;
 a_trans=create_trans(adown,astay,aup,ats);
 
 %Q transition
-qup=0.2;
-qdown=0.1;
+qup=0.02;
+qdown=0.01;
 qstay=1-qup-qdown;
 q_trans=create_trans(qdown,qstay,qup,tpts);
 
@@ -133,15 +133,16 @@ speed=1;
 % %Specification 2
 % run run_sp2.m
 
-%Specification 3
-run run_sp3.m
+% %Specification 3
+% run run_sp3.m
 
-%Specification 4
-run run_sp4.m
+% %Specification 4
+% run run_sp4.m
 
-%Specification 5 - Did not converge
-% run run_sp5.m 
+% Specification 5 
+run run_sp5.m 
 
-%Specification 6
-run run_sp6.m
+% %Specification 6
+% run run_sp6.m
+
 

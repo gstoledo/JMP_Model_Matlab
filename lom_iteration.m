@@ -13,7 +13,7 @@ function [e_udist, e_edist, e_mdist, e_ndist, e_tdist,store_n,store_p]=lom_itera
     
     %Iterate on masses of workers
     diff_dist=1;
-    diff_dist_max=.5e-4;
+    diff_dist_max=1e-4;
     it_dist=0;
      
     %Speed of convergence for distributions

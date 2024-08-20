@@ -13,7 +13,7 @@ function [Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl,Vttl,Utl] = vf
     
     %Iteration parameters
     diff=100;
-    diffmax=.5e-4;
+    diffmax=1e-6;
      
     it=0; 
     itmax=100000;
@@ -266,9 +266,9 @@ function [Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl,Vttl,Utl] = vf
         end
         Vqa_prime=permute(Vq_prime, [3 2 1]);
         
-        Vtup=fteam+ bt*death.^2*repmat(a_trans*Vetl',1,tpts,tpts)+ bt*death*(1-death)*repmat((a_trans*Vmtl),1,1,tpts)...
+        Vtup=fteam+ bt*(death.^2)*repmat(a_trans*Vetl',1,tpts,tpts)+ bt*death*(1-death)*repmat((a_trans*Vmtl),1,1,tpts)...
             + bt*death*(1-death)*permute(repmat((q_trans*(a_trans*Vntl)')',1,1,tpts),[1 3 2])...
-            + bt*(1-death).^2*Vqa_prime;
+            + bt*((1-death).^2)*Vqa_prime;
         
         %Unemployed worker
         Uplus= Uh + death*(-Uh) + (1-death)*Utl;

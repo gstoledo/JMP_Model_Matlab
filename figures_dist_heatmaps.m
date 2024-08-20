@@ -5,8 +5,8 @@ location="local";
 cd('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/JMP_Model_Matlab')
 addpath('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/JMP_Model_Matlab')
 addpath('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/Python_Firm Structure/replication_HLMP/matlab/run_A4_revisit')
-% load('model_solutions.mat')
-load('model_solutions_sp1hpc.mat')
+% load('model_solutions_sp4local.mat')
+load('model_solutions_sp3hpc.mat')
 load('xmin_results_combined.mat')
 
 
@@ -22,12 +22,7 @@ ats=size(Vm,1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Predefine qualitative color palettes
- bluePalette_rgb=[247 251 255; 222 235 247; 198 219 239; 158 202 225; 107 174 214; 66 146 198; 33 113 181;8 81 156; 8 48 107]/255;
- bluetoorange=[16 91 143; 70 114 159; 107 138 175; 141 162 191; 174 188 208; 207 214 224; 241 241 241; 243 222 208; 242 203 176; 240 185 144; 235 167 113; 229 149 82; 222 131 49];
- bluepurplePalette_rgb=[247 252 253; 224 236 244; 191 211 230; 158 188 218; 140 150 198; 140 107 177; 136 65 157; 129 15 124; 77 0 75]/255;
- 
- 
-
+load('color_style.mat'); % Ran in color_style.m
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Using imagesc
  % % Create a figure and axes

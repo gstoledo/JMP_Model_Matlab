@@ -13,11 +13,15 @@ for a=1:ats
         for q=1:tpts
             fteam(a,z,q)=A*a_type(a)*((alpha_m*type(z)^fcomp + (1-alpha_m)*type(q)^fcomp))^(1/fcomp);
         end
-        fman(a,z)=A*a_type(a)*(alpha_m*type(z)^fcomp+ (1-alpha_m)*type(1)^fcomp)^(1/fcomp);
+        fman(a,z)=(1/2)*A*a_type(a)*(alpha_m*type(z)^fcomp+ (1-alpha_m)*type(1)^fcomp)^(1/fcomp);
         fnman(a,z)=0;
     end
     fe(a)=0;
 end
+
+b=homeprod*fman(1,:) ; %Type home production vector
+% b=0.2*b;
+
 
 %A transition
 aup=0.1;
@@ -69,7 +73,7 @@ diff_joint_lag2=0;
 
 %Iterate on value functions and type distribution
 diff_joint    =100;
-diff_joint_max=1e-4; %Value func/distribution max tolerance
+diff_joint_max=1e-8; %Value func/distribution max tolerance
   
 it_joint      =0;
 it_joint_min  =250;
@@ -127,7 +131,7 @@ while (diff_joint>diff_joint_max | diff_joint_lag1>diff_joint_max  | diff_joint_
 
     %Print every 100 iterations
     if mod(it_joint,10)==0
-        fprintf('Joint Iteration %d, error %f \n', it_joint, diff_joint)
+        fprintf('Sp3 Joint Iteration %d, error %f \n', it_joint, diff_joint)
     end
     if it_joint==it_joint_max
         fprintf(2,'Joint Failed to converge\n')
@@ -147,3 +151,39 @@ popplus=sum(eplus_udist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+2*sum(epl
 save('model_solutions_sp3'+location,'Ve','Vm','Vn','Vt','U','Veh','Vmh','Vnh','Vth','eplus_udist','eplus_edist','eplus_mdist','eplus_ndist','eplus_tdist','nplus','popplus');
 
  
+%% Plottint the distribution of firms conditional on a
+load('color_style.mat'); % Ran in color_style.m
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ %Lets build our E matrix for each type of firm
+ E=zeros(tpts+1,tpts+1,ats);
+ for a=1:ats
+     E(1,1,a)=eplus_edist(1,a);
+     for z=2:tpts+1
+         for q=2:tpts+1
+             E(z,1,a)=eplus_mdist(a,z-1);
+             E(1,q,a)=eplus_ndist(a,q-1);
+             E(z,q,a)=eplus_tdist(a,z-1,q-1);
+         end
+     end
+ end
+ 
+heatmap_combined(E,1,bluepurplePalette_rgb, ats,tpts, 'Firm Distribution Conditional on a' , 'Worker type', 'Manager type', 'Figures_heatmaps/dist_cond_a.pdf');
+
+
+
+
+%% Same can be dine with the value functions
+V=zeros(tpts+1,tpts+1,ats);
+
+for a=1:ats
+    V(1,1,a)=Ve(1,a);
+    for z=2:tpts+1
+        for q=2:tpts+1
+            V(z,1,a)=Vm(a,z-1);
+            V(1,q,a)=Vn(a,q-1);
+            V(z,q,a)=Vt(a,z-1,q-1);
+        end
+    end
+end
+
+heatmap_combined(V,0,bluePalette_rgb, ats,tpts, 'Value Functions Conditional on a' , 'Worker type', 'Manager type', 'Figures_heatmaps/VFs_cond_a.pdf');

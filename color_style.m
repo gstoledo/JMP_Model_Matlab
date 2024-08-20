@@ -1,3 +1,5 @@
+clear all
+close all
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Predefine qualitative color palettes
 
