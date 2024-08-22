@@ -170,8 +170,6 @@ load('color_style.mat'); % Ran in color_style.m
 heatmap_combined(E,1,bluepurplePalette_rgb, ats,tpts, 'Firm Distribution Conditional on a' , 'Worker type', 'Manager type', 'Figures_heatmaps/dist_cond_a.pdf');
 
 
-
-
 %% Same can be dine with the value functions
 V=zeros(tpts+1,tpts+1,ats);
 
@@ -187,3 +185,35 @@ for a=1:ats
 end
 
 heatmap_combined(V,0,bluePalette_rgb, ats,tpts, 'Value Functions Conditional on a' , 'Worker type', 'Manager type', 'Figures_heatmaps/VFs_cond_a.pdf');
+
+
+
+%%  Wages
+wmin  =  -6*min(fteam(:)); 
+wmax = max(fteam(:));
+wpts = 100;
+ 
+wgrid = [wmin:(wmax - wmin)/(wpts - 1):wmax];
+
+%% Wage iteration
+
+%Inital guesses for wages
+if exist('wages_a'+string(ats)+'_z'+string(tpts)+'.mat')==2 && use_guess(1)=='y'
+    load('wages_a'+string(ats)+'_z'+string(tpts)+'.mat');
+    Wmini=Wm;
+    Wnini=Wn;
+    Wtmini=Wtm;
+    Wtnini=Wtn;
+else
+    Wmini=ones(wpts,ats,tpts)*wmin;
+    Wnini=ones(wpts,ats,tpts)*wmin;
+    Wtmini=ones(wpts,ats,tpts,tpts)*wmin;
+    Wtnini=ones(wpts,ats,tpts,tpts)*wmin;
+end
+
+
+tic
+[Wm,Wn,Wtm,Wtn]=wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,Vt,U,Vmh,Vnh,Vth,Veh,Wmini,Wnini,Wtmini,Wtnini,...
+speed,cost_d,cost_p,wgrid,bt,death,del,lam,lamu,bpw,n,a_trans,q_trans,e_udist,e_edist,e_mdist,e_ndist,e_tdist);
+toc
+save('wages_a'+string(ats)+'_z'+string(tpts)+'.mat','Wm','Wn','Wtm','Wtn')

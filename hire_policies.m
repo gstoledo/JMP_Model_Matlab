@@ -5,7 +5,7 @@ function [h_e_u, h_e_m, h_e_nm, h_e_t_m, h_e_t_nm, h_m_u, h_m_m, h_m_nm, h_m_t_m
     [gt_em_meet_u, gt_em_meet_m, gt_em_meet_nm, gt_em_meet_t_m, gt_em_meet_t_nm, gt_em_meet_t]=mf_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,true,cost_d);
     [gt_en_meet_u, gt_en_meet_m, gt_en_meet_nm, gt_en_meet_t_m, gt_en_meet_t_nm, gt_en_meet_t]=nf_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,true,cost_p);
     [gt_tf_meet_u, gt_tf_meet_m, gt_tf_meet_nm, gt_tf_meet_t_m, gt_tf_meet_t_nm, gt_tf_meet_t]=tf_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,true,cost_p,cost_d);
-    tol=1e-8;
+    tol=1e-10;
     
     %Empty firm hiring policy
     %Hire policy by empty firms from unemployed
