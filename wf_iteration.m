@@ -489,7 +489,7 @@ function [Wm,Wn,Wtm,Wtn]=wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,Vt,U,Vmh,Vnh,Vth,Ve
                     expec_n=zeros(ats,tpts);
                     for aprime=1:ats
                         for qprime=1:tpts
-                            expec_n(aprime,qprime)=a_trans(a,aprime)*q_trans(z,qprime)*Wntl(w,aprime,qprime);
+                            expec_n(aprime,qprime)=a_trans(a,aprime)*q_trans(z,qprime,a)*Wntl(w,aprime,qprime);
                         end
                     end
                     Wnup(w,a,z)= wgrid(w)+ bt*(1-death)*sum(expec_n,"all");
@@ -507,8 +507,8 @@ function [Wm,Wn,Wtm,Wtn]=wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,Vt,U,Vmh,Vnh,Vth,Ve
                         expec_tn=zeros(ats,tpts);
                         for aprime=1:ats
                             for qprime=1:tpts
-                                expec_tm(aprime,qprime)=a_trans(a,aprime)*q_trans(q,qprime)*(death*(1-death)*Wmtl(w,aprime,z)+(1-death)^2*Wtmtl(w,aprime,z,qprime));
-                                expec_tn(aprime,qprime)=a_trans(a,aprime)*q_trans(q,qprime)*(death*(1-death)*Wntl(w,aprime,qprime)+(1-death)^2*Wtntl(w,aprime,z,qprime));
+                                expec_tm(aprime,qprime)=a_trans(a,aprime)*q_trans(q,qprime,a)*(death*(1-death)*Wmtl(w,aprime,z)+(1-death)^2*Wtmtl(w,aprime,z,qprime));
+                                expec_tn(aprime,qprime)=a_trans(a,aprime)*q_trans(q,qprime,a)*(death*(1-death)*Wntl(w,aprime,qprime)+(1-death)^2*Wtntl(w,aprime,z,qprime));
                             end
                         end
                         Wtmup(w,a,z,q)= wgrid(w)+ bt*sum(expec_tm,"all");

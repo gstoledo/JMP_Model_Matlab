@@ -29,11 +29,21 @@ adown=0.3;
 astay=1-aup-adown;
 a_trans=create_trans(adown,astay,aup,ats);
 
-%Q transition
-qup=0.3;
-qdown=0.25;
+% %Q transition
+% qup=0.3;
+% qdown=0.25;
+% qstay=1-qup-qdown;
+% q_trans=create_trans(qdown,qstay,qup,tpts);
+
+%Q transition (New one, depends on a), change the qup and down to depend, I am just introducing the notation
+q_trans=zeros(tpts,tpts,ats);
+qup=0.3*ones(ats,1);
+qdown=0.25*ones(ats,1);
 qstay=1-qup-qdown;
-q_trans=create_trans(qdown,qstay,qup,tpts);
+
+for a=1:ats
+    q_trans(:,:,a)=create_trans(qdown(a),qstay(a),qup(a),tpts);
+end
 
 
 %Unemp transition
@@ -55,7 +65,7 @@ n0=sum(eplus_edist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+sum(eplus_tdis
 pop0=sum(eplus_udist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+2*sum(eplus_tdist,"all");
 
 %VFs to initialize
-%Inital guesses for value functions
+%Inital guesses for value functionsz
 Veini=zeros(1,ats);
 Vmini=fman/(1-bt);
 Vnini=fnman/(1-bt);
@@ -170,21 +180,21 @@ load('color_style.mat'); % Ran in color_style.m
 heatmap_combined(E,1,bluepurplePalette_rgb, ats,tpts, 'Firm Distribution Conditional on a' , 'Worker type', 'Manager type', 'Figures_heatmaps/dist_cond_a.pdf');
 
 
-%% Same can be dine with the value functions
-V=zeros(tpts+1,tpts+1,ats);
+% %% Same can be dine with the value functions
+% V=zeros(tpts+1,tpts+1,ats);
 
-for a=1:ats
-    V(1,1,a)=Ve(1,a);
-    for z=2:tpts+1
-        for q=2:tpts+1
-            V(z,1,a)=Vm(a,z-1);
-            V(1,q,a)=Vn(a,q-1);
-            V(z,q,a)=Vt(a,z-1,q-1);
-        end
-    end
-end
+% for a=1:ats
+%     V(1,1,a)=Ve(1,a);
+%     for z=2:tpts+1
+%         for q=2:tpts+1
+%             V(z,1,a)=Vm(a,z-1);
+%             V(1,q,a)=Vn(a,q-1);
+%             V(z,q,a)=Vt(a,z-1,q-1);
+%         end
+%     end
+% end
 
-heatmap_combined(V,0,bluePalette_rgb, ats,tpts, 'Value Functions Conditional on a' , 'Worker type', 'Manager type', 'Figures_heatmaps/VFs_cond_a.pdf');
+% heatmap_combined(V,0,bluePalette_rgb, ats,tpts, 'Value Functions Conditional on a' , 'Worker type', 'Manager type', 'Figures_heatmaps/VFs_cond_a.pdf');
 
 
 
@@ -216,4 +226,4 @@ tic
 [Wm,Wn,Wtm,Wtn]=wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,Vt,U,Vmh,Vnh,Vth,Veh,Wmini,Wnini,Wtmini,Wtnini,...
 speed,cost_d,cost_p,wgrid,bt,death,del,lam,lamu,bpw,n,a_trans,q_trans,e_udist,e_edist,e_mdist,e_ndist,e_tdist);
 toc
-save('wages_a'+string(ats)+'_z'+string(tpts)+'.mat','Wm','Wn','Wtm','Wtn')
+save('wages_a'+string(ats)+'_z'+string(tpts)+'.mat','Wm','Wn','Wtm','Wtn','wgrid');

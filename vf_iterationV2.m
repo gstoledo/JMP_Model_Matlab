@@ -246,30 +246,67 @@ function [Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl,Vttl,Utl] = vf
         %Firm with manager
         Vmup=fman + bt*death*repmat(a_trans*Vetl',1,tpts)+ bt*(1-death)*(a_trans*Vmtl);
         
-        %Firm with no manager (This is q-trans do not depending on a. If it depends will have to include pages)
-        Vnup=fnman+bt*death*repmat(a_trans*Vetl',1,tpts)+ bt*(1-death)*(q_trans*(a_trans*Vntl)')';
-        
-        %Firm with team
-        %Transitions for full firm
-        %Conditional on q, matrix mult to get the expected value for (a,z). Do that for every q 
-        Va_prime=zeros(ats,tpts,tpts);
-        for i=1:tpts 
-            Va_prime(:,:,i)=a_trans*Vttl(:,:,i);
+        % %Firm with no manager (This is q-trans do not depending on a. If it depends will have to include pages)
+        % Vnup=fnman+bt*death*repmat(a_trans*Vetl',1,tpts)+ bt*(1-death)*(q_trans*(a_trans*Vntl)')';
+        for a=1:ats
+            for q=1:tpts
+                expectdeath=zeros(1,ats);
+                expectlive=zeros(ats,tpts);
+                for apirme=1:ats
+                    expectdeath(apirme)=a_trans(a,apirme)*Vetl(apirme);
+                    for qprime=1:tpts
+                        expectlive(apirme,qprime)=a_trans(a,apirme)*q_trans(q,qprime,a)*Vntl(apirme,qprime);
+                    end
+                end
+                Vnup(a,q)=fnman(a,q)+bt*death*sum(expectdeath)+bt*(1-death)*sum(sum(expectlive));
+            end
         end
-        %Permute to multiply it by q_trans
-        Va_prime=permute(Va_prime, [3 2 1]);
+
         
-        %Conditional on a, matrix mult to get the expected value for (z,q). Do that for every a
-        Vq_prime=zeros(tpts,tpts,ats);
-        for i=1:ats 
-            Vq_prime(:,:,i)=q_trans*Va_prime(:,:,i);
+        % %Firm with team (old version, q trans is not dependent on a)
+        % %Transitions for full firm
+        % %Conditional on q, matrix mult to get the expected value for (a,z). Do that for every q 
+        % Va_prime=zeros(ats,tpts,tpts);
+        % for i=1:tpts 
+        %     Va_prime(:,:,i)=a_trans*Vttl(:,:,i);
+        % end
+        % %Permute to multiply it by q_trans
+        % Va_prime=permute(Va_prime, [3 2 1]);
+        
+        % %Conditional on a, matrix mult to get the expected value for (z,q). Do that for every a
+        % Vq_prime=zeros(tpts,tpts,ats);
+        % for i=1:ats 
+        %     Vq_prime(:,:,i)=q_trans*Va_prime(:,:,i);
+        % end
+        % Vqa_prime=permute(Vq_prime, [3 2 1]);
+        
+        % Vtup=fteam+ bt*(death.^2)*repmat(a_trans*Vetl',1,tpts,tpts)+ bt*death*(1-death)*repmat((a_trans*Vmtl),1,1,tpts)...
+        %     + bt*death*(1-death)*permute(repmat((q_trans*(a_trans*Vntl)')',1,1,tpts),[1 3 2])...
+        %     + bt*((1-death).^2)*Vqa_prime;
+
+        %Firm with team (new version)
+        for a=1:ats
+            for z=1:tpts
+                for q=1:tpts
+                    expectdeath_b=zeros(1,ats);
+                    expectdeath_n=zeros(1,ats);
+                    expectdeath_m=zeros(ats,tpts);
+                    expectlive_b=zeros(ats,tpts);
+                    for apirme=1:ats
+                        expectdeath_b(apirme)=a_trans(a,apirme)*Vetl(apirme);
+                        expectdeath_n(apirme)=a_trans(a,apirme)*Vmtl(apirme,z);
+                        for qprime=1:tpts
+                            expectdeath_m(apirme,qprime)=q_trans(q,qprime,a)*a_trans(a,apirme)*Vntl(apirme,qprime);
+                            expectlive_b(apirme,qprime)=q_trans(q,qprime,a)*a_trans(a,apirme)*Vttl(apirme,z,qprime);
+                        end
+                    end
+                    Vtup(a,z,q)=fteam(a,z,q)+bt*(death.^2)*sum(expectdeath_b)+bt*death*(1-death)*sum(expectdeath_n)...
+                        + bt*death*(1-death)*sum(sum(expectdeath_m)) + bt*((1-death).^2)*sum(sum(expectlive_b));
+                end
+            end
         end
-        Vqa_prime=permute(Vq_prime, [3 2 1]);
-        
-        Vtup=fteam+ bt*(death.^2)*repmat(a_trans*Vetl',1,tpts,tpts)+ bt*death*(1-death)*repmat((a_trans*Vmtl),1,1,tpts)...
-            + bt*death*(1-death)*permute(repmat((q_trans*(a_trans*Vntl)')',1,1,tpts),[1 3 2])...
-            + bt*((1-death).^2)*Vqa_prime;
-        
+
+    
         %Unemployed worker
         Uplus= Uh + death*(-Uh) + (1-death)*Utl;
         Uup=  b + bt*(u_trans*Uplus')';

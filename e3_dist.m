@@ -23,7 +23,7 @@ function [e3_udist,e3_edist,e3_mdist,e3_ndist,e3_tdist]=e3_dist(ats,tpts,e2_udis
             store_aprime_qprime=zeros(ats,tpts);
             for a_prime=1:ats
                 for q_prime=1:tpts
-                    store_aprime_qprime(a_prime,q_prime)=a_trans(a_prime,a)*q_trans(q_prime,q)*e2_ndist(a_prime,q_prime);
+                    store_aprime_qprime(a_prime,q_prime)=a_trans(a_prime,a)*q_trans(q_prime,q,a)*e2_ndist(a_prime,q_prime);
                 end
             end
             e3_ndist(a,q)=sum(store_aprime_qprime,"all");
@@ -38,7 +38,7 @@ function [e3_udist,e3_edist,e3_mdist,e3_ndist,e3_tdist]=e3_dist(ats,tpts,e2_udis
                 store_aprime_z_qprime=zeros(ats,tpts);
                 for a_prime=1:ats
                     for q_prime=1:tpts
-                        store_aprime_z_qprime(a_prime,q_prime)=a_trans(a_prime,a)*q_trans(q_prime,q)*e2_tdist(a_prime,z,q_prime);
+                        store_aprime_z_qprime(a_prime,q_prime)=a_trans(a_prime,a)*q_trans(q_prime,q,a)*e2_tdist(a_prime,z,q_prime);
                     end
                 end
                 e3_tdist(a,z,q)=sum(store_aprime_z_qprime,"all");

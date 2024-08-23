@@ -104,7 +104,7 @@ adown=0.3;
 astay=1-aup-adown;
 a_trans=create_trans(adown,astay,aup,ats);
 
-%Q transition (Old one, does not depend on a)
+% %Q transition
 % qup=0.02;
 % qdown=0.01;
 % qstay=1-qup-qdown;
@@ -121,7 +121,6 @@ for a=1:ats
 end
 
 
-
 %Unemp transition
 ugain=0.00           ; %Probability unemployed move up
 ustay=1-ulose-ugain  ; %Probability unemployed stay
@@ -134,27 +133,110 @@ zero_tol      =1e-10 ; %Tolerance for zero
 use_guess     ='y'   ;
 true=0               ; %Manager penalty toggle
 speed=1              ; %Convergenge speed
-% %Specification 0
 
 
-% run run_sp0.m
+%Load some results that we will simullate over
+load('model_solutions_sp3'+location)
+load('wages_a'+string(ats)+'_z'+string(tpts))
 
-% %Specification 1
-% run run_sp1.m
+e_udist=eplus_udist;
+e_edist=eplus_edist;
+e_mdist=eplus_mdist;
+e_ndist=eplus_ndist;
+e_tdist=eplus_tdist;
 
-% %Specification 2
-% run run_sp2.m
+% Distributions 
+%Firm type (unweighted)
+firm_dist=[sum(e_edist),sum(e_mdist,"all"),sum(e_ndist,"all"),sum(e_tdist,"all")]/n;
+firm_dist_pdf=firm_dist/sum(firm_dist);
 
-%Specification 3
-run run_sp3.m
+%CDF os mass of each type of firm 
+cdf_firm_dist=zeros(1,4);
+for i=1:4
+    cdf_firm_dist(i)=sum(firm_dist(1:i));
+end
+cdf_firm_dist(end)=1; %Just to make sure it is 1
 
-% %Specification 4
-% run run_sp4.m
+%Employee type wighted for the arival rates. This will be useful to get the probability if a match
+emp_dist=[lamu*sum(e_udist),lam*sum(e_mdist,"all"),lam*sum(e_ndist,"all"),lam*sum(e_tdist,"all")];
+emp_dist_pdf=emp_dist/sum(emp_dist);
 
-% % Specification 5 
-% run run_sp5.m 
+%Prob of matching 
+prob_matching=sum(emp_dist);
 
-% %Specification 6
-% run run_sp6.m
+% Now we do a cdf, considering the effective mass of each type and relative to the probability of matching
+cdf_emp_dist=zeros(1,4);
+for i=1:4
+    cdf_emp_dist(i)=sum(emp_dist(1:i))/prob_matching;
+end
+cdf_emp_dist(end)=1; %Just to make sure it is 1
 
+% Tranform measures into cdfs (multi-dimensional)
+cdf_e_udist=measure_to_cdf(e_udist);
+cdf_e_edist=measure_to_cdf(e_edist);
+cdf_e_mdist=measure2d_to_cdf(e_mdist); %Will have to be careful here when making the draw. Do I need to map back to the original coordinates?
+cdf_e_ndist=measure2d_to_cdf(e_ndist);
+cdf_e_tdist=measure3d_to_cdf(e_tdist);
+
+
+%% Adjust probabilities of shocks transitions
+
+
+
+%% Small simulation for firms
+n_months=10;
+n_firms=15;
+n_workers=n_firms;
+
+%Random matrices
+rng(1,"twister");
+
+r.state=rand(n_months,n_firms); %Inside the meetings, which type of meeting is happening
+r.event=rand(n_months,n_firms); % What kind of meeting is happening
+r.ashock=rand(n_months,n_firms); %Productivity shock
+r.qshock=rand(n_months,n_firms); %Learning shock
+
+
+% Storage of firm status
+firm_status=zeros(n_months,n_firms); %(1=empty, 2= Firm with manager, 3= Firm with non manager; 4= Firm with team)
+m_ftp=zeros(n_months,n_firms); %Manager type
+n_ftp=zeros(n_months,n_firms); %Non manager type
+a_ftp=zeros(n_months,n_firms); %Productivity type
+m_fwage=zeros(n_months,n_firms); %Manager wage
+n_fwage=zeros(n_months,n_firms); %Non manager wage
+
+
+%Inital conditions
+t=1;
+
+for i=1:n_firms  
+    firm_status(t,i)=draw_CDF_1d(cdf_firm_dist,r.state(t,i));
+    if (firm_status(t,i)==1) %Empty firm
+        a_ftp(t,i)=draw_CDF_1d(cdf_e_edist,r.ashock(t,i));
+        m_ftp(t,i)=0;
+        n_ftp(t,i)=0;
+        m_fwage(t,i)=0.0;
+        n_fwage(t,i)=0.0;
+    elseif (firm_status(t,i)==2) %Firm with manager
+        [a_ftp(t,i),m_ftp(t,i)]=draw_CDF_2d(cdf_e_mdist,ats,tpts,r.event(t,i));
+        n_ftp(t,i)=0;
+        target_wage=(1-bpw)*U(m_ftp(t,i))+bpw*(Vmh(a_ftp(t,i),m_ftp(t,i))- Veh(a_ftp(t,i)));
+        m_fwage(t,i)= InterpolateWage(Wm(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);
+        n_fwage(t,i)=0.0;
+    elseif (firm_status(t,i)==3) %Firm with non manager
+        [a_ftp(t,i),n_ftp(t,i)]=draw_CDF_2d(cdf_e_ndist,ats,tpts,r.event(t,i));
+        m_ftp(t,i)=0;
+        m_fwage(t,i)=0.0;
+        target_wage=(1-bpw)*U(n_ftp(t,i))+bpw*(Vnh(a_ftp(t,i),n_ftp(t,i))- Veh(a_ftp(t,i)));
+        n_fwage(t,i)= InterpolateWage(Wn(:,a_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
+    else
+        %Firm with team
+        [a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)]=draw_CDF_3d(cdf_e_tdist,ats,tpts,r.event(t,i));
+        target_wage_m=(1-bpw)*U(m_ftp(t,i))+bpw*(Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i))- Vnh(a_ftp(t,i),n_ftp(t,i)));
+        target_wage_n=(1-bpw)*U(n_ftp(t,i))+bpw*(Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i))- Vmh(a_ftp(t,i),m_ftp(t,i)));
+        m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage_m,wgrid);
+        n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage_n,wgrid);
+    end
+end    
+  
 

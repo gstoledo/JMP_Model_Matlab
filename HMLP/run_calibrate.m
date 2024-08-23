@@ -635,7 +635,7 @@ wtypeteam(end,end)=1-all_but_last          ;
  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% CDFs
+%% CDFs
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 max_age=12*200;
@@ -709,7 +709,7 @@ pr.g_stay_kl = 1.00 - pr.g_up_kl;
  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Compute marginals
+%% Compute marginals Values
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -732,7 +732,7 @@ end
  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Calculate wage bounds for all matches
+%% Calculate wage bounds for all matches
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for k=1:tpts
     wage_target_U_solo(k)=InterpolateWage( W_wk(:,k), U_k(k), wage_w );
@@ -850,8 +850,7 @@ for jjj=1:Nrep
                 
                         ta=draw_CDF_1d( cdf_worker_unempl, r.type(t,i));
                         if ( h0u_k(ta) > 0.0 )% firm hires unemployed worker
-                            if (r.tie_break(t,i) < 0.5) % flip a coin for which slot to use
- 
+                            if (r.tie_break(t,i) < 0.5) % flip a coin for which slot to use WE WILL NOT NEED THIS, BUT OUR PFs are more complicated
                                 firm_status_mi(t,i) = 1;
                                 firm_t1_mi(t,i) = ta;
                                 target_value = (1.0 - gamma) * U_k(ta) + gamma * Vmarginal_k(ta);
