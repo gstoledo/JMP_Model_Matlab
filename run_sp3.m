@@ -223,7 +223,7 @@ end
 
 
 tic
-[Wm,Wn,Wtm,Wtn]=wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,Vt,U,Vmh,Vnh,Vth,Veh,Wmini,Wnini,Wtmini,Wtnini,...
+[Wm,Wn,Wtm,Wtn,Wmh,Wnh,Wtnh,Wtmh]=wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,Vt,U,Vmh,Vnh,Vth,Veh,Wmini,Wnini,Wtmini,Wtnini,...
 speed,cost_d,cost_p,wgrid,bt,death,del,lam,lamu,bpw,n,a_trans,q_trans,e_udist,e_edist,e_mdist,e_ndist,e_tdist);
 toc
-save('wages_a'+string(ats)+'_z'+string(tpts)+'.mat','Wm','Wn','Wtm','Wtn','wgrid');
+save('wages_sp3_a'+string(ats)+'_z'+string(tpts)+'.mat','Wm','Wn','Wtm','Wtn','wgrid','Wmh','Wnh','Wtnh','Wtmh')

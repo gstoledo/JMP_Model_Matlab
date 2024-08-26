@@ -1,5 +1,5 @@
 %Function for the VF interation of wages
-function [Wm,Wn,Wtm,Wtn]=wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,Vt,U,Vmh,Vnh,Vth,Veh,Wmini,Wnini,Wtmini,Wtnini,...
+function [Wm,Wn,Wtm,Wtn,Wmh,Wnh,Wtnh,Wtmh] =wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,Vt,U,Vmh,Vnh,Vth,Veh,Wmini,Wnini,Wtmini,Wtnini,...
     speed,cost_d,cost_p,wgrid,bt,death,del,lam,lamu,bpw,n,a_trans,q_trans,e_udist,e_edist,e_mdist,e_ndist,e_tdist);
     Uh=U;
     %% Policy functions    
@@ -536,6 +536,62 @@ function [Wm,Wn,Wtm,Wtn]=wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,Vt,U,Vmh,Vnh,Vth,Ve
     Wn=Wnup;
     Wtm=Wtmup;
     Wtn=Wtnup;
+    
+
+    %Hat values
+    %% Reallocation stage
+        % %Guesses for W (production values)
+        Wmh=zeros(wpts,ats,tpts); %Value of manaer in a manager only firm
+        Wnh=zeros(wpts,ats,tpts); % Value of non-manager in a non-manager only firm
+        Wtmh=zeros(wpts,ats,tpts,tpts); %Value of manager in a team firm
+        Wtnh=zeros(wpts,ats,tpts,tpts); %Value of non-manager in a team firm 
+        %value for manager in a manager only firm
+        for w=1:wpts
+            for a=1:ats
+                for z=1:tpts
+                    inner=[U(z), r_m(a,z)*Wn(w,a,z) +(1-r_m(a,z))*min(d_m(a,z)*U(z)+(1-d_m(a,z))*Wm(w,a,z),Vm(a,z)-Ve(a))];
+                    Wmh(w,a,z)= max(inner);
+                end
+            end
+        end
+        
+        %value for non-manager in a non-manager only firm
+        for w=1:wpts
+            for a=1:ats
+                for z=1:tpts
+                    inner=[U(z), r_n(a,z)*Wm(w,a,z) +(1-r_n(a,z))*min(d_n(a,z)*U(z)+(1-d_n(a,z))*Wn(w,a,z),Vn(a,z)-Ve(a))];
+                    Wnh(w,a,z)= max(inner);
+                end
+            end
+        end
+                    
+        %value for manager in a team firm
+        for w=1:wpts
+            for a=1:ats
+                for z=1:tpts
+                    for q=1:tpts
+                        inner=[U(z), d_t_n(a,z,q)*(r_t_m(a,z,q)*Wn(w,a,z) +(1-r_t_m(a,z,q))*Wm(w,a,z))+r_t_n(a,z,q)*r_t_m(a,z,q)*Wtn(w,a,q,z) +...
+                         (1-d_t_n(a,z,q)-r_t_m(a,z,q)*r_t_n(a,z,q))*min((d_t_m(a,z,q)+d_t_b(a,z,q))*U(z)+(1-d_t_m(a,z,q)-d_t_b(a,z,q))*Wtm(w,a,z,q),Vt(a,z,q)-Vn(a,q))];
+                         Wtmh(w,a,z,q)= max(inner);
+                    end
+                end
+            end
+        end
+        
+        
+        %value for non-manager in a team firm
+        for w=1:wpts
+            for a=1:ats
+                for z=1:tpts
+                    for q=1:tpts
+                        inner=[U(z), d_t_m(a,z,q)*(r_t_n(a,z,q)*Wm(w,a,q) +(1-r_t_n(a,z,q))*Wn(w,a,q))+r_t_n(a,z,q)*r_t_m(a,z,q)*Wtm(w,a,q,z) +...
+                         (1-d_t_m(a,z,q)-r_t_n(a,z,q)*r_t_m(a,z,q))*min((d_t_n(a,z,q)+d_t_b(a,z,q))*U(q)+(1-d_t_n(a,z,q)-d_t_b(a,z,q))*Wtn(w,a,z,q),Vt(a,z,q)-Vm(a,z))];
+                            Wtnh(w,a,z,q)= max(inner);
+                    end
+                end
+            end
+        end
+
 
 
 

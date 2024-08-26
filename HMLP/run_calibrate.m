@@ -850,7 +850,7 @@ for jjj=1:Nrep
                 
                         ta=draw_CDF_1d( cdf_worker_unempl, r.type(t,i));
                         if ( h0u_k(ta) > 0.0 )% firm hires unemployed worker
-                            if (r.tie_break(t,i) < 0.5) % flip a coin for which slot to use WE WILL NOT NEED THIS, BUT OUR PFs are more complicated
+                            if (r.tie_break(t,i) < 0.5) % flip a coin for which slot to use WE WILL NOT NEED THIS, BUT OUR PFs are more complicated 
                                 firm_status_mi(t,i) = 1;
                                 firm_t1_mi(t,i) = ta;
                                 target_value = (1.0 - gamma) * U_k(ta) + gamma * Vmarginal_k(ta);
