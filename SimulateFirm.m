@@ -1,5 +1,5 @@
 % %Simulation as a function
-function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,prom_sm,prom_realloc]=SimulateFirm(n_months,n_firms,seed,ats,tpts,param,v,d,w)
+function [firm_status,a_ftp,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,prom_sm,prom_realloc]=SimulateFirm(n_months,n_firms,seed,ats,tpts,param,v,d,w)
     %Opening up the parameters
     fieldNames = fieldnames(param);
     % Loop over each field and assign it to a variable in the workspace
@@ -8,7 +8,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
         % Use eval to assign the value to the variable with the same name
         eval([varName ' = param.' varName ';']);
     end
-    
+
     fieldNames = fieldnames(v);
     % Loop over each field and assign it to a variable in the workspace
     for i = 1:length(fieldNames)% Dynamically create the variable name
@@ -189,21 +189,21 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
             [a_ftp(t,i),m_ftp(t,i)]=draw_CDF_2d(cdf_e_mdist,ats,tpts,r.event(t,i));
             n_ftp(t,i)=0;
             target_wage=(1-bpw)*U(m_ftp(t,i))+bpw*(Vmh(a_ftp(t,i),m_ftp(t,i))- Veh(a_ftp(t,i)));
-            m_fwage(t,i)= InterpolateWage(Wm(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);
+            m_fwage(t,i)= InterpolateWage(Wmh(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);
             n_fwage(t,i)=0.0;
         elseif (firm_status(t,i)==3) %Firm with non manager
             [a_ftp(t,i),n_ftp(t,i)]=draw_CDF_2d(cdf_e_ndist,ats,tpts,r.event(t,i));
             m_ftp(t,i)=0;
             m_fwage(t,i)=0.0;
             target_wage=(1-bpw)*U(n_ftp(t,i))+bpw*(Vnh(a_ftp(t,i),n_ftp(t,i))- Veh(a_ftp(t,i)));
-            n_fwage(t,i)= InterpolateWage(Wn(:,a_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
+            n_fwage(t,i)= InterpolateWage(Wnh(:,a_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
         else
             %Firm with team
             [a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)]=draw_CDF_3d(cdf_e_tdist,ats,tpts,r.event(t,i));
             target_wage_m=(1-bpw)*U(m_ftp(t,i))+bpw*(Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i))- Vnh(a_ftp(t,i),n_ftp(t,i)));
             target_wage_n=(1-bpw)*U(n_ftp(t,i))+bpw*(Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i))- Vmh(a_ftp(t,i),m_ftp(t,i)));
-            m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage_m,wgrid);
-            n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage_n,wgrid);
+            m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage_m,wgrid);
+            n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage_n,wgrid);
         end
     end    
     
@@ -239,7 +239,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             m_ftp(t,i)=zu;
                             n_ftp(t,i)=0;
                             target_wage=(1-bpw)*U(m_ftp(t,i))+bpw*(Vmh(a_ftp(t,i),m_ftp(t,i))- Veh(a_ftp(t,i)));
-                            m_fwage(t,i)= InterpolateWage(Wm(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);
+                            m_fwage(t,i)= InterpolateWage(Wmh(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);
                             n_fwage(t,i)=0.0;
                         else %Put as non manager
                             firm_status(t,i)=3;
@@ -248,7 +248,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             m_ftp(t,i)=0;
                             m_fwage(t,i)=0.0;
                             target_wage=(1-bpw)*U(n_ftp(t,i))+bpw*(Vnh(a_ftp(t,i),n_ftp(t,i))- Veh(a_ftp(t,i)));
-                            n_fwage(t,i)= InterpolateWage(Wn(:,a_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
+                            n_fwage(t,i)= InterpolateWage(Wnh(:,a_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
                         end
                     else %Firm does not hire
                         firm_status(t,i)=1;
@@ -269,7 +269,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             m_ftp(t,i)=zm;
                             n_ftp(t,i)=0;
                             target_wage=(1-bpw)*(Vmh(am,zm)-Veh(am))+bpw*(Vmh(a_ftp(t,i),m_ftp(t,i))- Veh(a_ftp(t,i)));
-                            m_fwage(t,i)= InterpolateWage(Wm(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);
+                            m_fwage(t,i)= InterpolateWage(Wmh(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);
                             n_fwage(t,i)=0.0;
                         else %Put as non manager
                             firm_status(t,i)=3;
@@ -278,7 +278,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             m_ftp(t,i)=0;
                             m_fwage(t,i)=0.0;
                             target_wage=(1-bpw)*(Vmh(am,zm)-Veh(am))+bpw*(Vnh(a_ftp(t,i),n_ftp(t,i))- Veh(a_ftp(t,i)));
-                            n_fwage(t,i)= InterpolateWage(Wn(:,a_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
+                            n_fwage(t,i)= InterpolateWage(Wnh(:,a_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
                         end
                     else %Firm does not hire
                         firm_status(t,i)=1;
@@ -300,7 +300,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             n_ftp(t,i)=0;
                             n_fwage(t,i)=0.0;
                             target_wage=(1-bpw)*(Vnh(an,zn)-Veh(an))+bpw*(Vmh(a_ftp(t,i),m_ftp(t,i))- Veh(a_ftp(t,i)));
-                            m_fwage(t,i)= InterpolateWage(Wm(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);
+                            m_fwage(t,i)= InterpolateWage(Wmh(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);
                         else %Put as non manager
                             firm_status(t,i)=3;
                             hire_n(t,i)=1;
@@ -308,7 +308,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             m_ftp(t,i)=0;
                             m_fwage(t,i)=0.0;
                             target_wage=(1-bpw)*(Vnh(an,zn)-Veh(an))+bpw*(Vnh(a_ftp(t,i),n_ftp(t,i))- Veh(a_ftp(t,i)));
-                            n_fwage(t,i)= InterpolateWage(Wn(:,a_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
+                            n_fwage(t,i)= InterpolateWage(Wnh(:,a_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
                         end
                     else %Firm does not hire
                         firm_status(t,i)=1;
@@ -329,7 +329,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             m_ftp(t,i)=zt;
                             n_ftp(t,i)=0;
                             target_wage=(1-bpw)*(Vth(at,zt,nt)-Vnh(at,nt))+bpw*(Vmh(a_ftp(t,i),m_ftp(t,i))- Veh(a_ftp(t,i)));
-                            m_fwage(t,i)= InterpolateWage(Wm(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);
+                            m_fwage(t,i)= InterpolateWage(Wmh(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);
                             n_fwage(t,i)=0.0;
                         else %Put as non manager
                             firm_status(t,i)=3;
@@ -338,7 +338,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             m_ftp(t,i)=0;
                             m_fwage(t,i)=0.0;
                             target_wage=(1-bpw)*(Vth(at,zt,nt)-Vnh(at,nt))+bpw*(Vnh(a_ftp(t,i),n_ftp(t,i))- Veh(a_ftp(t,i)));
-                            n_fwage(t,i)= InterpolateWage(Wn(:,a_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
+                            n_fwage(t,i)= InterpolateWage(Wnh(:,a_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
                         end
                     % Hire the non manager?
                     elseif (h_e_t_nm(at,zt,nt,a_ftp(t,i))>0)
@@ -349,7 +349,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             m_ftp(t,i)=nt;
                             n_ftp(t,i)=0;
                             target_wage=(1-bpw)*(Vth(at,zt,nt)-Vmh(at,zt))+bpw*(Vmh(a_ftp(t,i),m_ftp(t,i))- Veh(a_ftp(t,i)));
-                            m_fwage(t,i)= InterpolateWage(Wm(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);
+                            m_fwage(t,i)= InterpolateWage(Wmh(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);
                             n_fwage(t,i)=0.0;
                         else %Put as non manager
                             firm_status(t,i)=3;
@@ -358,7 +358,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             m_ftp(t,i)=0;
                             m_fwage(t,i)=0.0;
                             target_wage=(1-bpw)*(Vth(at,zt,nt)-Vmh(at,zt))+bpw*(Vnh(a_ftp(t,i),n_ftp(t,i))- Veh(a_ftp(t,i)));
-                            n_fwage(t,i)= InterpolateWage(Wn(:,a_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
+                            n_fwage(t,i)= InterpolateWage(Wnh(:,a_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
                         end
                     else %Firm does not hire
                         firm_status(t,i)=1;
@@ -410,7 +410,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=2;
                                 hire_m(t,i)=1;
                                 target_wage=(1-bpw)*U(zu)+ bpw*(Vmh(a_ftp(t,i),zu)+U(m_ftp(t,i))- Vmh(a_ftp(t,i),m_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wm(:,a_ftp(t,i),zu ),target_wage,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wmh(:,a_ftp(t,i),zu ),target_wage,wgrid);
                                 n_fwage(t,i)=0.0;
                                 m_ftp(t,i)=zu;
                                 n_ftp(t,i)=0;
@@ -419,7 +419,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_m(t,i)=1;
                                 prom_sm(t,i)=-1; %Demote the manager
                                 target_wage_m=(1-bpw)*U(m_ftp(t,i))+bpw*(Vth(a_ftp(t,i),zu,m_ftp(t,i))-cost_d - Vmh(a_ftp(t,i),m_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zu,m_ftp(t,i)),target_wage_m,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zu,m_ftp(t,i)),target_wage_m,wgrid);
                                 n_fwage(t,i)=m_fwage(t-1,i); %Wage of the demoted manager do not change now
                                 m_ftp(t,i)=zu;
                                 n_ftp(t,i)=m_ftp(t-1,i); %Demote the manager
@@ -428,7 +428,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_n(t,i)=1;
                                 m_fwage(t,i)=m_fwage(t-1,i); %Wage of the manager do not change now
                                 target_wage=(1-bpw)*U(zu)+bpw*(Vth(a_ftp(t,i),m_ftp(t,i),zu)- Vmh(a_ftp(t,i),m_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),m_ftp(t,i),zu),target_wage,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),m_ftp(t,i),zu),target_wage,wgrid);
                                 m_ftp(t,i)=m_ftp(t-1,i); %Manager stays
                                 n_ftp(t,i)=zu;
                             end
@@ -449,7 +449,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=2;
                                 hire_m(t,i)=1;
                                 target_wage=(1-bpw)*(Vmh(am,zm)-Veh(am))+bpw*(Vmh(a_ftp(t,i),zm)+U(m_ftp(t,i))- Vmh(a_ftp(t,i),m_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wm(:,a_ftp(t,i),zm),target_wage,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wmh(:,a_ftp(t,i),zm),target_wage,wgrid);
                                 n_fwage(t,i)=0.0;
                                 m_ftp(t,i)=zm;
                                 n_ftp(t,i)=0;
@@ -458,7 +458,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_m(t,i)=1;
                                 prom_sm(t,i)=-1; %Demote the manager
                                 target_wage_m=(1-bpw)*(Vmh(am,zm)-Veh(am))+bpw*(Vth(a_ftp(t,i),zm,m_ftp(t,i))-cost_d - Vmh(a_ftp(t,i),m_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zm,m_ftp(t,i)),target_wage_m,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zm,m_ftp(t,i)),target_wage_m,wgrid);
                                 n_fwage(t,i)=m_fwage(t-1,i); %Wage of the demoted manager do not change now
                                 m_ftp(t,i)=zm;
                                 n_ftp(t,i)=m_ftp(t-1,i); %Demote the manager
@@ -467,7 +467,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_n(t,i)=1;
                                 m_fwage(t,i)=m_fwage(t-1,i); %Wage of the manager do not change now
                                 target_wage=(1-bpw)*(Vmh(am,zm)-Veh(am))+bpw*(Vth(a_ftp(t,i),m_ftp(t,i),zm)- Vmh(a_ftp(t,i),m_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),m_ftp(t,i),zm),target_wage,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),m_ftp(t,i),zm),target_wage,wgrid);
                                 m_ftp(t,i)=m_ftp(t-1,i); %Manager stays
                                 n_ftp(t,i)=zm;
                             end
@@ -488,7 +488,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=2;
                                 hire_m(t,i)=1;
                                 target_wage=(1-bpw)*(Vnh(an,zn)-Veh(an))+bpw*(Vmh(a_ftp(t,i),zn)+U(m_ftp(t,i))- Vmh(a_ftp(t,i),m_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wm(:,a_ftp(t,i),zn),target_wage,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wmh(:,a_ftp(t,i),zn),target_wage,wgrid);
                                 n_fwage(t,i)=0.0;
                                 m_ftp(t,i)=zn;
                                 n_ftp(t,i)=0;
@@ -497,7 +497,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_m(t,i)=1;
                                 prom_sm(t,i)=-1; %Demote the manager
                                 target_wage_m=(1-bpw)*(Vnh(an,zn)-Veh(an))+bpw*(Vth(a_ftp(t,i),zn,m_ftp(t,i))-cost_d - Vmh(a_ftp(t,i),m_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zn,m_ftp(t,i)),target_wage_m,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zn,m_ftp(t,i)),target_wage_m,wgrid);
                                 n_fwage(t,i)=m_fwage(t-1,i); %Wage of the demoted manager do not change now
                                 m_ftp(t,i)=zn;
                                 n_ftp(t,i)=m_ftp(t-1,i); %Demote the manager
@@ -506,7 +506,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_n(t,i)=1;
                                 m_fwage(t,i)=m_fwage(t-1,i); %Wage of the manager do not change now
                                 target_wage=(1-bpw)*(Vnh(an,zn)-Veh(an))+bpw*(Vth(a_ftp(t,i),m_ftp(t,i),zn)- Vmh(a_ftp(t,i),m_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),m_ftp(t,i),zn),target_wage,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),m_ftp(t,i),zn),target_wage,wgrid);
                                 m_ftp(t,i)=m_ftp(t-1,i); %Manager stays
                                 n_ftp(t,i)=zn;
                             end
@@ -527,7 +527,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=2;
                                 hire_m(t,i)=1;
                                 target_wage=(1-bpw)*(Vth(at,zt,nt)-Vnh(at,nt))+bpw*(Vmh(a_ftp(t,i),zt)+U(m_ftp(t,i))- Vmh(a_ftp(t,i),m_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wm(:,a_ftp(t,i),zt),target_wage,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wmh(:,a_ftp(t,i),zt),target_wage,wgrid);
                                 n_fwage(t,i)=0.0;
                                 m_ftp(t,i)=zt;
                                 n_ftp(t,i)=0;
@@ -536,7 +536,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_m(t,i)=1;
                                 prom_sm(t,i)=-1; %Demote the manager
                                 target_wage_m=(1-bpw)*(Vth(at,zt,nt)-Vnh(at,nt))+bpw*(Vth(a_ftp(t,i),zt,m_ftp(t,i))-cost_d - Vmh(a_ftp(t,i),m_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zt,m_ftp(t,i)),target_wage_m,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zt,m_ftp(t,i)),target_wage_m,wgrid);
                                 n_fwage(t,i)=m_fwage(t-1,i); %Wage of the demoted manager do not change now
                                 m_ftp(t,i)=zt;
                                 n_ftp(t,i)=m_ftp(t-1,i); %Demote the manager
@@ -545,7 +545,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_n(t,i)=1;
                                 m_fwage(t,i)=m_fwage(t-1,i); %Wage of the manager do not change now
                                 target_wage=(1-bpw)*(Vth(at,zt,nt)-Vnh(at,nt)) + bpw*(Vth(a_ftp(t,i),m_ftp(t,i),zt)- Vmh(a_ftp(t,i),m_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),m_ftp(t,i),zt),target_wage,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),m_ftp(t,i),zt),target_wage,wgrid);
                                 n_ftp(t,i)=zt;
                             end
                         % Hire the non manager?
@@ -555,7 +555,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=2;
                                 hire_m(t,i)=1;
                                 target_wage=(1-bpw)*(Vth(at,zt,nt)-Vmh(at,zt))+bpw*(Vmh(a_ftp(t,i),nt)+U(m_ftp(t,i))- Vmh(a_ftp(t,i),m_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wm(:,a_ftp(t,i),nt),target_wage,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wmh(:,a_ftp(t,i),nt),target_wage,wgrid);
                                 n_fwage(t,i)=0.0;
                                 m_ftp(t,i)=nt;
                                 n_ftp(t,i)=0;
@@ -564,7 +564,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_m(t,i)=1;
                                 prom_sm(t,i)=-1; %Demote the manager
                                 target_wage_m=(1-bpw)*(Vth(at,zt,nt)-Vmh(at,zt))+bpw*(Vth(a_ftp(t,i),nt,m_ftp(t,i))-cost_d - Vmh(a_ftp(t,i),m_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),nt,m_ftp(t,i)),target_wage_m,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),nt,m_ftp(t,i)),target_wage_m,wgrid);
                                 n_fwage(t,i)=m_fwage(t-1,i); %Wage of the demoted manager do not change now
                                 m_ftp(t,i)=nt;
                                 n_ftp(t,i)=m_ftp(t-1,i); %Demote the manager
@@ -573,7 +573,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_n(t,i)=1;
                                 m_fwage(t,i)=m_fwage(t-1,i); %Wage of the manager do not change now
                                 target_wage=(1-bpw)*(Vth(at,zt,nt)-Vmh(at,zt))+bpw*(Vth(a_ftp(t,i),m_ftp(t,i),nt)- Vmh(a_ftp(t,i),m_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),m_ftp(t,i),nt),target_wage,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),m_ftp(t,i),nt),target_wage,wgrid);
                                 m_ftp(t,i)=m_ftp(t-1,i); %Manager stays
                                 n_ftp(t,i)=nt;
                             end
@@ -599,9 +599,9 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             firm_status(t,i)=2;
                             %Check if wage goes up
                             target_wage=max(Vmh(av,m_ftp(t,i)),Vnh(av,n_ftp(t,i)))-Veh(av); %Marginal of the poaching firm
-                            current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wm(:,a_ftp(t,i),m_ftp(t,i)));
+                            current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wmh(:,a_ftp(t,i),m_ftp(t,i)));
                             if (target_wage>current_wage)
-                                m_fwage(t,i)= InterpolateWage(Wm(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wmh(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);
                             else
                                 m_fwage(t,i)=m_fwage(t-1,i);
                             end
@@ -622,9 +622,9 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             %Check if wage goes up
                             nu=[Vmh(am,m_ftp(t,i))+U(zm),Vth(am,zm,m_ftp(t,i)), Vth(am,m_ftp(t,i),zm)-cost_d];
                             target_wage_m=max(nu)-Vmh(am,zm); %Marginal of the poaching firm
-                            current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wm(:,a_ftp(t,i),m_ftp(t,i)));
+                            current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wmh(:,a_ftp(t,i),m_ftp(t,i)));
                             if (target_wage_m>current_wage)
-                                m_fwage(t,i)= InterpolateWage(Wm(:,a_ftp(t,i),m_ftp(t,i)),target_wage_m,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wmh(:,a_ftp(t,i),m_ftp(t,i)),target_wage_m,wgrid);
                             else
                                 m_fwage(t,i)=m_fwage(t-1,i);
                             end
@@ -645,9 +645,9 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             %Check if wage goes up
                             nu=[Vnh(an,m_ftp(t,i))+U(zn),Vth(an,zn,m_ftp(t,i))-cost_p, Vth(an,m_ftp(t,i),zn)];
                             target_wage_m=max(nu)-Vnh(an,zn); %Marginal of the poaching firm
-                            current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wm(:,a_ftp(t,i),m_ftp(t,i)));
+                            current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wmh(:,a_ftp(t,i),m_ftp(t,i)));
                             if (target_wage_m>current_wage)
-                                m_fwage(t,i)= InterpolateWage(Wm(:,a_ftp(t,i),m_ftp(t,i)),target_wage_m,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wmh(:,a_ftp(t,i),m_ftp(t,i)),target_wage_m,wgrid);
                             else
                                 m_fwage(t,i)=m_fwage(t-1,i);
                             end
@@ -668,9 +668,9 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             %Check if wage goes up
                             nu=[Vth(at,zt,m_ftp(t,i))+U(nt),Vth(at,m_ftp(t,i),zt)-cost_d+U(nt), Vth(at,nt,m_ftp(t,i))+U(zt)-cost_p, Vth(at,m_ftp(t,i),nt)+U(zt)];
                             target_wage_m=max(nu)-Vth(at,zt,nt) %Marginal of the poaching firm
-                            current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wm(:,a_ftp(t,i),m_ftp(t,i)));
+                            current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wmh(:,a_ftp(t,i),m_ftp(t,i)));
                             if (target_wage_m>current_wage)
-                                m_fwage(t,i)= InterpolateWage(Wm(:,a_ftp(t,i),m_ftp(t,i)),target_wage_m,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wmh(:,a_ftp(t,i),m_ftp(t,i)),target_wage_m,wgrid);
                             else
                                 m_fwage(t,i)=m_fwage(t-1,i);
                             end
@@ -701,10 +701,10 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                 % else %Manager stays
                 %     firm_status(t,i)=2;
                 %     %Does the wage goes down?
-                %     current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wm(:,a_ftp(t,i),m_ftp(t,i)));
+                %     current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wmh(:,a_ftp(t,i),m_ftp(t,i)));
                 %     target_wage=Vmh(a_ftp(t,i),m_ftp(t,i))-Veh(a_ftp(t,i));
                 %     if (target_wage<current_wage)
-                %         m_fwage(t,i)= InterpolateWage(Wm(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);
+                %         m_fwage(t,i)= InterpolateWage(Wmh(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);
                 %     else
                 %         m_fwage(t,i)=m_fwage(t-1,i);
                 %     end
@@ -752,7 +752,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=3;
                                 hire_n(t,i)=1;
                                 target_wage=(1-bpw)*U(zu)+bpw*(Vnh(a_ftp(t,i),zu)+U(n_ftp(t,i))- Vnh(a_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wn(:,a_ftp(t,i),zu),target_wage,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wnh(:,a_ftp(t,i),zu),target_wage,wgrid);
                                 m_fwage(t,i)=0.0;
                                 m_ftp(t,i)=0;
                                 n_ftp(t,i)=zu;
@@ -761,7 +761,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_n(t,i)=1;
                                 prom_sm(t,i)=1; %Promote the non manager 
                                 target_wage_n=(1-bpw)*U(zu)+bpw*(Vth(a_ftp(t,i),n_ftp(t,i),zu)-cost_p - Vnh(a_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),n_ftp(t,i),zu),target_wage_n,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),n_ftp(t,i),zu),target_wage_n,wgrid);
                                 m_fwage(t,i)=n_fwage(t-1,i); %Wage of the promoted non manager do not change now
                                 m_ftp(t,i)=n_ftp(t,i); %Promote the non manager
                                 n_ftp(t,i)=zu;
@@ -770,7 +770,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_m(t,i)=1;
                                 n_fwage(t,i)=n_fwage(t-1,i); %Wage of the non manager do not change now
                                 target_wage=(1-bpw)*U(zu)+bpw*(Vth(a_ftp(t,i),zu,n_ftp(t,i))- Vnh(a_ftp(t,i),n_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zu,n_ftp(t,i)),target_wage,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zu,n_ftp(t,i)),target_wage,wgrid);
                                 m_ftp(t,i)=zu;
                             end
                         else %Firm does not hire
@@ -790,7 +790,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=3;
                                 hire_n(t,i)=1;
                                 target_wage=(1-bpw)*(Vmh(am,zm)-Veh(am))+bpw*(Vnh(a_ftp(t,i),zm)+U(n_ftp(t,i))- Vnh(a_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wn(:,a_ftp(t,i),zm),target_wage,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wnh(:,a_ftp(t,i),zm),target_wage,wgrid);
                                 m_fwage(t,i)=0.0;
                                 m_ftp(t,i)=0;
                                 n_ftp(t,i)=zm;
@@ -799,7 +799,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_n(t,i)=1;
                                 prom_sm(t,i)=1; %Promote the non manager
                                 target_wage_n=(1-bpw)*(Vmh(am,zm)-Veh(am))+bpw*(Vth(a_ftp(t,i),n_ftp(t,i),zm)-cost_p - Vnh(a_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),n_ftp(t,i),zm),target_wage_n,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),n_ftp(t,i),zm),target_wage_n,wgrid);
                                 m_fwage(t,i)=n_fwage(t-1,i); %Wage of the promoted non manager do not change now
                                 m_ftp(t,i)=n_ftp(t,i); %Promote the non manager
                                 n_ftp(t,i)=zm;
@@ -807,7 +807,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=4; %becomes a team
                                 hire_m(t,i)=1;
                                 target_wage=(1-bpw)*(Vmh(am,zm)-Veh(am))+bpw*(Vth(a_ftp(t,i),zm,n_ftp(t,i))- Vnh(a_ftp(t,i),n_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zm,n_ftp(t,i)),target_wage,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zm,n_ftp(t,i)),target_wage,wgrid);
                                 n_fwage(t,i)=n_fwage(t-1,i); %Wage of the non manager do not change now
                                 m_ftp(t,i)=zm;
                             end
@@ -827,7 +827,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=3;
                                 hire_n(t,i)=1;
                                 target_wage=(1-bpw)*(Vnh(an,zn)-Veh(an))+bpw*(Vnh(a_ftp(t,i),zn)+U(n_ftp(t,i))- Vnh(a_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wn(:,a_ftp(t,i),zn),target_wage,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wnh(:,a_ftp(t,i),zn),target_wage,wgrid);
                                 m_fwage(t,i)=0.0;
                                 m_ftp(t,i)=0;
                                 n_ftp(t,i)=zn;
@@ -836,7 +836,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_n(t,i)=1;
                                 prom_sm(t,i)=1; %Promote the non manager
                                 target_wage_n=(1-bpw)*(Vnh(an,zn)-Veh(an))+bpw*(Vth(a_ftp(t,i),n_ftp(t,i),zn)-cost_p - Vnh(a_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),n_ftp(t,i),zn),target_wage_n,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),n_ftp(t,i),zn),target_wage_n,wgrid);
                                 m_fwage(t,i)=n_fwage(t-1,i); %Wage of the promoted non manager do not change now
                                 m_ftp(t,i)=n_ftp(t,i); %Promote the non manager
                                 n_ftp(t,i)=zn;
@@ -844,7 +844,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=4; %becomes a team
                                 hire_m(t,i)=1;
                                 target_wage=(1-bpw)*(Vnh(an,zn)-Veh(an))+bpw*(Vth(a_ftp(t,i),zn,n_ftp(t,i))- Vnh(a_ftp(t,i),n_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zn,n_ftp(t,i)),target_wage,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zn,n_ftp(t,i)),target_wage,wgrid);
                                 n_fwage(t,i)=n_fwage(t-1,i); %Wage of the non
                                 m_ftp(t,i)=zn;
                             end
@@ -864,7 +864,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=3;
                                 hire_n(t,i)=1;
                                 target_wage=(1-bpw)*(Vth(at,zt,nt)-Vnh(at,nt))+bpw*(Vnh(a_ftp(t,i),zt)+U(n_ftp(t,i))- Vnh(a_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wn(:,a_ftp(t,i),zt),target_wage,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wnh(:,a_ftp(t,i),zt),target_wage,wgrid);
                                 m_fwage(t,i)=0.0;
                                 m_ftp(t,i)=0;
                                 n_ftp(t,i)=zt;
@@ -873,7 +873,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_n(t,i)=1;
                                 prom_sm(t,i)=1; %Promote the non manager
                                 target_wage_n=(1-bpw)*(Vth(at,zt,nt)-Vnh(at,nt))+bpw*(Vth(a_ftp(t,i),n_ftp(t,i),zt)-cost_p - Vnh(a_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),n_ftp(t,i),zt),target_wage_n,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),n_ftp(t,i),zt),target_wage_n,wgrid);
                                 m_fwage(t,i)=n_fwage(t-1,i); %Wage of the promoted non manager do not change now
                                 m_ftp(t,i)=n_ftp(t,i); %Promote the non manager
                                 n_ftp(t,i)=zt;
@@ -882,7 +882,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_m(t,i)=1;
                                 n_fwage(t,i)=n_fwage(t-1,i); %Wage of the non manager do not change now
                                 target_wage=(1-bpw)*(Vth(at,zt,nt)-Vnh(at,nt))+bpw*(Vth(a_ftp(t,i),zt,n_ftp(t,i))- Vnh(a_ftp(t,i),n_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zt,n_ftp(t,i)),target_wage,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zt,n_ftp(t,i)),target_wage,wgrid);
                                 m_ftp(t,i)=zt;
                             end
                         % Hire the non manager?
@@ -892,7 +892,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=3;
                                 hire_n(t,i)=1;
                                 target_wage=(1-bpw)*(Vth(at,zt,nt)-Vmh(at,zt))+bpw*(Vnh(a_ftp(t,i),nt)+U(n_ftp(t,i))- Vnh(a_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wn(:,a_ftp(t,i),nt),target_wage,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wnh(:,a_ftp(t,i),nt),target_wage,wgrid);
                                 m_fwage(t,i)=0.0;
                                 m_ftp(t,i)=0;
                                 n_ftp(t,i)=nt;
@@ -901,7 +901,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_n(t,i)=1;
                                 prom_sm(t,i)=1; %Promote the non manager
                                 target_wage_n=(1-bpw)*(Vth(at,zt,nt)-Vmh(at,zt))+bpw*(Vth(a_ftp(t,i),n_ftp(t,i),nt)-cost_p - Vnh(a_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),n_ftp(t,i),nt),target_wage_n,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),n_ftp(t,i),nt),target_wage_n,wgrid);
                                 m_fwage(t,i)=n_fwage(t-1,i); %Wage of the promoted non manager do not change now
                                 m_ftp(t,i)=n_ftp(t,i); %Promote the non manager
                                 n_ftp(t,i)=nt;
@@ -910,7 +910,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_m(t,i)=1;
                                 n_fwage(t,i)=n_fwage(t-1,i); %Wage of the non manager do not change now
                                 target_wage=(1-bpw)*(Vth(at,zt,nt)-Vmh(at,zt))+bpw*(Vth(a_ftp(t,i),nt,n_ftp(t,i))- Vnh(a_ftp(t,i),n_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),nt,n_ftp(t,i)),target_wage,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),nt,n_ftp(t,i)),target_wage,wgrid);
                                 m_ftp(t,i)=nt;
                             end
                         else %Firm does not hire
@@ -934,9 +934,9 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             firm_status(t,i)=3;
                             %Check if wage goes up
                             target_wage=max(Vnh(av,n_ftp(t,i)),Vmh(av,n_ftp(t,i)))-Veh(av); %Marginal of the poaching firm
-                            current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wn(:,a_ftp(t,i),n_ftp(t,i)));
+                            current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wnh(:,a_ftp(t,i),n_ftp(t,i)));
                             if (target_wage>current_wage)
-                                n_fwage(t,i)= InterpolateWage(Wn(:,a_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wnh(:,a_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
                             else
                                 n_fwage(t,i)=n_fwage(t-1,i);
                             end
@@ -957,9 +957,9 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             %Check if wage goes up
                             nu=[Vmh(am,n_ftp(t,i))+U(zm),Vth(am,zm,n_ftp(t,i)), Vth(am,n_ftp(t,i),zm)-cost_d];
                             target_wage_m=max(nu)-Vmh(am,zm); %Marginal of the poaching firm
-                            current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wn(:,a_ftp(t,i),n_ftp(t,i)));
+                            current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wnh(:,a_ftp(t,i),n_ftp(t,i)));
                             if (target_wage_m>current_wage)
-                                n_fwage(t,i)= InterpolateWage(Wn(:,a_ftp(t,i),n_ftp(t,i)),target_wage_m,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wnh(:,a_ftp(t,i),n_ftp(t,i)),target_wage_m,wgrid);
                             else
                                 n_fwage(t,i)=n_fwage(t-1,i);
                             end
@@ -980,9 +980,9 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             %Check if wage goes up
                             nu=[Vnh(an,n_ftp(t,i))+U(zn),Vth(an,zn,n_ftp(t,i))-cost_p, Vth(an,n_ftp(t,i),zn)];
                             target_wage_m=max(nu)-Vnh(an,zn); %Marginal of the poaching firm
-                            current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wn(:,a_ftp(t,i),n_ftp(t,i)));
+                            current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wnh(:,a_ftp(t,i),n_ftp(t,i)));
                             if (target_wage_m>current_wage)
-                                n_fwage(t,i)= InterpolateWage(Wn(:,a_ftp(t,i),n_ftp(t,i)),target_wage_m,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wnh(:,a_ftp(t,i),n_ftp(t,i)),target_wage_m,wgrid);
                             else
                                 n_fwage(t,i)=n_fwage(t-1,i);
                             end
@@ -1003,9 +1003,9 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             %Check if wage goes up
                             nu=[Vth(at,zt,n_ftp(t,i))+U(nt),Vth(at,n_ftp(t,i),zt)-cost_d+U(nt), Vth(at,nt,n_ftp(t,i))+U(zt)-cost_p, Vth(at,n_ftp(t,i),nt)+U(zt)];
                             target_wage_m=max(nu)-Vth(at,zt,nt) %Marginal of the poaching firm
-                            current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wn(:,a_ftp(t,i),n_ftp(t,i)));
+                            current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wnh(:,a_ftp(t,i),n_ftp(t,i)));
                             if (target_wage_m>current_wage)
-                                n_fwage(t,i)= InterpolateWage(Wn(:,a_ftp(t,i),n_ftp(t,i)),target_wage_m,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wnh(:,a_ftp(t,i),n_ftp(t,i)),target_wage_m,wgrid);
                             else
                                 n_fwage(t,i)=n_fwage(t-1,i);
                             end
@@ -1036,10 +1036,10 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                 % else %Non manager stays
                 %     firm_status(t,i)=3;
                 %     %Does the wage goes down?
-                %     current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wn(:,a_ftp(t,i),n_ftp(t,i)));
+                %     current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wnh(:,a_ftp(t,i),n_ftp(t,i)));
                 %     target_wage=Vnh(a_ftp(t,i),n_ftp(t,i))-Veh(a_ftp(t,i));
                 %     if (target_wage<current_wage)
-                %         n_fwage(t,i)= InterpolateWage(Wn(:,a_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
+                %         n_fwage(t,i)= InterpolateWage(Wnh(:,a_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
                 %     else
                 %         n_fwage(t,i)=n_fwage(t-1,i);
                 %     end
@@ -1095,7 +1095,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=4;
                                 hire_m(t,i)=1;
                                 target_wage=(1-bpw)*U(zu)+bpw*(Vth(a_ftp(t,i),zu,n_ftp(t,i))+U(m_ftp(t,i))- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zu,n_ftp(t,i)),target_wage,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zu,n_ftp(t,i)),target_wage,wgrid);
                                 n_fwage(t,i)=n_fwage(t-1,i);
                                 m_ftp(t,i)=zu;
                             elseif (p_t_m_d(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i),zu)>0) %Put as manager with demotion
@@ -1103,7 +1103,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_m(t,i)=1;
                                 prom_sm(t,i)=-1; %Demote the manager
                                 target_wage_m=(1-bpw)*U(zu)+bpw*(Vth(a_ftp(t,i),zu,m_ftp(t,i))+U(n_ftp(t,i))-cost_d- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zu,m_ftp(t,i)),target_wage_m,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zu,m_ftp(t,i)),target_wage_m,wgrid);
                                 n_fwage(t,i)=m_fwage(t-1,i); %Wage of the demoted manager do not change now
                                 n_ftp(t,i)=m_ftp(t,i); %Demote the manager
                                 m_ftp(t,i)=zu;
@@ -1111,7 +1111,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=4; %still a team
                                 hire_n(t,i)=1;
                                 target_wage_n=(1-bpw)*U(zu)+bpw*(Vth(a_ftp(t,i),m_ftp(t,i),zu)+U(n_ftp(t,i))- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),m_ftp(t,i),zu),target_wage_n,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),m_ftp(t,i),zu),target_wage_n,wgrid);
                                 m_fwage(t,i)=m_fwage(t-1,i); %Wage of the non manager do not change now
                                 n_ftp(t,i)=zu;
                             else %Put as non manager with promotion
@@ -1119,7 +1119,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_n(t,i)=1;
                                 prom_sm(t,i)=1; %Promote the non manager
                                 target_wage_n=(1-bpw)*U(zu)+bpw*(Vth(a_ftp(t,i),n_ftp(t,i),zu)-cost_p+ U(m_ftp(t,i)) -Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),n_ftp(t,i),zu),target_wage_n,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),n_ftp(t,i),zu),target_wage_n,wgrid);
                                 m_fwage(t,i)=n_fwage(t-1,i); %Wage of the promoted non manager do not change now
                                 m_ftp(t,i)=n_ftp(t,i); %Promote the non manager
                                 n_ftp(t,i)=zu;
@@ -1141,7 +1141,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=4;
                                 hire_m(t,i)=1;
                                 target_wage=(1-bpw)*(Vmh(am,zm)-Veh(am))+bpw*(Vth(a_ftp(t,i),zm,n_ftp(t,i))+U(m_ftp(t,i))- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zm,n_ftp(t,i)),target_wage,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zm,n_ftp(t,i)),target_wage,wgrid);
                                 n_fwage(t,i)=n_fwage(t-1,i);
                                 m_ftp(t,i)=zm;
                             elseif (p_t_m_d(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i),zm)>0) %Put as manager with demotion
@@ -1149,7 +1149,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_m(t,i)=1;
                                 prom_sm(t,i)=-1; %Demote the manager
                                 target_wage_m=(1-bpw)*(Vmh(am,zm)-Veh(am))+bpw*(Vth(a_ftp(t,i),zm,m_ftp(t,i))+U(n_ftp(t,i))-cost_d- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zm,m_ftp(t,i)),target_wage_m,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zm,m_ftp(t,i)),target_wage_m,wgrid);
                                 n_fwage(t,i)=m_fwage(t-1,i); %Wage of the demoted manager do not change now
                                 n_ftp(t,i)=m_ftp(t,i); %Demote the manager
                                 m_ftp(t,i)=zm;
@@ -1157,7 +1157,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=4; %still a team
                                 hire_n(t,i)=1;
                                 target_wage_n=(1-bpw)*(Vmh(am,zm)-Veh(am))+bpw*(Vth(a_ftp(t,i),m_ftp(t,i),zm)+U(n_ftp(t,i))- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),m_ftp(t,i),zm),target_wage_n,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),m_ftp(t,i),zm),target_wage_n,wgrid);
                                 m_fwage(t,i)=m_fwage(t-1,i); %Wage of the manager do not change now
                                 n_ftp(t,i)=zm;
                             else %Put as non manager with promotion
@@ -1165,7 +1165,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_n(t,i)=1;
                                 prom_sm(t,i)=1; %Promote the non manager
                                 target_wage_n=(1-bpw)*(Vmh(am,zm)-Veh(am))+bpw*(Vth(a_ftp(t,i),n_ftp(t,i),zm)-cost_p + U(m_ftp(t,i))-Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),n_ftp(t,i),zm),target_wage_n,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),n_ftp(t,i),zm),target_wage_n,wgrid);
                                 m_fwage(t,i)=n_fwage(t-1,i); %Wage of the promoted non manager do not change now
                                 m_ftp(t,i)=n_ftp(t,i); %Promote the non manager
                                 n_ftp(t,i)=zm;
@@ -1186,7 +1186,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=4;
                                 hire_m(t,i)=1;
                                 target_wage=(1-bpw)*(Vnh(an,zn)-Veh(an))+bpw*(Vth(a_ftp(t,i),zn,n_ftp(t,i))+U(m_ftp(t,i))- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zn,n_ftp(t,i)),target_wage,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zn,n_ftp(t,i)),target_wage,wgrid);
                                 n_fwage(t,i)=n_fwage(t-1,i);
                                 m_ftp(t,i)=zn;
                             elseif (p_t_m_d(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i),zn)>0) %Put as manager with demotion
@@ -1194,7 +1194,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_m(t,i)=1;
                                 prom_sm(t,i)=-1; %Demote the manager
                                 target_wage_m=(1-bpw)*(Vnh(an,zn)-Veh(an))+bpw*(Vth(a_ftp(t,i),zn,m_ftp(t,i))+U(n_ftp(t,i))-cost_d- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zn,m_ftp(t,i)),target_wage_m,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zn,m_ftp(t,i)),target_wage_m,wgrid);
                                 n_fwage(t,i)=m_fwage(t-1,i); %Wage of the demoted manager do not change now
                                 n_ftp(t,i)=m_ftp(t,i); %Demote the manager
                                 m_ftp(t,i)=zn;
@@ -1202,7 +1202,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=4; %still a team
                                 hire_n(t,i)=1;
                                 target_wage_n=(1-bpw)*(Vnh(an,zn)-Veh(an))+bpw*(Vth(a_ftp(t,i),m_ftp(t,i),zn)+U(n_ftp(t,i))- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),m_ftp(t,i),zn),target_wage_n,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),m_ftp(t,i),zn),target_wage_n,wgrid);
                                 m_fwage(t,i)=m_fwage(t-1,i); %Wage of the non manager do not change now
                                 n_ftp(t,i)=zn;
                             else %Put as non manager with promotion
@@ -1210,7 +1210,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_n(t,i)=1;
                                 prom_sm(t,i)=1; %Promote the non manager
                                 target_wage_n=(1-bpw)*(Vnh(an,zn)-Veh(an))+bpw*(Vth(a_ftp(t,i),n_ftp(t,i),zn)-cost_p + U(m_ftp(t,i))-Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),n_ftp(t,i),zn),target_wage_n,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),n_ftp(t,i),zn),target_wage_n,wgrid);
                                 m_fwage(t,i)=n_fwage(t-1,i); %Wage of the promoted non manager do not change now
                                 m_ftp(t,i)=n_ftp(t,i); %Promote the non manager
                                 n_ftp(t,i)=zn;
@@ -1231,7 +1231,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=4;
                                 hire_m(t,i)=1;
                                 target_wage=(1-bpw)*(Vth(at,zt,nt)-Vnh(at,nt))+bpw*(Vth(a_ftp(t,i),zt,n_ftp(t,i))+U(m_ftp(t,i))- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zt,n_ftp(t,i)),target_wage,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zt,n_ftp(t,i)),target_wage,wgrid);
                                 n_fwage(t,i)=n_fwage(t-1,i);
                                 m_ftp(t,i)=zt;
                             elseif (p_t_m_d(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i),zt)>0) %Put as manager with demotion
@@ -1239,7 +1239,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_m(t,i)=1;
                                 prom_sm(t,i)=-1; %Demote the manager
                                 target_wage_m=(1-bpw)*(Vth(at,zt,nt)-Vnh(at,nt))+bpw*(Vth(a_ftp(t,i),zt,m_ftp(t,i))+U(n_ftp(t,i))-cost_d- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zt,m_ftp(t,i)),target_wage_m,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zt,m_ftp(t,i)),target_wage_m,wgrid);
                                 n_fwage(t,i)=m_fwage(t-1,i); %Wage of the demoted manager do not change now
                                 n_ftp(t,i)=m_ftp(t,i); %Demote the manager
                                 m_ftp(t,i)=zt;
@@ -1247,7 +1247,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=4; %still a team
                                 hire_n(t,i)=1;
                                 target_wage_n=(1-bpw)*(Vth(at,zt,nt)-Vnh(at,nt))+bpw*(Vth(a_ftp(t,i),m_ftp(t,i),zt)+U(n_ftp(t,i))- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),m_ftp(t,i),zt),target_wage_n,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),m_ftp(t,i),zt),target_wage_n,wgrid);
                                 m_fwage(t,i)=m_fwage(t-1,i); %Wage of the manager do not change now
                                 n_ftp(t,i)=zt;
                             else %Put as non manager with promotion
@@ -1255,7 +1255,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_n(t,i)=1;
                                 prom_sm(t,i)=1; %Promote the non manager
                                 target_wage_n=(1-bpw)*(Vth(at,zt,nt)-Vnh(at,nt))+bpw*(Vth(a_ftp(t,i),n_ftp(t,i),zt)-cost_p + U(m_ftp(t,i))-Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),n_ftp(t,i),zt),target_wage_n,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),n_ftp(t,i),zt),target_wage_n,wgrid);
                                 m_fwage(t,i)=n_fwage(t-1,i); %Wage of the promoted non manager do not change now
                                 m_ftp(t,i)=n_ftp(t,i); %Promote the non manager
                                 n_ftp(t,i)=zt;
@@ -1274,7 +1274,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=4;
                                 hire_m(t,i)=1;
                                 target_wage=(1-bpw)*(Vth(at,zt,nt)-Vmh(at,zt))+bpw*(Vth(a_ftp(t,i),zt,n_ftp(t,i))+U(m_ftp(t,i))- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zt,n_ftp(t,i)),target_wage,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zt,n_ftp(t,i)),target_wage,wgrid);
                                 n_fwage(t,i)=n_fwage(t-1,i);
                                 m_ftp(t,i)=zt;
                             elseif (p_t_m_d(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i),nt)>0) %Put as manager with demotion
@@ -1282,7 +1282,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_m(t,i)=1;
                                 prom_sm(t,i)=-1; %Demote the manager
                                 target_wage_m=(1-bpw)*(Vth(at,zt,nt)-Vmh(at,zt))+bpw*(Vth(a_ftp(t,i),zt,m_ftp(t,i))+U(n_ftp(t,i))-cost_d- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),zt,m_ftp(t,i)),target_wage_m,wgrid);
+                                m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),zt,m_ftp(t,i)),target_wage_m,wgrid);
                                 n_fwage(t,i)=m_fwage(t-1,i); %Wage of the demoted manager do not change now
                                 n_ftp(t,i)=m_ftp(t,i); %Demote the manager
                                 m_ftp(t,i)=zt;
@@ -1290,7 +1290,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 firm_status(t,i)=4; %still a team
                                 hire_n(t,i)=1;
                                 target_wage_n=(1-bpw)*(Vth(at,zt,nt)-Vmh(at,zt))+bpw*(Vth(a_ftp(t,i),m_ftp(t,i),zt)+U(n_ftp(t,i))- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),m_ftp(t,i),zt),target_wage_n,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),m_ftp(t,i),zt),target_wage_n,wgrid);
                                 m_fwage(t,i)=m_fwage(t-1,i); %Wage of the manager do not change now
                                 n_ftp(t,i)=zt;
                             else %Put as non manager with promotion
@@ -1298,7 +1298,7 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                                 hire_n(t,i)=1;
                                 prom_sm(t,i)=1; %Promote the non manager
                                 target_wage_n=(1-bpw)*(Vth(at,zt,nt)-Vmh(at,zt))+bpw*(Vth(a_ftp(t,i),n_ftp(t,i),zt)-cost_p + U(m_ftp(t,i))-Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
-                                n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),n_ftp(t,i),zt),target_wage_n,wgrid);
+                                n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),n_ftp(t,i),zt),target_wage_n,wgrid);
                                 m_fwage(t,i)=n_fwage(t-1,i); %Wage of the promoted non manager do not change now
                                 m_ftp(t,i)=n_ftp(t,i); %Promote the non manager
                                 n_ftp(t,i)=zt;
@@ -1333,18 +1333,18 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             gain_n=max(Vmh(av,n_ftp(t,i)),Vnh(av,n_ftp(t,i)))-Veh(av) - Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i))+Vmh(a_ftp(t,i),m_ftp(t,i));
                             if (gain_m>=gain_n) %Manager might get a raise
                                 target_wage=max(Vmh(av,m_ftp(t,i)),Vnh(av,m_ftp(t,i)))-Veh(av); %Marginal of the poaching firm
-                                current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wtm(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
+                                current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wtmh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
                                 if (target_wage>current_wage)
-                                    m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
+                                    m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
                                 else
                                     m_fwage(t,i)=m_fwage(t-1,i);
                                 end
                                 n_fwage(t,i)=n_fwage(t-1,i);
                             else %Non manager might get a raise
                                 target_wage=max(Vmh(av,n_ftp(t,i)),Vnh(av,n_ftp(t,i)))-Veh(av); %Marginal of the poaching firm
-                                current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wtn(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
+                                current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wtnh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
                                 if (target_wage>current_wage)
-                                    n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
+                                    n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
                                 else
                                     n_fwage(t,i)=n_fwage(t-1,i);
                                 end
@@ -1375,18 +1375,18 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             gain_n=max(nu_n)-Vnh(am,zm)- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i))+Vmh(a_ftp(t,i),m_ftp(t,i));
                             if (gain_m>=gain_n) %Manager might get a raise
                                 target_wage=max(nu_m)-Vmh(am,zm); %Marginal of the poaching firm
-                                current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wtm(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
+                                current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wtmh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
                                 if (target_wage>current_wage)
-                                    m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
+                                    m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
                                 else
                                     m_fwage(t,i)=m_fwage(t-1,i);
                                 end
                                 n_fwage(t,i)=n_fwage(t-1,i);
                             else %Non manager might get a raise
                                 target_wage=max(nu_n)-Vnh(am,zm); %Marginal of the poaching firm
-                                current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wtn(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
+                                current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wtnh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
                                 if (target_wage>current_wage)
-                                    n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
+                                    n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
                                 else
                                     n_fwage(t,i)=n_fwage(t-1,i);
                                 end
@@ -1417,18 +1417,18 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             gain_n=max(nu_n)-Vnh(an,zn)- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i))+Vmh(a_ftp(t,i),m_ftp(t,i));
                             if (gain_m>=gain_n) %Manager might get a raise
                                 target_wage=max(nu_m)-Vnh(an,zn); %Marginal of the poaching firm
-                                current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wtm(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
+                                current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wtmh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
                                 if (target_wage>current_wage)
-                                    m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
+                                    m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
                                 else
                                     m_fwage(t,i)=m_fwage(t-1,i);
                                 end
                                 n_fwage(t,i)=n_fwage(t-1,i);
                             else %Non manager might get a raise
                                 target_wage=max(nu_n)-Vnh(an,zn); %Marginal of the poaching firm
-                                current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wtn(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
+                                current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wtnh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
                                 if (target_wage>current_wage)
-                                    n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
+                                    n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
                                 else
                                     n_fwage(t,i)=n_fwage(t-1,i);
                                 end
@@ -1459,18 +1459,18 @@ function [firm_status,m_ftp,n_ftp,m_fwage,n_fwage,hire_m,hire_n,fire_m,fire_n,pr
                             gain_n=max(nu_n)-Vth(at,zt,nt)- Vth(a_ftp(t,i),m_ftp(t,i),n_ftp(t,i))+Vmh(a_ftp(t,i),m_ftp(t,i));
                             if (gain_m>=gain_n) %Manager might get a raise
                                 target_wage=max(nu_m)-Vth(at,zt,nt); %Marginal of the poaching firm
-                                current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wtm(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
+                                current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wtmh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
                                 if (target_wage>current_wage)
-                                    m_fwage(t,i)= InterpolateWage(Wtm(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
+                                    m_fwage(t,i)= InterpolateWage(Wtmh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
                                 else
                                     m_fwage(t,i)=m_fwage(t-1,i);
                                 end
                                 n_fwage(t,i)=n_fwage(t-1,i);
                             else %Non manager might get a raise
                                 target_wage=max(nu_n)-Vth(at,zt,nt); %Marginal of the poaching firm
-                                current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wtn(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
+                                current_wage=InterpolateWage(wgrid, n_fwage(t,i),Wtnh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)));
                                 if (target_wage>current_wage)
-                                    n_fwage(t,i)= InterpolateWage(Wtn(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
+                                    n_fwage(t,i)= InterpolateWage(Wtnh(:,a_ftp(t,i),m_ftp(t,i),n_ftp(t,i)),target_wage,wgrid);
                                 else
                                     n_fwage(t,i)=n_fwage(t-1,i);
                                 end
