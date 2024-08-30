@@ -85,7 +85,7 @@ fe=zeros(1,ats);
 for a=1:ats
     for z=1:tpts
         for q=1:tpts
-            fteam(a,z,q)=A*a_type(a)*(type(z).^alpha_m)*(type(q).^alpha_n);
+            fteam(a,z,q)=A*(type(z).^alpha_m)*(type(q).^alpha_n);
         end
         fman(a,z)=A*a_type(a)*type(z).^alpha_m;
         fnman(a,z)=0;
@@ -132,7 +132,7 @@ u_trans=create_trans(ulose,ustay,ugain,tpts);
 dayy          ='1'   ; %Version of the code    
 zero_tol      =1e-10 ; %Tolerance for zero
 use_guess     ='y'   ;
-true=0               ; %Manager penalty toggle
+tr=0               ; %Manager penalty toggle
 speed=1              ; %Convergenge speed
 % %Specification 0
 
@@ -144,10 +144,10 @@ speed=1              ; %Convergenge speed
 
 % %Specification 2
 % run run_sp2.m
-
+% tic;
 %Specification 3
 run run_sp3.m
-
+% toc;
 % %Specification 4
 % run run_sp4.m
 

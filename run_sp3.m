@@ -11,7 +11,7 @@ fe=zeros(1,ats);
 for a=1:ats
     for z=1:tpts
         for q=1:tpts
-            fteam(a,z,q)=A*a_type(a)*((alpha_m*type(z)^fcomp + (1-alpha_m)*type(q)^fcomp))^(1/fcomp);
+            fteam(a,z,q)=A*((alpha_m*a_type(a)*type(z)^fcomp + (1-alpha_m)*type(q)^fcomp))^(1/fcomp);
         end
         fman(a,z)=(1/2)*A*a_type(a)*(alpha_m*type(z)^fcomp+ (1-alpha_m)*type(1)^fcomp)^(1/fcomp);
         fnman(a,z)=0;
@@ -72,7 +72,9 @@ Vnini=fnman/(1-bt);
 Vtini=fteam/(1-bt);
 Uini=b/(1-bt);
 
-[Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl, Vttl, Utl]= vf_iterationV2(eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist,eplus_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,true,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed);
+
+
+[Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl, Vttl, Utl]= vf_iterationV2(eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist,eplus_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,tr,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed);
 
 
 update_speed_v=1;
@@ -109,7 +111,7 @@ while (diff_joint>diff_joint_max | diff_joint_lag1>diff_joint_max  | diff_joint_
     end
 
     %Value function iteration
-    [Veplus, Vmplus, Vnplus, Vtplus, Uplus, Vehplus, Vmhplus, Vnhplus, Vthplus, Vetlplus, Vmtlplus, Vntlplus, Vttlplus, Utlplus] = vf_iterationV2(e_edist,e_mdist,e_ndist,e_tdist,e_udist,Ve,Vm,Vn,Vt,U,ats,tpts,cost_d,cost_p,true,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed);
+    [Veplus, Vmplus, Vnplus, Vtplus, Uplus, Vehplus, Vmhplus, Vnhplus, Vthplus, Vetlplus, Vmtlplus, Vntlplus, Vttlplus, Utlplus] = vf_iterationV2(e_edist,e_mdist,e_ndist,e_tdist,e_udist,Ve,Vm,Vn,Vt,U,ats,tpts,cost_d,cost_p,tr,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed);
     %Update the values
     Ve=(1-update_speed_v)*Ve+update_speed_v*Veplus;
     Vm=(1-update_speed_v)*Vm+update_speed_v*Vmplus;
@@ -206,7 +208,6 @@ wpts = 100;
 wgrid = [wmin:(wmax - wmin)/(wpts - 1):wmax];
 
 %% Wage iteration
-
 %Inital guesses for wages
 if exist('wages_a'+string(ats)+'_z'+string(tpts)+'.mat')==2 && use_guess(1)=='y'
     load('wages_a'+string(ats)+'_z'+string(tpts)+'.mat');

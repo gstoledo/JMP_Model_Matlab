@@ -26,7 +26,7 @@ function [Wm,Wn,Wtm,Wtn,Wmh,Wnh,Wtnh,Wtmh] =wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,
 
     %Iteration parameters
     diff=100;
-    diffmax=1e-6;
+    diffmax=1e-8;
          
     itw=0; 
     itmax=100000;
@@ -520,9 +520,9 @@ function [Wm,Wn,Wtm,Wtn,Wmh,Wnh,Wtnh,Wtmh] =wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,
     
         diff=max([max(abs(Wmup-Wm),[],'all'),max(abs(Wnup-Wn),[],'all'),max(abs(Wtmup-Wtm),[],'all'),max(abs(Wtnup-Wtn),[],'all')]);
         %Print every 50 iterations the difference and some text
-        if mod(itw,10)==0
-            fprintf('Wage Iteration %d, error %f \n', itw, diff)
-        end
+        % if mod(itw,100)==0
+        %     fprintf('Wage Iteration %d, error %f \n', itw, diff)
+        % end
         %In red failed to converge
         if itw==itmax
             fprintf(2,'WF Failed to converge\n')
