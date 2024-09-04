@@ -1921,7 +1921,6 @@ for jjj=1:Nrep
         id    =id+1;
         for i=12:12:T-t_burn %Step forward annually
             
-            
             if death1c_annual(i,j)==0
                 data_row=data_row+1; %Advance data row
                 period=period+1; %Advance period

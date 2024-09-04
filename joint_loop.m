@@ -29,21 +29,51 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %%Initial guesses for the LOM
-    eplus_udist=(1/tpts)*ones(1,tpts);
-    eplus_edist=(n/ats)*ones(1,ats);    
-    eplus_mdist=zeros(ats,tpts); %Distribution of firms with manager e_m(a,z)
-    eplus_ndist=zeros(ats,tpts); %Distribution of firms with no manager e_n(a,q)
-    eplus_tdist=zeros(ats,tpts,tpts); %Distribution of firms with team e_t(a,z,q)
+    model_file = 'solved_model.mat';
+    if exist(model_file, 'file')==2 && use_guess(1)=='y'
+        load(model_file, 'v', 'e', 'w');
+        if length(v.Ve)==ats && length(v.U)==tpts   %Making sure the initial guesses are the same size as the model
+            Veini=v.Ve;
+            Vmini=v.Vm;
+            Vnini=v.Vn;
+            Vtini=v.Vt;
+            Uini=v.U;
+            eplus_udist=e.eplus_udist;
+            eplus_edist=e.eplus_edist;
+            eplus_mdist=e.eplus_mdist;
+            eplus_ndist=e.eplus_ndist;
+            eplus_tdist=e.eplus_tdist;
+        else
+            clear v e w    
+            %%Initial guesses for the LOM
+            eplus_udist=(1/tpts)*ones(1,tpts);
+            eplus_edist=(n/ats)*ones(1,ats);    
+            eplus_mdist=zeros(ats,tpts); %Distribution of firms with manager e_m(a,z)
+            eplus_ndist=zeros(ats,tpts); %Distribution of firms with no manager e_n(a,q)
+            eplus_tdist=zeros(ats,tpts,tpts); %Distribution of firms with team e_t(a,z,q)
 
+            %Inital guesses for value functionsz
+            Veini=zeros(1,ats);
+            Vmini=fman/(1-bt);
+            Vnini=fnman/(1-bt);
+            Vtini=fteam/(1-bt);
+            Uini=b/(1-bt);
+        end 
+    else        
+        %%Initial guesses for the LOM
+        eplus_udist=(1/tpts)*ones(1,tpts);
+        eplus_edist=(n/ats)*ones(1,ats);    
+        eplus_mdist=zeros(ats,tpts); %Distribution of firms with manager e_m(a,z)
+        eplus_ndist=zeros(ats,tpts); %Distribution of firms with no manager e_n(a,q)
+        eplus_tdist=zeros(ats,tpts,tpts); %Distribution of firms with team e_t(a,z,q)
 
-    %Inital guesses for value functionsz
-    Veini=zeros(1,ats);
-    Vmini=fman/(1-bt);
-    Vnini=fnman/(1-bt);
-    Vtini=fteam/(1-bt);
-    Uini=b/(1-bt);
-
+        %Inital guesses for value functionsz
+        Veini=zeros(1,ats);
+        Vmini=fman/(1-bt);
+        Vnini=fnman/(1-bt);
+        Vtini=fteam/(1-bt);
+        Uini=b/(1-bt);
+    end
 
     %Initialize the loop with a guess for value functions
     [Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl, Vttl, Utl]= vf_iterationV2(eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist,eplus_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,tr,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed);
@@ -110,17 +140,16 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
         diff_joint_lag1=diff_joint;
         diff_joint=diff_joint_store;
 
-        %Print every 100 iterations
-        if mod(it_joint,10)==0
-            fprintf(string(spec_name)+' Joint Iteration %d, error %f \n', it_joint, diff_joint);
+        % %Print every 100 iterations
+        % if mod(it_joint,10)==0
+        %     fprintf(string(spec_name)+' Joint Iteration %d, error %f \n', it_joint, diff_joint);
+        % end
+        if diff_joint<diff_joint_max && diff_joint_lag1<diff_joint_max  && diff_joint_lag2<diff_joint_max && it_joint>=it_joint_min
+            fprintf(string(spec_name)+' Joint Converged in %d iterations\n',it_joint);
         end
         if it_joint==it_joint_max
             fprintf(2,'Joint Failed to converge\n')
         end
-        if diff_joint<diff_joint_max
-            fprintf(string(spec_name)+' Joint Converged in %d iterations\n',it_joint);
-        end
-
     end
     %Check sum of the eplus final distributions
     nplus=sum(eplus_edist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+sum(eplus_tdist,"all");
@@ -128,20 +157,42 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
 
     % toc;
 
-    %% Wage iteration
-    %Inital guesses for wages
-    if exist('wages_a'+string(ats)+'_z'+string(tpts)+'.mat')==2 && use_guess(1)=='y'
-        load('wages_a'+string(ats)+'_z'+string(tpts)+'.mat');
-        Wmini=Wm;
-        Wnini=Wn;
-        Wtmini=Wtm;
-        Wtnini=Wtn;
+    % %% Wage iteration
+    % %Inital guesses for wages
+    % model_file = 'solution_wages.mat';
+    % if exist(model_file, 'file')==2 && use_guess(1)=='y'
+    %     load(model_file, 'Wm', 'Wn', 'Wtm', 'Wtn');
+    %     if size(Wm,1)==wpts && size(Wm,2)==ats && size(Wm,3)==tpts 
+    %         Wmini=Wm;
+    %         Wnini=Wn;
+    %         Wtmini=Wtm;
+    %         Wtnini=Wtn;
+    %     else
+    %         Wmini=ones(wpts,ats,tpts)*wmin;
+    %         Wnini=ones(wpts,ats,tpts)*wmin;
+    %         Wtmini=ones(wpts,ats,tpts,tpts)*wmin;
+    %         Wtnini=ones(wpts,ats,tpts,tpts)*wmin;
+    %     end
+    % else
+    %     Wmini=ones(wpts,ats,tpts)*wmin;
+    %     Wnini=ones(wpts,ats,tpts)*wmin;
+    %     Wtmini=ones(wpts,ats,tpts,tpts)*wmin;
+    %     Wtnini=ones(wpts,ats,tpts,tpts)*wmin;
+    % end
+
+    if exist(model_file, 'file')==2 && use_guess(1)=='y'
+        %Use w
+        Wmini=w.Wm;
+        Wnini=w.Wn;
+        Wtmini=w.Wtm;
+        Wtnini=w.Wtn;
     else
         Wmini=ones(wpts,ats,tpts)*wmin;
         Wnini=ones(wpts,ats,tpts)*wmin;
         Wtmini=ones(wpts,ats,tpts,tpts)*wmin;
         Wtnini=ones(wpts,ats,tpts,tpts)*wmin;
     end
+
 
 
     % tic

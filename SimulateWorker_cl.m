@@ -1,5 +1,5 @@
 % %Simulation as a function
-function ws=SimulateWorker_cl(n_months,n_workers,p,ps,tg,v,d,w,fs)
+function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
     %Opening up the parameters
     fieldNames = fieldnames(p);
     % Loop over each field and assign it to a variable in the workspace
@@ -24,7 +24,15 @@ function ws=SimulateWorker_cl(n_months,n_workers,p,ps,tg,v,d,w,fs)
         % Use eval to assign the value to the variable with the same name
         eval([varName ' = tg.' varName ';']);
     end
-    
+
+    fieldNames = fieldnames(sp);
+    % Loop over each field and assign it to a variable in the workspace
+    for i = 1:length(fieldNames)% Dynamically create the variable name
+        varName = fieldNames{i};
+        % Use eval to assign the value to the variable with the same name
+        eval([varName ' = sp.' varName ';']);
+    end
+     
     fieldNames = fieldnames(v);
     % Loop over each field and assign it to a variable in the workspace
     for i = 1:length(fieldNames)% Dynamically create the variable name
@@ -33,12 +41,12 @@ function ws=SimulateWorker_cl(n_months,n_workers,p,ps,tg,v,d,w,fs)
         eval([varName ' = v.' varName ';']);
     end
 
-    fieldNames = fieldnames(d);
+    fieldNames = fieldnames(e);
     % Loop over each field and assign it to a variable in the workspace
     for i = 1:length(fieldNames)% Dynamically create the variable name
         varName = fieldNames{i};
         % Use eval to assign the value to the variable with the same name
-        eval([varName ' = d.' varName ';']);
+        eval([varName ' = e.' varName ';']);
     end
 
     fieldNames = fieldnames(w);
@@ -203,7 +211,7 @@ function ws=SimulateWorker_cl(n_months,n_workers,p,ps,tg,v,d,w,fs)
         end
     end
     
-    %quantiles_n=zeros(nquantiles,ats,tpts);
+    quantiles_n=zeros(nquantiles,ats,tpts);
     for a=1:ats
         for z=1:tpts
             I=find(firm_status==3 & a_ftp==a & n_ftp==z);

@@ -11,6 +11,29 @@ load('xmin_results_combined.mat')
 x=xmin; %Use some values of HLPM to start 
 
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Toggles
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+tg.use_guess='y'; 
+tg.zero_tol=1e-10;                  %Tolerance for zero
+tg.tr=0;                            %Manager penalty toggle
+tg.speed=1;                         %Convergenge speed
+tg.update_speed_v=1;                %Update speed for value functions
+tg.update_speed=1;                  %Update speed for wages
+
+%% Simulation parameters
+sp.seed=1;                          %Seed for random number generator
+sp.n_firms=10;                      %Number of firms
+sp.n_workers=sp.n_firms;             %Number of workers
+sp.n_months=24;                     %Number of months
+sp.burn_years=1;                  %Number of years to burn
+sp.t_burn=12*sp.burn_years;        %Number of months to burn
+sp.n_years=sp.n_months/12;        %Number of years total
+sp.stable_years = sp.n_years - sp.burn_years; %Number of years to keep the simulation
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Pre-set parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -22,17 +45,6 @@ ps.death=1/(35*12);                 %Probability agent dies
 ps.bpw=1-xmin(11);                  %bpw is bargaining power of worker
 ps.bpf=1-ps.bpw;                    %Firm bargaining power (1-gamma)
 ps.n=1;                             %Measure of firms
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Toggles
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-tg.use_guess='y'; 
-tg.zero_tol=1e-10;                  %Tolerance for zero
-tg.tr=0;                          %Manager penalty toggle
-tg.speed=1;                         %Convergenge speed
-tg.update_speed_v=1;                %Update speed for value functions
-tg.update_speed=1;                  %Update speed for wages
-tg.seed=1;                          %Seed for random number generator
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Parameters
@@ -56,6 +68,7 @@ p.cost_d=1;                         %cost of demoting a manager to non manager
 p.cost_p=1;                         %cost of promoting a non manager to manager
 
 
+
 %Joint loop 
 tic;
 [v,e,w]=joint_loop(p,ps,tg,"spec3");
@@ -65,6 +78,14 @@ toc;
 n_months=30;
 n_firms=10;
 n_workers=n_firms;
-fs=SimulateFirm_cl(n_months,n_firms,p,ps,tg,v,e,w);
-ws=SimulateWorker_cl(n_months,n_workers,p,ps,tg,v,e,w,fs);
+fs=SimulateFirm_cl(p,ps,tg,sp,v,e,w);
+ws=SimulateWorker_cl(p,ps,sp,tg,v,e,w,fs);
+
+save('simulations.mat','fs','ws','sp')
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
 

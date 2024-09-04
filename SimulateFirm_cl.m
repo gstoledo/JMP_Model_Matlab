@@ -1,5 +1,5 @@
 % %Simulation as a function
-function fs=SimulateFirm_cl(n_months,n_firms,p,ps,tg,v,d,w)
+function fs=SimulateFirm_cl(p,ps,tg,sp,v,d,w)
     %Opening up the parameters
     fieldNames = fieldnames(p);
     % Loop over each field and assign it to a variable in the workspace
@@ -17,6 +17,7 @@ function fs=SimulateFirm_cl(n_months,n_firms,p,ps,tg,v,d,w)
         eval([varName ' = ps.' varName ';']);
     end
 
+
     fieldNames = fieldnames(tg);
     % Loop over each field and assign it to a variable in the workspace
     for i = 1:length(fieldNames)% Dynamically create the variable name
@@ -24,7 +25,15 @@ function fs=SimulateFirm_cl(n_months,n_firms,p,ps,tg,v,d,w)
         % Use eval to assign the value to the variable with the same name
         eval([varName ' = tg.' varName ';']);
     end
-    
+
+    fieldNames = fieldnames(sp);
+    % Loop over each field and assign it to a variable in the workspace
+    for i = 1:length(fieldNames)% Dynamically create the variable name
+        varName = fieldNames{i};
+        % Use eval to assign the value to the variable with the same name
+        eval([varName ' = sp.' varName ';']);
+    end
+
     fieldNames = fieldnames(v);
     % Loop over each field and assign it to a variable in the workspace
     for i = 1:length(fieldNames)% Dynamically create the variable name

@@ -527,9 +527,9 @@ function [Wm,Wn,Wtm,Wtn,Wmh,Wnh,Wtnh,Wtmh] =wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,
         if itw==itmax
             fprintf(2,'WF Failed to converge\n')
         end
-        if diff<diffmax
-            fprintf('Wages Converged in %d iterations\n',itw)
-        end
+        % if diff<diffmax
+        %     fprintf('Wages Converged in %d iterations\n',itw)
+        % end
     end
     %Final values
     Wm=Wmup;
