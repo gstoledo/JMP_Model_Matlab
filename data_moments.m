@@ -12,8 +12,8 @@
 % as Vector
 dm(1)=                              0.047+0.009;  % NiMi Rate internal promotions to managers (as a fraction of total managers)
 dm(2)=                              0.021+0.001;  % MiNi Rate internal demotions to non-managers (as a fraction of total non-managers)
-% dm(3)=                              6.84;          % Q5Q1nm_wage Non Manager Wage Ratio quintile 5 to quintile 1 of total avg wage
-% dm(4)=                              3.35;          % Q5Q2nm_wage Non Manager Wage Ratio quintile 5 to quintile 2 of total avg wage
-% dm(5)=                              2.30;          % Q5Q3nm_wage Non Manager Wage Ratio quintile 5 to quintile 3 of total avg wage
-% dm(6)=                              1.68;          % Q5Q4nm_wage Non Manager Wage Ratio quintile 5 to quintile 4 of total avg wage
+dm(3)=                              6.84;          % Q5Q1nm_wage Non Manager Wage Ratio quintile 5 to quintile 1 of total avg wage
+dm(4)=                              3.35;          % Q5Q2nm_wage Non Manager Wage Ratio quintile 5 to quintile 2 of total avg wage
+dm(5)=                              2.30;          % Q5Q3nm_wage Non Manager Wage Ratio quintile 5 to quintile 3 of total avg wage
+dm(6)=                              1.68;          % Q5Q4nm_wage Non Manager Wage Ratio quintile 5 to quintile 4 of total avg wage
 % dm(7)=                              1;           % Q5Q4nm_wage Non Manager Wage Ratio quintile 5 to quintile 4 of total avg wage    

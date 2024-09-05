@@ -135,15 +135,15 @@ function mm= model_moments(ps,sp,fs,ws)
     I_dem=find(prom_sm==-1 | prom_realloc==-1);
     mm(2)=length(I_dem)/length(I_nman);
     
-    % % Split the sample by firms with each level of productivity
+    % Split the sample by firms with each level of productivity
     
-    % % Iq5=find(prod==5);
-    % nm_avg_q=zeros(1,ats);
-    % for a=1:ats
-    %     Iq{a}=find(prod==a);
-    %     nm_avg_q(a)=sum(nman_wage(Iq{a}))/length(Iq{a});
-    % end
+    % Iq5=find(prod==5);
+    nm_avg_q=zeros(1,ats);
+    for a=1:ats
+        Iq{a}=find(prod==a);
+        nm_avg_q(a)=sum(nman_wage(Iq{a}))/length(Iq{a});
+    end
     
-    % %Top to 1, top to 2...
-    % mm(3:3+ats-2)=nm_avg_q(ats) ./ nm_avg_q(1:ats-1);
+    %Top to 1, top to 2...
+    mm(3:3+ats-2)=nm_avg_q(ats) ./ nm_avg_q(1:ats-1);
     
