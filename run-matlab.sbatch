@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=calibrationv0
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=32
+#SBATCH --cpus-per-task=25
 #SBATCH --mem=128GB
 #SBATCH --time=07:00:00
 #SBATCH --output=Matlab-%j.out

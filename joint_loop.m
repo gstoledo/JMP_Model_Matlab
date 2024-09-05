@@ -32,7 +32,8 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
     model_file = 'solved_model.mat';
     if exist(model_file, 'file')==2 && use_guess(1)=='y'
         load(model_file, 'v', 'e', 'w');
-        if length(v.Ve)==ats && length(v.U)==tpts   %Making sure the initial guesses are the same size as the model
+        %Making sure the initial guesses are the same size as the model and they are not empty
+        if length(v.Ve)==ats && length(v.U)==tpts && ~isempty(v.Ve) && ~isempty(v.U) && ~isempty(v.Vm) && ~isempty(v.Vn) && ~isempty(v.Vt)
             Veini=v.Ve;
             Vmini=v.Vm;
             Vnini=v.Vn;
@@ -181,11 +182,19 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
     % end
 
     if exist(model_file, 'file')==2 && use_guess(1)=='y'
-        %Use w
-        Wmini=w.Wm;
-        Wnini=w.Wn;
-        Wtmini=w.Wtm;
-        Wtnini=w.Wtn;
+        load(model_file, 'w');
+        if size(w.Wm,1)==wpts && size(w.Wm,2)==ats && size(w.Wm,3)==tpts && ~isempty(w.Wm) && ~isempty(w.Wn) && ~isempty(w.Wtm) && ~isempty(w.Wtn)
+            Wmini=w.Wm;
+            Wnini=w.Wn;
+            Wtmini=w.Wtm;
+            Wtnini=w.Wtn;
+        else
+            clear w
+            Wmini=ones(wpts,ats,tpts)*wmin;
+            Wnini=ones(wpts,ats,tpts)*wmin;
+            Wtmini=ones(wpts,ats,tpts,tpts)*wmin;
+            Wtnini=ones(wpts,ats,tpts,tpts)*wmin;
+        end
     else
         Wmini=ones(wpts,ats,tpts)*wmin;
         Wnini=ones(wpts,ats,tpts)*wmin;

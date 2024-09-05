@@ -1,5 +1,5 @@
 %Function that runs, simulate compute moments of the model and get the difference with the data moments
-function [distance,mm]=f_SMM(p,ps,tg,sp,dm)
+function [distance,model_mom]=f_SMM(p,ps,tg,sp,dm,moments_selection)
     %Solve the model
     [v,e,w]=joint_loop(p,ps,tg,"spec3");
     save('solved_model.mat','v','e','w')
@@ -7,12 +7,15 @@ function [distance,mm]=f_SMM(p,ps,tg,sp,dm)
     fs=SimulateFirm_cl(p,ps,tg,sp,v,e,w);
     ws=SimulateWorker_cl(p,ps,sp,tg,v,e,w,fs);
     % save('simulations.mat','fs','ws','sp')
+    %Data moments
+    data_mom=data_moments(dm, moments_selection);
+
     %Model moments
-    mm=model_moments(ps,sp,fs,ws);
-    numMoments = length(mm);
+    model_mom= model_moments(ps,sp,fs,ws,moments_selection);
+    numMoments = length(model_mom);
 
     %Difference
-    diff=dm-mm;
+    diff=model_mom-data_mom;
     %Weightning matrix, identity matrix for now
     WMat= eye(numMoments);
 

@@ -1,6 +1,6 @@
 %From test script long_data
 
-function mm= model_moments(ps,sp,fs,ws)
+function model_moments= model_moments(ps,sp,fs,ws,moments_selection)
     %Unpack sp, fs and ws, ps 
     fieldNames = fieldnames(ps);
     % Loop over each field and assign it to a variable in the workspace
@@ -129,11 +129,11 @@ function mm= model_moments(ps,sp,fs,ws)
     %Moments
     %Promotion
     I_prom=find(prom_sm==1 | prom_realloc==1);
-    mm(1)=length(I_prom)/length(I_man);
+    mm.NiMi = length(I_prom)/length(I_man);
     
     %Demotion
     I_dem=find(prom_sm==-1 | prom_realloc==-1);
-    mm(2)=length(I_dem)/length(I_nman);
+    mm.MiNi = length(I_dem)/length(I_nman);
     
     % Split the sample by firms with each level of productivity
     
@@ -143,7 +143,24 @@ function mm= model_moments(ps,sp,fs,ws)
         Iq{a}=find(prod==a);
         nm_avg_q(a)=sum(nman_wage(Iq{a}))/length(Iq{a});
     end
+
+
+    if ats== 5
+        mm.Q5Q1nm_wage = nm_avg_q(5)/nm_avg_q(1);                    
+        mm.Q5Q2nm_wage = nm_avg_q(5)/nm_avg_q(2);                   
+        mm.Q5Q3nm_wage = nm_avg_q(5)/nm_avg_q(3);                     
+        mm.Q5Q4nm_wage = nm_avg_q(5)/nm_avg_q(4);                     
+        mm.Q5Q5nm_wage = nm_avg_q(5)/nm_avg_q(5);
+    else 
+        mm.Q5Q1nm_wage =  nm_avg_q(2)/nm_avg_q(1);
+        mm.Q5Q5nm_wage= nm_avg_q(2)/nm_avg_q(2);
+    end
+
+    % Loop over the fields specified in moments_selection
+    model_moments = zeros(1, length(moments_selection));
+    for i = 1:length(moments_selection)
+        field_name = moments_selection{i};  % Get the field name from the selection
+        model_moments(i) = mm.(field_name);  % Access the corresponding field in the struct
+    end
     
-    %Top to 1, top to 2...
-    mm(3:3+ats-2)=nm_avg_q(ats) ./ nm_avg_q(1:ats-1);
-    
+
