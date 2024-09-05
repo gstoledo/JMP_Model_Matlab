@@ -96,6 +96,7 @@ run data_moments.m
 % numMoments = length(mm);
 %Import data moments
 
+% run data_moments.m
 
 % tic
 % distance=wrapperSMM(p_vec, ps, tg, sp, dm);
