@@ -31,7 +31,7 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     model_file = 'solved_model.mat';
     if exist(model_file, 'file')==2 && use_guess(1)=='y'
-        load(model_file, 'v', 'e', 'w');
+        load(model_file, 'v', 'e');
         %Making sure the initial guesses are the same size as the model and they are not empty
         if length(v.Ve)==ats && length(v.U)==tpts && ~isempty(v.Ve) && ~isempty(v.U) && ~isempty(v.Vm) && ~isempty(v.Vn) && ~isempty(v.Vt)
             Veini=v.Ve;
@@ -45,7 +45,7 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
             eplus_ndist=e.eplus_ndist;
             eplus_tdist=e.eplus_tdist;
         else
-            clear v e w    
+            % clear v e w    
             %%Initial guesses for the LOM
             eplus_udist=(1/tpts)*ones(1,tpts);
             eplus_edist=(n/ats)*ones(1,ats);    
@@ -145,9 +145,9 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
         % if mod(it_joint,10)==0
         %     fprintf(string(spec_name)+' Joint Iteration %d, error %f \n', it_joint, diff_joint);
         % end
-        if diff_joint<diff_joint_max && diff_joint_lag1<diff_joint_max  && diff_joint_lag2<diff_joint_max && it_joint>=it_joint_min
-            fprintf(string(spec_name)+' Joint Converged in %d iterations\n',it_joint);
-        end
+        % if diff_joint<diff_joint_max && diff_joint_lag1<diff_joint_max  && diff_joint_lag2<diff_joint_max && it_joint>=it_joint_min
+        %     fprintf(string(spec_name)+' Joint Converged in %d iterations\n',it_joint);
+        % end
         if it_joint==it_joint_max
             fprintf(2,'Joint Failed to converge\n')
         end
@@ -189,7 +189,7 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
             Wtmini=w.Wtm;
             Wtnini=w.Wtn;
         else
-            clear w
+            % clear w
             Wmini=ones(wpts,ats,tpts)*wmin;
             Wnini=ones(wpts,ats,tpts)*wmin;
             Wtmini=ones(wpts,ats,tpts,tpts)*wmin;
@@ -209,6 +209,7 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
     speed,cost_d,cost_p,wgrid,bt,death,del,lam,lamu,bpw,n,a_trans,q_trans,e_udist,e_edist,e_mdist,e_ndist,e_tdist);
     % toc
     %Output the results
+    clear v e w
     v=struct('Ve',Ve,'Vm',Vm,'Vn',Vn,'Vt',Vt,'U',U,'Veh',Veh,'Vmh',Vmh,'Vnh',Vnh,'Vth',Vth);
     e=struct('eplus_udist',eplus_udist,'eplus_edist',eplus_edist,'eplus_mdist',eplus_mdist,'eplus_ndist',eplus_ndist,'eplus_tdist',eplus_tdist,'nplus',nplus,'popplus',popplus);
     w=struct('Wm',Wm,'Wn',Wn,'Wtm',Wtm,'Wtn',Wtn,'Wmh',Wmh,'Wnh',Wnh,'Wtmh',Wtmh,'Wtnh',Wtnh);

@@ -1,10 +1,10 @@
 #!/bin/bash
 
-#SBATCH --job-name=calibrationv0
+#SBATCH --job-name=CalibrationCosts_Lambdas
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=25
+#SBATCH --cpus-per-task=32
 #SBATCH --mem=128GB
-#SBATCH --time=07:00:00
+#SBATCH --time=15:00:00
 #SBATCH --output=Matlab-%j.out
 #SBATCH --error=Matlab-%j.err
 #SBATCH --mail-type=END
@@ -20,11 +20,6 @@ export MATLAB_LOG_DIR=$SLURM_JOBTMP
 cp -rp /share/apps/matlab-slurm/20201018/slurm/shared/parallel.mlsettings $MATLAB_PREFDIR
 
 cat<<EOF | matlab -nodisplay
-
-% Add your working directory to MATLAB's path
-addpath('/home/gst247/HPC_Model_Matlab/JMP_Model_Matlab');
-
-
 
 % Run your MATLAB script
 calibrationv0

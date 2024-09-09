@@ -1232,7 +1232,7 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                                     co_wage(t,i)=0.0;
                                     co_tenure(t,i)=0;
                                     a_wtp(t,i)=0;
-                                    fire_n(t,i)=1
+                                    fire_n(t,i)=1;
                                 elseif (p_n_n_p(a_wtp(t,i),self_z(t,i),zt)>0) %Hired as a non manager promoting the current one
                                     worker_status(t,i)=4; %manager in a team
                                     self_wage(t,i)=self_wage(t-1,i); %does not chenge now

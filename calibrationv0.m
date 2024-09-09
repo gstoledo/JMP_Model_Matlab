@@ -7,6 +7,9 @@ if location == "local"
     cd('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/JMP_Model_Matlab')
     addpath('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/JMP_Model_Matlab')
     addpath('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/Python_Firm Structure/replication_HLMP/matlab/run_A4_revisit')
+else
+    % Add your working directory to MATLAB's path
+    addpath('/home/gst247/HPC_Model_Matlab/JMP_Model_Matlab')
 end
 load('xmin_results_combined.mat')
 x=xmin; %Use some values of HLPM to start 
@@ -20,7 +23,7 @@ x=xmin; %Use some values of HLPM to start
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Toggles
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-tg.use_guess='y'; 
+tg.use_guess='no'; 
 tg.zero_tol=1e-10;                  %Tolerance for zero
 tg.tr=0;                            %Manager penalty toggle
 tg.speed=1;                         %Convergenge speed
@@ -73,8 +76,8 @@ theta.n=1;                             %Measure of firms
 
 theta.aup=0.1;                          %Probability of moving up
 theta.adown=0.3;                        %Probability of moving down
-theta.qdown=0*ones(theta.ats,1);           %Probability of moving down in q
-theta.ulose=x(6);                        %Probability of moving donw in u
+theta.qdown=0*ones(theta.ats,1);        %Probability of moving down in q
+theta.ulose=x(6);                       %Probability of moving donw in u
 theta.A=x(14);                          %Aggegate productivity parameter, still unsure hor to add this here
 theta.fcomp=x(3);                       %Complementarity in F
 theta.alpha_m=0.7;                      %Manager share
@@ -84,15 +87,17 @@ theta.lamu=x(1);                        %Prob of U find a firm
 theta.lam=x(2);                         %Prob of firm find another firm
 theta.del=x(5);                         %Separation rate
 theta.qup=0.3*ones(theta.ats,1);           %Probability of moving up in q. The qup for the last level of productivity is irrelevant
-theta.cost_d=1;                         %cost of demoting a manager to non manager  
-theta.cost_p=1;                         %cost of promoting a non manager to manager
+theta.cost_d=0.8;                         %cost of demoting a manager to non manager  
+theta.cost_p=0.3;                         %cost of promoting a non manager to manager
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Grids
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-cgrid.cost_d=linspace(1,2.5,5);
-cgrid.cost_p=linspace(1,2.5,5);
-cgrid.qup = repmat({linspace(0.1, 0.5, 2)},length(theta.qup),1);
+cgrid.cost_d=linspace(0.5,1.4,15);
+cgrid.cost_p=linspace(0.05,0.4,15);
+cgrid.qup = repmat({linspace(0.1, 0.5, 5)},length(theta.qup),1);
+cgrid.lamu=linspace(0.1,0.6,10);
+cgrid.lam=linspace(0.1,0.6,10);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % %Function to wrap the SMM function
@@ -131,79 +136,49 @@ cgrid.qup = repmat({linspace(0.1, 0.5, 2)},length(theta.qup),1);
 
 
 
-%% Lets try ionly with the 2 costs
-%Select the ones we want to calibrate
-p_selection = {'cost_d', 'cost_p', 'qup'};
-% p_selection={'cost_d', 'cost_p'};
-[p_vec, ps] = param_selection(theta, p_selection);
-%Moments selection to be used in the calibration
+%% Manual calibration for some combinations
+%Only costs
+p_selection={'cost_p','cost_d',};
 moments_selection = {'NiMi', 'MiNi'};
+cgrid.cost_d=linspace(0.5,1.4,15);
+cgrid.cost_p=linspace(0.01,0.2,15);
+manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'costs_lowcp');
+
+% %Only qup
+% p_selection={'qup'};
+% moments_selection = {'Q5Q1nm_wage', 'Q5Q2nm_wage', 'Q5Q3nm_wage', 'Q5Q4nm_wage', 'Q5Q5nm_wage'};
+% manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'qup');
+
+
+%Costs amd Lambadas to get only NiMi and MiNi
+p_selection={'cost_p','cost_d','lamu','lam'};
+moments_selection = {'NiMi', 'MiNi'};
+manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'costs_lambdas');
 
 
 
-%Create the combinations
-combinations = create_combinations(cgrid, p_selection,theta);
-nCombinations = size(combinations, 1);
-distances=zeros(nCombinations,1);
-moments=zeros(nCombinations,length(moments_selection));
 
 
-parfor idx = 1:nCombinations
-    p_vec=[combinations(idx,:)];
-    [distances(idx), moments(idx,:)]=wrapperSMM(p_vec, p_selection, theta, ps, tg, sp, dm, moments_selection)
-end
-save('calibrationv0.mat','distances','moments','combinations','dm')
-if location=="hpc"
-    save('/home/gst247/HPC_Model_Matlab/Calibration_outcomes/calibrationv0_costs_quq.mat','distances','moments','combinations','dm')
-end
+% % With minimization
+% p_selection={'cost_p','cost_d',};
+% [p_vec, ps] = param_selection(theta, p_selection);
+% moments_selection = {'NiMi', 'MiNi'};
+% %Number of parameters
+% nvars=length(p_selection);
+% lb = [cgrid.cost_p(1); cgrid.cost_d(1)];
+% ub = [cgrid.cost_p(end); cgrid.cost_d(end)];
 
+% %Initial guess
+% pvec0=[0.1,1];
+% options = optimoptions('ga', 'Display', 'iter', ...
+%                        'UseParallel', true, 'PopulationSize', 10, 'InitialPopulationMatrix', pvec0);
 
-clear variables
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%Lets get a sense of how these parameters affect the model
-%Create a grid (10 points for each parameter) arounf the inital "guesses"
-% grid_cost_d=linspace(0.5,1.5,5);
-% grid_cost_p=linspace(0.5,1.5,5);
-% grid_qup=linspace(0.1,0.5,5);
-
-
-% parpool('local');
-% if ps.ats==2
-%     [CostD, CostP, Qup1, Qup2 ] = ndgrid(grid_cost_d, grid_cost_p, grid_qup, grid_qup);
-%     combinations = [CostD(:), CostP(:), Qup1(:), Qup2(:)];
-%     nCombinations = size(combinations, 1);
-%     distances=zeros(nCombinations,1);
-%     moments=zeros(nCombinations,4);
-%     parfor idx = 1:nCombinations
-%         % Get the current combination
-%         cost_d = combinations(idx, 1);
-%         cost_p = combinations(idx, 2);
-%         qup1 = combinations(idx, 3);
-%         qup2 = combinations(idx, 4);
-    
-%         p_vec=[cost_d; cost_p; qup1; qup2];
-%         [distances(idx), moments(idx,:)]=wrapperSMM(p_vec, ps, tg, sp, dm);
-%     end
-
-% elseif ps.ats==5
-%     [CostD, CostP, Qup1, Qup2, Qup3, Qup4, Qup5 ] = ndgrid(grid_cost_d, grid_cost_p, grid_qup, grid_qup, grid_qup, grid_qup, grid_qup);
-%     combinations = [CostD(:), CostP(:), Qup1(:), Qup2(:), Qup3(:), Qup4(:), Qup5(:)];
-%     nCombinations = size(combinations, 1);
-%     distances=zeros(nCombinations,1);
-%     moments=zeros(nCombinations,6); %When it is right has to be the same or more than the number of parameters
-%     parfor idx = 1:nCombinations
-%         % Get the current combination
-%         cost_d =combinations(idx, 1);
-%         cost_p =combinations(idx, 2);
-%         qup1 = combinations(idx, 3);
-%         qup2 = combinations(idx, 4);
-%         qup3 = combinations(idx, 5);
-%         qup4 = combinations(idx, 6);
-%         qup5 = combinations(idx, 7);
-%         p_vec=[cost_d; cost_p; qup1; qup2; qup3; qup4; qup5];
-%         [distances(idx), moments(idx,:)]=wrapperSMM(p_vec, ps, tg, sp, dm);
-%     end
+% %Run the optimization
+% tic;
+% [theta_opt, fval] = ga(@(p_vec) wrapperSMM(p_vec, p_selection, theta, ps, tg, sp, dm, moments_selection), nvars, ...
+%                 [], [], [], [], lb, ub, [], [], options);
+% toc;               
+% save('calibrationv0_mincosts.mat','theta_opt','fval')
+% if location=="hpc"
+%     save('/home/gst247/HPC_Model_Matlab/Calibration_outcomes/min_calib.mat','theta_opt','fval')
 % end
-% save('calibrationv0.mat','distances','moments','combinations','dm')
-
