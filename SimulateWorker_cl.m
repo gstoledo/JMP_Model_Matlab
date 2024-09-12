@@ -2775,5 +2775,5 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
         end
     end
 
-    ws=struct('worker_status',worker_status,'self_wage',self_wage,'self_tenure',self_tenure,'co_wage',co_wage,'co_tenure',co_tenure,'co_z',co_z,'a_wtp',a_wtp,'hire_m',hire_m,'hire_n',hire_n,'fire_m',fire_m,'fire_n',fire_n,'prom_sm',prom_sm,'prom_realloc',prom_realloc);
+    ws=struct('worker_status',worker_status,'self_z',self_z,'self_wage',self_wage,'self_tenure',self_tenure,'co_wage',co_wage,'co_tenure',co_tenure,'co_z',co_z,'a_wtp',a_wtp,'hire_m',hire_m,'hire_n',hire_n,'fire_m',fire_m,'fire_n',fire_n,'prom_sm',prom_sm,'prom_realloc',prom_realloc);
 

@@ -78,7 +78,7 @@ function [a_trans,q_trans,u_trans,fteam,fman,fnman,fe,b,mnew_high,typebirth,wmin
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%Wages 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    wmin  =  -6*min(fteam(:));                                 %Minimum wage in the grid
+    wmin  =  -1*min(fteam(:));                                 %Minimum wage in the grid
     wmax = max(fteam(:));                                      %Maximum wage in the grid
     wgrid = [wmin:(wmax - wmin)/(wpts - 1):wmax]; %Wage grid
 

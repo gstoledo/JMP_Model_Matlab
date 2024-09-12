@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#SBATCH --job-name=lmdcd2
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=128GB
@@ -19,11 +18,6 @@ export MATLAB_LOG_DIR=$SLURM_JOBTMP
 
 cp -rp /share/apps/matlab-slurm/20201018/slurm/shared/parallel.mlsettings $MATLAB_PREFDIR
 
-cat<<EOF | matlab -nodisplay
-
-% Run your MATLAB script
-calibrationv0
+srun matlab -nodisplay -r "calibration_jobs('$SLURM_JOB_NAME')"
 
 exit
-
-EOF

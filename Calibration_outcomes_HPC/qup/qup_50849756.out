@@ -1,0 +1,17 @@
+
+                            < M A T L A B (R) >
+                  Copyright 1984-2023 The MathWorks, Inc.
+                  R2023b (23.2.0.2365128) 64-bit (glnxa64)
+                              August 23, 2023
+
+ 
+To get started, type doc.
+For product information, visit www.mathworks.com.
+ 
+>> >> Running manual calibration for qup
+Starting parallel pool (parpool) using the 'Processes' profile ...
+Connected to parallel pool with 32 workers.
+Joint Failed to converge
+Joint Failed to converge
+Calibration for qup done
+>> >> Parallel pool using the 'Processes' profile is shutting down.

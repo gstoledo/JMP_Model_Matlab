@@ -1,5 +1,4 @@
-% location = "local";
-location="hpc";
+location = "local";
 if location == "local"
     %Clear all but location variable
     clearvars -except location
@@ -54,7 +53,7 @@ dm.Q5Q3nm_wage                      =2.30;          %Non Manager Wage Ratio quin
 dm.Q5Q4nm_wage                      =1.68;          %Non Manager Wage Ratio quintile 5 to quintile 4 of total avg wage
 dm.Q5Q5nm_wage                      =1;           %Non Manager Wage Ratio quintile 5 to quintile 4 of total avg wage
 dm.ManWorkerRatio                   =1.53;           % Ratio between managers and workers wage/employment ratio
-dm.bcross                           =0.137;         %Cross Section Wage Premium
+dm.b_cross                          =0.137;         %Cross Section Wage Premium
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Pre-set parameters
@@ -88,7 +87,7 @@ theta.mnew=x(9);                        %Paramter of exponetial dist for newborn
 theta.lamu=x(1);                        %Prob of U find a firm
 theta.lam=x(2);                         %Prob of firm find another firm
 theta.del=x(5);                         %Separation rate
-theta.qup=0.05*ones(theta.ats,1);       %Probability of moving up in q. The qup for the last level of productivity is irrelevant
+theta.qup=0.08*ones(theta.ats,1);       %Probability of moving up in q. The qup for the last level of productivity is irrelevant
 theta.cost_d=0.8;                       %cost of demoting a manager to non manager  
 theta.cost_p=0.02;                       %cost of promoting a non manager to manager
 
@@ -98,12 +97,10 @@ theta.cost_p=0.02;                       %cost of promoting a non manager to man
 cgrid.cost_d=linspace(0.5,1.4,15);
 cgrid.cost_p=linspace(0.02,0.2,15);
 cgrid.qup = repmat({linspace(0.08, 0.4, 5)},length(theta.qup),1);
-cgrid.lamu=linspace(0.2,0.4,10);
-cgrid.lam=linspace(0.2,0.4,10);
+cgrid.lamu=linspace(0.1,0.6,10);
+cgrid.lam=linspace(0.1,0.6,10);
 cgrid.alpha_m=linspace(0.5,0.9,10);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 
 % % %Function to wrap the SMM function
 % p_selection={'cost_p','cost_d','lamu','lam','alpha_m'};
@@ -116,7 +113,7 @@ cgrid.alpha_m=linspace(0.5,0.9,10);
 % fs=SimulateFirm_cl(p,ps,tg,sp,v,e,w);
 % ws=SimulateWorker_cl(p,ps,sp,tg,v,e,w,fs);
 % save('simulations.mat','fs','ws','sp')
-% % %Model moments
+% %Model moments
 % mm=model_moments(ps,sp,fs,ws);
 % numMoments = length(mm);
 %Import data moments
@@ -124,121 +121,52 @@ cgrid.alpha_m=linspace(0.5,0.9,10);
 % run data_moments.m
 
 
+
+
+
+
 %% Manual calibration for some combinations
-%% Only costs
+% % Only costs
+% p_selection={'cost_p','cost_d',};
+% [p_vec, ps] = param_selection(theta, p_selection);
+% moments_selection = {'NiMi', 'MiNi'};
+% cgrid.cost_d=linspace(0.5,1.4,15);
+% cgrid.cost_p=linspace(0.02,0.2,15);
+% manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'costs_lowcp');
+
+% %Manual calibration report
+% load('Calibration_outcomes/manual_calibcosts_lowcp.mat')
+% folder = 'Calibration_outcomes';
+% calibration_report(p_selection,ps ,moments_selection, combinations, data_mom, moments, distances, 0.05, folder,'costs_lowcp')
+
+% % %Only qup
+% % p_selection={'qup'};
+% % moments_selection = {'Q5Q1nm_wage', 'Q5Q2nm_wage', 'Q5Q3nm_wage', 'Q5Q4nm_wage', 'Q5Q5nm_wage'};
+% % manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'qup');
+
+
+%Costs amd Lambadas to get only NiMi and MiNi
 p_selection={'cost_p','cost_d'};
 [p_vec, ps] = param_selection(theta, p_selection);
-moments_selection = {'NiMi', 'MiNi'}; 
-cgrid.cost_d=linspace(0.5,1.4,12);
-cgrid.cost_p=linspace(0.01,0.2,12);
-cgrid.alpha_m=linspace(0.6,0.9,5);
+moments_selection = {'NiMi', 'MiNi'};
+cgrid.cost_d=linspace(0.5,1.4,1);
+cgrid.cost_p=linspace(0.01,0.2,1);
+cgrid.lamu=linspace(0.2,0.6,2);
+folder='Calibration_outcomes';
+filename='costs_lamu';
 manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'costs');
-
-%% Only costs with qup=0.06
-p_selection={'cost_p','cost_d'};
-theta.qup=0.06*ones(theta.ats,1);       %Probability of moving up in q. The qup for the last level of productivity is irrelevant
-[p_vec, ps] = param_selection(theta, p_selection);
-moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
-cgrid.cost_d=linspace(0.7,2,12);
-cgrid.cost_p=linspace(0.1,0.5,12);
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'costsq06');
-
-
-%% Only costs with qup=0.055
-p_selection={'cost_p','cost_d'};
-theta.qup=0.055*ones(theta.ats,1);       %Probability of moving up in q. The qup for the last level of productivity is irrelevant
-[p_vec, ps] = param_selection(theta, p_selection);
-moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
-cgrid.cost_d=linspace(1,3,12);
-cgrid.cost_p=linspace(0.2,1,12);
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'costsq055');
-
-
-%% With alpha
-p_selection={'cost_p','cost_d','alpha_m'};
-[p_vec, ps] = param_selection(theta, p_selection);
-moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
-cgrid.cost_d=linspace(0.5,1.4,12);
-cgrid.cost_p=linspace(0.01,0.2,12);
-cgrid.alpha_m=linspace(0.6,0.9,5);
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'costs_alpha');
-
-
-%% Costs amd Lambadas to get only NiMi and MiNi
-p_selection={'cost_p','cost_d','lamu','lam'};
-moments_selection = {'NiMi', 'MiNi'};
-cgrid.cost_d=linspace(0.5,1.4,10);
-cgrid.cost_p=linspace(0.01,0.2,10);
-cgrid.lamu=linspace(0.1,0.6,5);
-cgrid.lam=linspace(0.1,0.6,5);
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'costs_lambdas');
-
-
-%% Test of Wage moments
-% Set qup to zero and alpha to 1 
-theta.qup=0.05*ones(theta.ats,1);       %Probability of moving up in q. The qup for the last level of productivity is irrelevant
-theta.alpha_m=0.8;                      %Manager share
-p_selection={'lamu','lam'};
-moments_selection = {'ManWorkerRatio','bcross'};
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'No_NM');
-
-
-%% Focus on the rates
-p_selection={'cost_p','cost_d', 'lamu', 'lam', 'alpha_m'};
-moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
-%Make grids smaller
-cgrid.cost_d=linspace(0.5,1.4,4);
-cgrid.cost_p=linspace(0.02,0.2,4);
-cgrid.lamu=linspace(0.2,0.6,5);
-cgrid.lam=linspace(0.2,0.6,5);
-cgrid.alpha_m=linspace(0.5,0.9,2);
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'rates');
-
-
-%% Only qup
-p_selection={'qup'};
-moments_selection = {'NiMi', 'MiNi'};
-theta.cost_p=0.25;
-theta.cost_d=1.227;
-cgrid.qup = repmat({linspace(0.05, 0.07, 3)},length(theta.qup),1);
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'qup');
-
-
-%% Only lambdas
-p_selection={'lamu','lam'};
-moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
-theta.qup=0.05*ones(theta.ats,1);       
-theta.cost_p=0.25;
-theta.cost_d=1.5;
-cgrid.lamu=linspace(0.4,0.65,10);
-cgrid.lam=linspace(0.2,0.35,10);
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'lambdas');
-
-
-
-%% Only lambdas with cost_d=2
-p_selection={'lamu','lam'};
-moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
-theta.qup=0.05*ones(theta.ats,1);       
-theta.cost_p=0.25;
-theta.cost_d=2.5;
-theta.alpha_m=0.75;
-cgrid.lamu=linspace(0.4,0.65,10);
-cgrid.lam=linspace(0.2,0.35,10);
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'lmdcd2');
-
+load('Calibration_outcomes/costs/calibrationv0.mat')
+calibration_report(p_selection,ps ,moments_selection, combinations, data_mom, moments, distances, 0.05, folder, filename)
 
 % %% Lets put alpha to the mix
 % p_selection={'alpha_m'};
 % moments_selection = {'ManWorkerRatio','b_cross'};
-% manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'alpha_qup_Bcross');
+% cgrid.alpha_m=linspace(0.5,0.9,2);
+% manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'alpha_Bcross');
 
 
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% With minimization
+% % With minimization
 % p_selection={'cost_p','cost_d', 'lamu', 'lam', 'alpha_m'};
 % [p_vec, ps] = param_selection(theta, p_selection);
 % moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
