@@ -116,13 +116,13 @@ gray_qual = qualitative(9,:);
 cbp1=["#999999"; "#444444"; "#E69F00"; "#56B4E9"; "#009E73";"#F0E442"; "#0072B2"; "#D55E00"; "#C0362C"; "#CC79A7"];
 greycbp1=cbp1(1,:);
 blackcbp1=cbp1(2,:);
-redcbp1=cbp1(3,:);
-dkorangecbp1=cbp1(4,:);
-orangecpb1=cbp1(5,:);
+orangecbp1=cbp1(3,:);
+bluecbp1=cbp1(4,:);
+greencbp1=cbp1(5,:);
 yellowcbp1=cbp1(6,:);
-greencbp1=cbp1(7,:);
-dkbluecbp1=cbp1(8,:);
-bluecbp1=cbp1(9,:);
+dkbluecbp1=cbp1(7,:);
+dkorangecbp1=cbp1(8,:);
+redcbp1=cbp1(9,:);  
 pinkcbp1=cbp1(10,:);
 
 

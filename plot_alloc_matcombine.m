@@ -14,7 +14,7 @@ function plot_alloc_matcombine(H_matrices_set, titles, mainTitle, xlabelText, yl
     
     % Create a tiled layout for subplots with more spacing
     figure;
-    t = tiledlayout(numRows + 1, numCols, 'Padding', 'compact', 'TileSpacing', 'compact');
+    t = tiledlayout(numRows + 1, numCols, 'Padding', 'loose', 'TileSpacing', 'compact'); % Use 'loose' padding for more space between title and plots
     
     % Add the main title
     sg = sgtitle(mainTitle, 'FontSize', fontSize + 10, 'FontWeight', 'bold');
@@ -34,7 +34,7 @@ function plot_alloc_matcombine(H_matrices_set, titles, mainTitle, xlabelText, yl
         
         % Loop over each matrix and overlay the scatter plots
         hold on;
-        markerSize = 70; % Marker size for the scatter plot
+        markerSize = 100; % Marker size for the scatter plot
         for i = 1:length(H_matrices)
             H_u = H_matrices{i};
             if any(H_u(:)) % Only plot if the matrix has at least one `1`
@@ -100,7 +100,7 @@ function plot_alloc_matcombine(H_matrices_set, titles, mainTitle, xlabelText, yl
     
     % Adjust the legend's position to move it up and center it
     lgd.Position(1) = 0.73 - lgd.Position(3) / 2; % Center horizontally
-    lgd.Position(2) = lgd.Position(2) + 0.11; % Move up slightly
+    lgd.Position(2) = lgd.Position(2) +0.13 ; % Move up slightly
     
     % Adjust marker sizes in the legend
     legendIcons = findobj(lgd, 'type', 'patch');

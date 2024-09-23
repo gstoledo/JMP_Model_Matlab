@@ -648,7 +648,6 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                                 co_z(t,i)=0.0;
                                 co_wage(t,i)=0.0;
                                 co_tenure(t,i)=0;
-                                a_wtp(t,i)=0;
                             end
                         elseif (r.state(t,i)>=cdf_emp_dist(1) && r.state(t,i)<cdf_emp_dist(2)) %meet firm with manager
                             [am,zm]=draw_CDF_2d(cdf_e_mdist,ats,tpts,r.type(t,i));
@@ -691,7 +690,6 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                                 co_z(t,i)=0.0;
                                 co_wage(t,i)=0.0;
                                 co_tenure(t,i)=0;
-                                a_wtp(t,i)=0;
                             end
                         elseif (r.state(t,i)>=cdf_emp_dist(2) && r.state(t,i)<cdf_emp_dist(3)) %meet firm with non manager
                             [an,zn]=draw_CDF_2d(cdf_e_ndist,ats,tpts,r.type(t,i));
@@ -734,7 +732,6 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                                 co_z(t,i)=0.0;
                                 co_wage(t,i)=0.0;
                                 co_tenure(t,i)=0;
-                                a_wtp(t,i)=0;
                             end
                         else %meet firm with team
                             [at,zt,nt]=draw_CDF_3d(cdf_e_tdist,ats,tpts,r.type(t,i));
@@ -809,7 +806,6 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                                 co_z(t,i)=0.0;
                                 co_wage(t,i)=0.0;
                                 co_tenure(t,i)=0;
-                                a_wtp(t,i)=0;
                             end
                         end
                     elseif (r.event(t,i)>del+prob_matching && r.event(t,i)<=del+prob_matching+lam) %Workers meets another firm 
@@ -897,10 +893,10 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                                 worker_status(t,i)=2;
                                 %Does the wage increase?
                                 current_wage=InterpolateWage(wgrid,self_wage(t,i),Wmh(:,a_wtp(t,i),self_z(t,i)));
-                                nu=[Vth(am,zm,self_z(t,i)),Vmh(am,self_z(t,i))+U(zm),Vth(am,self_z(t,i),zm)-cost_d]
+                                nu=[Vth(am,zm,self_z(t,i)),Vmh(am,self_z(t,i))+U(zm),Vth(am,self_z(t,i),zm)-cost_d];
                                 target_wage= max(nu)-Vmh(am,zm);
                                 if (current_wage<target_wage)
-                                    self_wage(t,i)=InterpolateWage(Wmh(:,a_twp(t,i),self_z(t,i)),target_wage,wgrid);
+                                    self_wage(t,i)=InterpolateWage(Wmh(:,a_wtp(t,i),self_z(t,i)),target_wage,wgrid);
                                 else
                                     self_wage(t,i)=self_wage(t-1,i);
                                 end
@@ -952,10 +948,10 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                                 worker_status(t,i)=2;
                                 %Does the wage increase?
                                 current_wage=InterpolateWage(wgrid,self_wage(t,i),Wmh(:,a_wtp(t,i),self_z(t,i)));
-                                nu=[Vnh(an,self_z(t,i))+U(zn),Vth(an,zn,self_z(t,i))-cost_p,Vth(an,self_z(t,i),zn)]
+                                nu=[Vnh(an,self_z(t,i))+U(zn),Vth(an,zn,self_z(t,i))-cost_p,Vth(an,self_z(t,i),zn)];
                                 target_wage= max(nu)-Vmh(an,zn);
                                 if (current_wage<target_wage)
-                                    self_wage(t,i)=InterpolateWage(Wmh(:,a_twp(t,i),self_z(t,i)),target_wage,wgrid);
+                                    self_wage(t,i)=InterpolateWage(Wmh(:,a_wtp(t,i),self_z(t,i)),target_wage,wgrid);
                                 else
                                     self_wage(t,i)=self_wage(t-1,i);
                                 end
@@ -1020,10 +1016,10 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                                 worker_status(t,i)=2;
                                 %Does the wage increase?
                                 current_wage=InterpolateWage(wgrid,self_wage(t,i),Wmh(:,a_wtp(t,i),self_z(t,i)));
-                                nu=[Vth(at,zt,self_z(t,i))+U(nt),Vth(at,nt,self_z(t,i))-cost_p+U(zt),Vth(at,self_z(t,i),zt)-cost_d+U(nt),Vth(at,self_z(t,i),nt)+U(zt)]
+                                nu=[Vth(at,zt,self_z(t,i))+U(nt),Vth(at,nt,self_z(t,i))-cost_p+U(zt),Vth(at,self_z(t,i),zt)-cost_d+U(nt),Vth(at,self_z(t,i),nt)+U(zt)];
                                 target_wage= max(nu)-Vth(at,zt,nt);
                                 if (current_wage<target_wage)
-                                    self_wage(t,i)=InterpolateWage(Wmh(:,a_twp(t,i),self_z(t,i)),target_wage,wgrid);
+                                    self_wage(t,i)=InterpolateWage(Wmh(:,a_wtp(t,i),self_z(t,i)),target_wage,wgrid);
                                 else
                                     self_wage(t,i)=self_wage(t-1,i);
                                 end
@@ -1382,7 +1378,7 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                                 nu=[Vmh(am,self_z(t,i))+U(zm),Vth(am,zm,self_z(t,i)),Vth(am,self_z(t,i),zm)-cost_d];
                                 target_wage= max(nu)-Vmh(am,zm);
                                 if (current_wage<target_wage)
-                                    self_wage(t,i)=InterpolateWage(Wmh(:,a_twp(t,i),self_z(t,i)),target_wage,wgrid);
+                                    self_wage(t,i)=InterpolateWage(Wmh(:,a_wtp(t,i),self_z(t,i)),target_wage,wgrid);
                                 else
                                     self_wage(t,i)=self_wage(t-1,i);
                                 end
@@ -1437,7 +1433,7 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                                 nu=[Vnh(an,self_z(t,i))+U(zn),Vth(an,self_z(t,i),zn),Vth(an,zn,self_z(t,i))-cost_p];
                                 target_wage= max(nu)-Vnh(an,zn);
                                 if (current_wage<target_wage)
-                                    self_wage(t,i)=InterpolateWage(Wnh(:,a_twp(t,i),self_z(t,i)),target_wage,wgrid);
+                                    self_wage(t,i)=InterpolateWage(Wnh(:,a_wtp(t,i),self_z(t,i)),target_wage,wgrid);
                                 else
                                     self_wage(t,i)=self_wage(t-1,i);
                                 end
@@ -1502,10 +1498,10 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                                 worker_status(t,i)=3; %non manager alone
                                 %Does the wage increase?
                                 current_wage=InterpolateWage(wgrid,self_wage(t,i),Wnh(:,a_wtp(t,i),self_z(t,i)));
-                                nu=[Vth(at,zt,self_z(t,i))+U(nt),Vth(at,nt,self_z(t,i))-cost_p+U(zt),Vth(at,self_z(t,i),zt)-cost_d+U(nt),Vth(at,self_z(t,i),nt)+U(zt)]
+                                nu=[Vth(at,zt,self_z(t,i))+U(nt),Vth(at,nt,self_z(t,i))-cost_p+U(zt),Vth(at,self_z(t,i),zt)-cost_d+U(nt),Vth(at,self_z(t,i),nt)+U(zt)];
                                 target_wage= max(nu)-Vth(at,zt,nt);
                                 if (current_wage<target_wage)
-                                    self_wage(t,i)=InterpolateWage(Wnh(:,a_twp(t,i),self_z(t,i)),target_wage,wgrid);
+                                    self_wage(t,i)=InterpolateWage(Wnh(:,a_wtp(t,i),self_z(t,i)),target_wage,wgrid);
                                 else
                                     self_wage(t,i)=self_wage(t-1,i);
                                 end
@@ -1808,7 +1804,7 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                                 worker_status(t,i)=4; %manager in a team
                                 %Does the increase? Only if  m was the one tried to get hired
                                 nu_m=[Vmh(av,self_z(t,i)),Vnh(av,self_z(t,i))];
-                                nu_n=[Vnh(av,cot_z(t,i)),Vmh(av,co_z(t,i))];
+                                nu_n=[Vnh(av,co_z(t,i)),Vmh(av,co_z(t,i))];
                                 gain_m=max(nu_m)-Ve(av)+Vth(a_wtp(t,i),self_z(t,i),co_z(t,i))-Vnh(a_wtp(t,i),co_z(t,i));
                                 gain_n=max(nu_n)-Ve(av)+Vth(a_wtp(t,i),self_z(t,i),co_z(t,i))-Vmh(a_wtp(t,i),self_z(t,i));
                                 target_wage_m=(1-bpw)*(Vth(a_wtp(t,i),self_z(t,i),co_z(t,i))-Vnh(a_wtp(t,i),co_z(t,i)))+bpw*(max(nu_m)-Ve(av));
@@ -1880,7 +1876,7 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                                 worker_status(t,i)=4; %manager in a team
                                 %Does the increase? Only if  m was the one tried to get hired
                                 nu_m=[Vmh(am,self_z(t,i))+U(zm),Vth(am,zm,self_z(t,i)),Vth(am,self_z(t,i),zm)-cost_d];
-                                nu_n=[Vmh(am,cot_z(t,i))+U(zm),Vth(am,zm,cot_z(t,i)),Vth(am,cot_z(t,i),zm)-cost_d];
+                                nu_n=[Vmh(am,co_z(t,i))+U(zm),Vth(am,zm,co_z(t,i)),Vth(am,co_z(t,i),zm)-cost_d];
                                 gain_m=max(nu_m)-Vmh(am,zm)-Vth(a_wtp(t,i),self_z(t,i),co_z(t,i))+Vnh(a_wtp(t,i),co_z(t,i));
                                 gain_n=max(nu_n)-Vmh(am,zm)-Vth(a_wtp(t,i),self_z(t,i),co_z(t,i))+Vmh(a_wtp(t,i),self_z(t,i));
                                 target_wage_m=(1-bpw)*(Vth(a_wtp(t,i),self_z(t,i),co_z(t,i))-Vnh(a_wtp(t,i),co_z(t,i)))+bpw*(max(nu_m)-Vmh(am,zm));
@@ -1952,7 +1948,7 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                                 worker_status(t,i)=4; %manager in a team
                                 %Does the wage increase? Only if  m was the one tried to get hired
                                 nu_m=[Vnh(an,self_z(t,i))+U(zn),Vth(an,zn,self_z(t,i))-cost_p,Vth(an,self_z(t,i),zn)];
-                                nu_n=[Vnh(an,cot_z(t,i))+U(zn),Vth(an,zn,cot_z(t,i))-cost_p,Vth(an,cot_z(t,i),zn)];
+                                nu_n=[Vnh(an,co_z(t,i))+U(zn),Vth(an,zn,co_z(t,i))-cost_p,Vth(an,co_z(t,i),zn)];
                                 gain_m=max(nu_m)-Vnh(an,zn)-Vth(a_wtp(t,i),self_z(t,i),co_z(t,i))+Vnh(a_wtp(t,i),co_z(t,i));
                                 gain_n=max(nu_n)-Vnh(an,zn)-Vth(a_wtp(t,i),self_z(t,i),co_z(t,i))+Vmh(a_wtp(t,i),self_z(t,i));
                                 target_wage_m=(1-bpw)*(Vth(a_wtp(t,i),self_z(t,i),co_z(t,i))-Vnh(a_wtp(t,i),co_z(t,i)))+bpw*(max(nu_m)-Vnh(an,zn));
@@ -2037,7 +2033,7 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                                 worker_status(t,i)=4; %manager in a team
                                 %Does the wage increase? Only if  m was the one tried to get hired
                                 nu_m=[Vth(at,self_z(t,i),nt)+U(zt),Vth(at,zt,self_z(t,i))+U(nt),Vth(at,self_z(t,i),zt)-cost_d+U(nt),Vth(at,nt,self_z(t,i))-cost_p+U(zt)];
-                                nu_n=[Vth(at,cot_z(t,i),nt)+U(zt),Vth(at,zt,cot_z(t,i))+U(nt),Vth(at,cot_z(t,i),zt)-cost_d+U(nt),Vth(at,nt,cot_z(t,i))-cost_p+U(zt)];
+                                nu_n=[Vth(at,co_z(t,i),nt)+U(zt),Vth(at,zt,co_z(t,i))+U(nt),Vth(at,co_z(t,i),zt)-cost_d+U(nt),Vth(at,nt,co_z(t,i))-cost_p+U(zt)];
                                 gain_m=max(nu_m)-Vth(at,zt,nt)-Vth(a_wtp(t,i),self_z(t,i),co_z(t,i))+Vnh(a_wtp(t,i),co_z(t,i));
                                 gain_n=max(nu_n)-Vth(at,zt,nt)-Vth(a_wtp(t,i),self_z(t,i),co_z(t,i))+Vmh(a_wtp(t,i),self_z(t,i));
                                 target_wage_m=(1-bpw)*(Vth(a_wtp(t,i),self_z(t,i),co_z(t,i))-Vnh(a_wtp(t,i),co_z(t,i)))+bpw*(max(nu_m)-Vth(at,zt,nt));
@@ -2359,8 +2355,8 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                             else %No one gets hired
                                 worker_status(t,i)=5; %non manager in a team
                                 %Does the wage increase? Only if  nm was the one tried to get hired
-                                nu_m=[Vmh(av,co_z(t,i)),Vnh(av,co_z(t,i))]
-                                nu_n=[Vmh(av,self_z(t,i)),Vnh(av,self_z(t,i))]
+                                nu_m=[Vmh(av,co_z(t,i)),Vnh(av,co_z(t,i))];
+                                nu_n=[Vmh(av,self_z(t,i)),Vnh(av,self_z(t,i))];
                                 gain_m=max(nu_m)-Veh(av)-Vth(a_wtp(t,i),co_z(t,i),self_z(t,i))+Vnh(a_wtp(t,i),self_z(t,i));
                                 gain_n=max(nu_n)-Veh(av)-Vth(a_wtp(t,i),co_z(t,i),self_z(t,i))+Vmh(a_wtp(t,i),co_z(t,i));
                                 target_wage_m=(1-bpw)*(Vth(a_wtp(t,i),co_z(t,i),self_z(t,i))-Vnh(a_wtp(t,i),self_z(t,i)))+bpw*(max(nu_m)-Veh(av));
@@ -2431,8 +2427,8 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                             else %NO one gets hired
                                 worker_status(t,i)=5; %non manager in a team
                                 %Does the wage increase? Only if  nm was the one tried to get hired
-                                nu_m=[Vmh(am,cot_z(t,i))+U(zm),Vth(am,zm,co_z(t,i)),Vth(am,co_z(t,i),zm)-cost_d]
-                                nu_n=[Vmh(am,self_z(t,i))+U(zm),Vth(am,zm,co_z(t,i)),Vth(am,co_z(t,i),zm)-cost_d]
+                                nu_m=[Vmh(am,co_z(t,i))+U(zm),Vth(am,zm,co_z(t,i)),Vth(am,co_z(t,i),zm)-cost_d];
+                                nu_n=[Vmh(am,self_z(t,i))+U(zm),Vth(am,zm,co_z(t,i)),Vth(am,co_z(t,i),zm)-cost_d];
                                 gain_m=max(nu_m)-Vmh(am,zm)-Vth(a_wtp(t,i),co_z(t,i),self_z(t,i))+Vnh(a_wtp(t,i),self_z(t,i));
                                 gain_n=max(nu_n)-Vmh(am,zm)-Vth(a_wtp(t,i),co_z(t,i),self_z(t,i))+Vmh(a_wtp(t,i),co_z(t,i));
                                 target_wage_m=(1-bpw)*(Vth(a_wtp(t,i),co_z(t,i),self_z(t,i))-Vnh(a_wtp(t,i),self_z(t,i)))+bpw*(max(nu_m)-Vmh(am,zm));
@@ -2503,8 +2499,8 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                             else %NO one gets hired
                                 worker_status(t,i)=5; %non manager in a team
                                 %Does the wage increase? Only if  nm was the one tried to get hired
-                                nu_m=[Vnh(an,cot_z(t,i))+U(zn),Vth(an,zn,co_z(t,i))-cost_p,Vth(an,co_z(t,i),zn)]
-                                nu_n=[Vnh(an,self_z(t,i))+U(zn),Vth(an,zn,self_z(t,i))-cost_p,Vth(an,self_z(t,i),zn)]
+                                nu_m=[Vnh(an,co_z(t,i))+U(zn),Vth(an,zn,co_z(t,i))-cost_p,Vth(an,co_z(t,i),zn)];
+                                nu_n=[Vnh(an,self_z(t,i))+U(zn),Vth(an,zn,self_z(t,i))-cost_p,Vth(an,self_z(t,i),zn)];
                                 gain_m=max(nu_m)-Vnh(an,zn)-Vth(a_wtp(t,i),co_z(t,i),self_z(t,i))+Vnh(a_wtp(t,i),self_z(t,i));
                                 gain_n=max(nu_n)-Vnh(an,zn)-Vth(a_wtp(t,i),co_z(t,i),self_z(t,i))+Vmh(a_wtp(t,i),co_z(t,i));
                                 target_wage_m=(1-bpw)*(Vth(a_wtp(t,i),co_z(t,i),self_z(t,i))-Vnh(a_wtp(t,i),self_z(t,i)))+bpw*(max(nu_m)-Vnh(an,zn));
@@ -2588,8 +2584,8 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
                             else %NO one gets hired
                                 worker_status(t,i)=5; %non manager in a team
                                 %Does the wage increase? Only if  nm was the one tried to get hired
-                                nu_m=[Vth(at,zt,co_z(t,i))+U(nt),Vth(at,nt,co_z(t,i))-cost_p+U(zt),Vth(at,co_z(t,i),nt)+U(zt),Vth(at,co_z(t,i),zt)-cost_d+U(nt)]
-                                nu_n=[Vth(at,zt,self_z(t,i))+U(nt),Vth(at,nt,self_z(t,i))-cost_p+U(zt),Vth(at,self_z(t,i),nt)+U(zt),Vth(at,self_z(t,i),zt)-cost_d+U(nt)]
+                                nu_m=[Vth(at,zt,co_z(t,i))+U(nt),Vth(at,nt,co_z(t,i))-cost_p+U(zt),Vth(at,co_z(t,i),nt)+U(zt),Vth(at,co_z(t,i),zt)-cost_d+U(nt)];
+                                nu_n=[Vth(at,zt,self_z(t,i))+U(nt),Vth(at,nt,self_z(t,i))-cost_p+U(zt),Vth(at,self_z(t,i),nt)+U(zt),Vth(at,self_z(t,i),zt)-cost_d+U(nt)];
                                 gain_m=max(nu_m)-Vth(at,zt,nt)-Vth(a_wtp(t,i),co_z(t,i),self_z(t,i))+Vnh(a_wtp(t,i),self_z(t,i));
                                 gain_n=max(nu_n)-Vth(at,zt,nt)-Vth(a_wtp(t,i),co_z(t,i),self_z(t,i))+Vmh(a_wtp(t,i),co_z(t,i));
                                 target_wage_m=(1-bpw)*(Vth(a_wtp(t,i),co_z(t,i),self_z(t,i))-Vnh(a_wtp(t,i),self_z(t,i)))+bpw*(max(nu_m)-Vth(at,zt,nt));

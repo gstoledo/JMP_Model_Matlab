@@ -626,7 +626,7 @@ function fs=SimulateFirm_cl(p,ps,tg,sp,v,d,w)
                         else %Firm does not hire
                             firm_status(t,i)=2;
                             %Check if wage goes up
-                            target_wage=max(Vmh(av,m_ftp(t,i)),Vnh(av,n_ftp(t,i)))-Veh(av); %Marginal of the poaching firm
+                            target_wage=max(Vmh(av,m_ftp(t,i)),Vnh(av,m_ftp(t,i)))-Veh(av); %Marginal of the poaching firm
                             current_wage=InterpolateWage(wgrid, m_fwage(t,i),Wmh(:,a_ftp(t,i),m_ftp(t,i)));
                             if (target_wage>current_wage)
                                 m_fwage(t,i)= InterpolateWage(Wmh(:,a_ftp(t,i),m_ftp(t,i)),target_wage,wgrid);

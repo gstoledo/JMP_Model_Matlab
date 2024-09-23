@@ -1,4 +1,4 @@
-function manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,filename)
+function manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm, cw, location, filename)
     [~, ps] = param_selection(theta, p_selection);
 
     
@@ -18,7 +18,7 @@ function manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,l
 
     parfor idx = 1:nCombinations
         p_vec=[combinations(idx,:)];
-        [distances(idx), moments(idx,:)]=wrapperSMM(p_vec, p_selection, theta, ps, tg, sp, dm, moments_selection);
+        [distances(idx), moments(idx,:)]=wrapperSMM(p_vec, p_selection, theta, ps, tg, sp, dm, moments_selection,cw);
         % Display every 10th iteration
         if mod(idx, 10) == 0
             fprintf('Iteration %d of %d\n', idx, nCombinations)

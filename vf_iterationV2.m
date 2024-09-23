@@ -1,6 +1,6 @@
 %Function to perform the value function iteration
 %Correcting for the u issue
-function [Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl,Vttl,Utl] = vf_iterationV2(e_edist,e_mdist,e_ndist,e_tdist,e_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,tr,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed)
+function [Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl,Vttl,Utl,failed] = vf_iterationV2(e_edist,e_mdist,e_ndist,e_tdist,e_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,tr,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed,display_iter_v)
     %Use initial guesses for value functions
     Veup = Veini;
     Vmup = Vmini;
@@ -16,8 +16,8 @@ function [Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl,Vttl,Utl] = vf
     diffmax=1e-6;
      
     it=0; 
-    itmax=100000;
-    
+    itmax=20000;
+    failed=0; %Flag for failed convergence
     %speed=1; %Speed of convergence
      
     while diff>diffmax & it<itmax
@@ -252,10 +252,10 @@ function [Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl,Vttl,Utl] = vf
             for q=1:tpts
                 expectdeath=zeros(1,ats);
                 expectlive=zeros(ats,tpts);
-                for apirme=1:ats
-                    expectdeath(apirme)=a_trans(a,apirme)*Vetl(apirme);
+                for aprime=1:ats
+                    expectdeath(aprime)=a_trans(a,aprime)*Vetl(aprime);
                     for qprime=1:tpts
-                        expectlive(apirme,qprime)=a_trans(a,apirme)*q_trans(q,qprime,a)*Vntl(apirme,qprime);
+                        expectlive(aprime,qprime)=a_trans(a,aprime)*q_trans(q,qprime,a)*Vntl(aprime,qprime);
                     end
                 end
                 Vnup(a,q)=fnman(a,q)+bt*death*sum(expectdeath)+bt*(1-death)*sum(sum(expectlive));
@@ -292,12 +292,12 @@ function [Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl,Vttl,Utl] = vf
                     expectdeath_n=zeros(1,ats);
                     expectdeath_m=zeros(ats,tpts);
                     expectlive_b=zeros(ats,tpts);
-                    for apirme=1:ats
-                        expectdeath_b(apirme)=a_trans(a,apirme)*Vetl(apirme);
-                        expectdeath_n(apirme)=a_trans(a,apirme)*Vmtl(apirme,z);
+                    for aprime=1:ats
+                        expectdeath_b(aprime)=a_trans(a,aprime)*Vetl(aprime);
+                        expectdeath_n(aprime)=a_trans(a,aprime)*Vmtl(aprime,z);
                         for qprime=1:tpts
-                            expectdeath_m(apirme,qprime)=q_trans(q,qprime,a)*a_trans(a,apirme)*Vntl(apirme,qprime);
-                            expectlive_b(apirme,qprime)=q_trans(q,qprime,a)*a_trans(a,apirme)*Vttl(apirme,z,qprime);
+                            expectdeath_m(aprime,qprime)=q_trans(q,qprime,a)*a_trans(a,aprime)*Vntl(aprime,qprime);
+                            expectlive_b(aprime,qprime)=q_trans(q,qprime,a)*a_trans(a,aprime)*Vttl(aprime,z,qprime);
                         end
                     end
                     Vtup(a,z,q)=fteam(a,z,q)+bt*(death.^2)*sum(expectdeath_b)+bt*death*(1-death)*sum(expectdeath_n)...
@@ -314,18 +314,20 @@ function [Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl,Vttl,Utl] = vf
     
         %diff=max([max(abs(V0 - V0up)),max(max(abs(V1 - V1up))),max(max(abs(V2 - V2up))),max(abs(U-Uup))]);
         diff=max([max(abs(Ve-Veup)), max(abs(Vm-Vmup),[],[1 2]), max(abs(Vn-Vnup),[],[1 2]), max(abs(Vt-Vtup),[],[1 2 3]), max(abs(U-Uup))]);  
-    
-        %Print every 50 iterations the difference and some text
-        % if mod(it,100)==0
-        %     fprintf('Iteration %d, error %f \n', it, diff)
-        % end
-        %In red failed to converge
+        if display_iter_v==1
+            % Print every 50 iterations the difference and some text
+            if mod(it,100)==0
+                fprintf('Iteration %d, error %f \n', it, diff)
+            end
+            % In red failed to converge
+            if diff<diffmax
+                cprintf('green','Converged in %d iterations\n',it)
+            end
+        end
         if it==itmax
             fprintf(2,'VF Failed to converge\n')
+            failed=1;
         end
-        % if diff<diffmax
-        %     cprintf('green','Converged in %d iterations\n',it)
-        % end
     end
     end 
     

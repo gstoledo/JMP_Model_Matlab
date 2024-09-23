@@ -21,10 +21,13 @@ function heatmap_combined(E, normalize, pallete, ats, tpts, Title, xlabel, ylabe
     t = tiledlayout(numRows, numCols, 'TileSpacing', 'Compact', 'Padding', 'Compact');
 
     % Create a finer palette by interpolating the existing palette
-    numShades = 1000; % Increase this to get more shades
-    finerPalette = interp1(linspace(0, 1, size(pallete, 1)), pallete, linspace(0, 1, numShades));
-
-    for a = 1:ats
+    numShades = 100000; % Increase this to get more shades
+    
+    % Apply a non-linear transformation (logarithmic scaling)
+    scaleFactor = 0.25; % Adjust this factor to control how much emphasis is on lower values
+    finerPalette = interp1(linspace(0, 1, size(pallete, 1)), pallete, linspace(0, 1, numShades).^scaleFactor);
+    %Run for every 2 values of a
+    for a = 1:2:ats
         nexttile;
         h1 = heatmap(En(:,:,a));
         h1.Title = 'a=' + string(a);
@@ -49,9 +52,9 @@ function heatmap_combined(E, normalize, pallete, ats, tpts, Title, xlabel, ylabe
         warning('off', 'MATLAB:structOnObject')
         hs1 = struct(h1);
         hs1.Axes.Title.FontWeight = 'normal';
-        hs1.Axes.Title.FontSize = 12;
-        hs1.Axes.XAxis.FontSize = 12;
-        hs1.Axes.YAxis.FontSize = 12;
+        hs1.Axes.Title.FontSize = 20;
+        hs1.Axes.XAxis.FontSize = 16;
+        hs1.Axes.YAxis.FontSize = 16;
         warning('on', 'MATLAB:structOnObject')
 
         % Adjust the heatmap to be square
@@ -66,12 +69,12 @@ function heatmap_combined(E, normalize, pallete, ats, tpts, Title, xlabel, ylabe
         end
         h1.Units = originalUnits;
         
-        % Apply the finer colormap
+        % Apply the finer colormap with logarithmic scaling
         colormap(finerPalette);
     end
     
     % Add a title to the entire tiled layout
-    title(t, Title,'FontSize', 20, 'FontName', 'Helvetica');
+    title(t, Title,'FontSize', 22, 'FontName', 'Helvetica');
     
     % Adjust the figure's PaperPosition property for printing
     fig = gcf;
@@ -80,5 +83,5 @@ function heatmap_combined(E, normalize, pallete, ats, tpts, Title, xlabel, ylabe
     fig.PaperPosition = [0 0 30 20]; % Adjust these values as needed for better fit
 
     % Save the figure to a PDF file using the -bestfit option
-    print(fig, filename, '-dpdf', '-bestfit');
+    print(fig, filename, '-dpng', '-r300');
 end

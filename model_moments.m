@@ -281,43 +281,44 @@ function model_moments= model_moments(ps,sp,fs,ws,moments_selection)
 
 
     % Manager to worker wage ratio
-    I_team=find(status==4); %team
+    I_team=find(status==4 & man_wage>0 & nman_wage>0);
+    % I_team=find(status==4);
     ratio= man_wage(I_team)./nman_wage(I_team);
     mm.ManWorkerRatio = mean(ratio);
 
     %From worker data
 
 
-    %Crosse section reg inside the model 
-    %Sample of employed workers
-    I_samp=find(w_status~=1 & wage>0);
-    length(I_samp ); 
+    % %Crosse section reg inside the model 
+    % %Sample of employed workers
+    % I_samp=find(w_status~=1 & wage>0);
+    % length(I_samp ); 
    
-    %Winsorize variables
-    wins_lb_cut=.5;
-    wins_ub_cut=99.5;
+    % %Winsorize variables
+    % wins_lb_cut=.5;
+    % wins_ub_cut=99.5;
 
-    %Winsorize wages
-    % lw=winsorize(log(wage(I_samp)),wins_lb_cut,wins_ub_cut);
-    %Manually winsorize
-    lw=log(wage(I_samp));
-    lw(lw<prctile(lw,wins_lb_cut))=prctile(lw,wins_lb_cut);
-    lw(lw>prctile(lw,wins_ub_cut))=prctile(lw,wins_ub_cut);
+    % %Winsorize wages
+    % % lw=winsorize(log(wage(I_samp)),wins_lb_cut,wins_ub_cut);
+    % %Manually winsorize
+    % lw=log(wage(I_samp));
+    % lw(lw<prctile(lw,wins_lb_cut))=prctile(lw,wins_lb_cut);
+    % lw(lw>prctile(lw,wins_ub_cut))=prctile(lw,wins_ub_cut);
     
 
-    if ats==5
-        X=[ones(length(I_samp),1),dummy_manager(I_samp),dummy_firm2(I_samp),dummy_firm3(I_samp),dummy_firm4(I_samp),dummy_firm5(I_samp),tenure(I_samp)];
-    else
-        X=[ones(length(I_samp),1),dummy_manager(I_samp),dummy_firm2(I_samp),tenure(I_samp)];
-    end
-    [~,nX]=size(X);
-    Y=lw;
-    b_cross=(X'*X)\X'*Y;   
-    eps=Y-X*b_cross;
-    sig_sq=sum(eps.^2)/length(I_samp);
-    std_error_cross=(sig_sq*eye(nX)/(X'*X))^.5;
+    % if ats==5
+    %     X=[ones(length(I_samp),1),dummy_manager(I_samp),dummy_firm2(I_samp),dummy_firm3(I_samp),dummy_firm4(I_samp),dummy_firm5(I_samp),tenure(I_samp)];
+    % else
+    %     X=[ones(length(I_samp),1),dummy_manager(I_samp),dummy_firm2(I_samp),tenure(I_samp)];
+    % end
+    % [~,nX]=size(X);
+    % Y=lw;
+    % b_cross=(X'*X)\X'*Y;   
+    % eps=Y-X*b_cross;
+    % sig_sq=sum(eps.^2)/length(I_samp);
+    % std_error_cross=(sig_sq*eye(nX)/(X'*X))^.5;
 
-    mm.b_cross=b_cross(2);
+    % mm.b_cross=b_cross(2);
 
     % Loop over the fields specified in moments_selection
     model_moments = zeros(1, length(moments_selection));

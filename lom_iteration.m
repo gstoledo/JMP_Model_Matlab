@@ -1,5 +1,5 @@
 %LOM interation for SS 
-function [e_udist, e_edist, e_mdist, e_ndist, e_tdist,store_n,store_p]=lom_iteration(eini_udist,eini_edist,eini_mdist,eini_ndist,eini_tdist,ats,tpts,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,true,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,it_joint)
+function [e_udist, e_edist, e_mdist, e_ndist, e_tdist,store_n,store_p,failed]=lom_iteration(eini_udist,eini_edist,eini_mdist,eini_ndist,eini_tdist,ats,tpts,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,it_joint,speed_dist,display_iter_dist)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     %Lets do the iteration of the LOMs
@@ -13,20 +13,21 @@ function [e_udist, e_edist, e_mdist, e_ndist, e_tdist,store_n,store_p]=lom_itera
     
     %Iterate on masses of workers
     diff_dist=1;
-    diff_dist_max=1e-4;
+    diff_dist_max=1e-5;
     it_dist=0;
      
     %Speed of convergence for distributions
-    speed_dist=1;
+    % speed_dist=1;
     
-    it_dist_max=10000;
-    if it_joint>100 && it_joint<200
+    it_dist_max=20000;
+    if it_joint>30 && it_joint<50
         min_it=5;
-    elseif it_joint>=200
+    elseif it_joint>=50
         min_it=1;
     else
-        min_it=25;
+        min_it=20;
     end
+    failed=0; %Flag for failed convergence
 
     while (diff_dist>diff_dist_max  | it_dist<min_it) && it_dist<it_dist_max
         it_dist=it_dist+1;
@@ -83,17 +84,20 @@ function [e_udist, e_edist, e_mdist, e_ndist, e_tdist,store_n,store_p]=lom_itera
 
             %%Error
             diff_dist=max([max(abs(eplus_udist-e_udist)),max(abs(eplus_edist-e_edist)),max(abs(eplus_mdist-e_mdist),[],[1 2]),max(abs(eplus_ndist-e_ndist),[],[1 2]),max(abs(eplus_tdist-e_tdist),[],[1 2 3])]);
-    
-            % %Print every 100 iterations
-            % if mod(it_dist,100)==0
-            %     fprintf('Dist Iteration %d, error %f \n', it_dist, diff_dist)
-            % end 
+            if display_iter_dist==1
+                %Print every 100 iterations
+                if mod(it_dist,100)==0
+                    fprintf('Dist Iteration %d, error %f \n', it_dist, diff_dist)
+                end 
+                if diff_dist<diff_dist_max && it_dist>=min_it
+                    cprintf('green','Distributions Converged in %d iterations\n',it_dist)
+                end
+            end
             %In red failed to converge
             if it_dist==it_dist_max
                 fprintf(2,'LOM Failed to converge\n')
+                failed=1;
             end
-            % if diff_dist<diff_dist_max
-            %     cprintf('green','Distributions Converged in %d iterations\n',it_dist)
-            % end
+
         end
     end

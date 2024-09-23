@@ -1,10 +1,9 @@
 #!/bin/bash
 
-#SBATCH --job-name=lmdcd2
-#SBATCH --nodes=1
+#SBATCH --job-name=Std_Lunch_selec
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=128GB
-#SBATCH --time=48:00:00
+#SBATCH --time=10:00:00
 #SBATCH --output=/home/gst247/HPC_Model_Matlab/Calibration_outcomes/%x/%x_%j.out   # Redirect standard output to Calibration_outcomes/filename/MATLAB_jobid.out
 #SBATCH --error=/home/gst247/HPC_Model_Matlab/Calibration_outcomes/%x/%x_%j.err    # Redirect standard error to Calibration_outcomes/filename/MATLAB_jobid.err
 #SBATCH --mail-type=END
@@ -22,7 +21,8 @@ cp -rp /share/apps/matlab-slurm/20201018/slurm/shared/parallel.mlsettings $MATLA
 cat<<EOF | matlab -nodisplay
 
 % Run your MATLAB script
-calibrationv0
+%calibrationv0
+selected_model
 
 exit
 

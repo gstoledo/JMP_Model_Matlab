@@ -1,6 +1,6 @@
 %Function for the VF interation of wages
 function [Wm,Wn,Wtm,Wtn,Wmh,Wnh,Wtnh,Wtmh] =wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,Vt,U,Vmh,Vnh,Vth,Veh,Wmini,Wnini,Wtmini,Wtnini,...
-    speed,cost_d,cost_p,wgrid,bt,death,del,lam,lamu,bpw,n,a_trans,q_trans,e_udist,e_edist,e_mdist,e_ndist,e_tdist);
+    speed,cost_d,cost_p,wgrid,bt,death,del,lam,lamu,bpw,n,a_trans,q_trans,e_udist,e_edist,e_mdist,e_ndist,e_tdist,display_iter)
     Uh=U;
     %% Policy functions    
     % %Hiring policies, looking at origins not allocations yet 
@@ -519,6 +519,16 @@ function [Wm,Wn,Wtm,Wtn,Wmh,Wnh,Wtnh,Wtmh] =wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,
         end
     
         diff=max([max(abs(Wmup-Wm),[],'all'),max(abs(Wnup-Wn),[],'all'),max(abs(Wtmup-Wtm),[],'all'),max(abs(Wtnup-Wtn),[],'all')]);
+
+        if display_iter==1
+            %Print every 50 iterations the difference and some text
+            if mod(itw,100)==0
+                fprintf('Wage Iteration %d, error %f \n', itw, diff)
+            end
+            if diff<diffmax
+                fprintf('Wages Converged in %d iterations\n',itw)
+            end
+        end
         %Print every 50 iterations the difference and some text
         % if mod(itw,100)==0
         %     fprintf('Wage Iteration %d, error %f \n', itw, diff)
@@ -527,9 +537,7 @@ function [Wm,Wn,Wtm,Wtn,Wmh,Wnh,Wtnh,Wtmh] =wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,
         if itw==itmax
             fprintf(2,'WF Failed to converge\n')
         end
-        % if diff<diffmax
-        %     fprintf('Wages Converged in %d iterations\n',itw)
-        % end
+
     end
     %Final values
     Wm=Wmup;

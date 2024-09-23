@@ -28,7 +28,7 @@ tg.tr=0;                            %Manager penalty toggle
 tg.speed=1;                         %Convergenge speed
 tg.update_speed_v=1;                %Update speed for value functions
 tg.update_speed=1;                  %Update speed for wages
-tg.display='y';                      %Display iterations
+tg.display_iter=1;                      %Display iterations
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Simulation parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,21 +75,21 @@ theta.n=1;                             %Measure of firms
 %% Parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-theta.aup=0.1;                          %Probability of moving up
-theta.adown=0.3;                        %Probability of moving down
+theta.aup=0.05;                          %Probability of moving up
+theta.adown=0.05;                        %Probability of moving down
 theta.qdown=0*ones(theta.ats,1);        %Probability of moving down in q
 theta.ulose=x(6);                       %Probability of moving donw in u
-theta.A=x(14);                          %Aggegate productivity parameter, still unsure hor to add this here
+theta.A=5;                          %Aggegate productivity parameter, still unsure hor to add this here
 theta.fcomp=x(3);                       %Complementarity in F
 theta.alpha_m=0.7;                      %Manager share
-theta.homeprod=x(12);                   %Home production
+theta.homeprod=0.1;                     %Home production
 theta.mnew=x(9);                        %Paramter of exponetial dist for newborn workers
 theta.lamu=x(1);                        %Prob of U find a firm
 theta.lam=x(2);                         %Prob of firm find another firm
 theta.del=x(5);                         %Separation rate
-theta.qup=0.08*ones(theta.ats,1);       %Probability of moving up in q. The qup for the last level of productivity is irrelevant
-theta.cost_d=0.8;                       %cost of demoting a manager to non manager  
-theta.cost_p=0.02;                       %cost of promoting a non manager to manager
+theta.qup=0.1*ones(theta.ats,1);       %Probability of moving up in q. The qup for the last level of productivity is irrelevant
+theta.cost_d=2.25;                       %cost of demoting a manager to non manager  
+theta.cost_p=1.05;                       %cost of promoting a non manager to manager
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Grids
@@ -102,12 +102,6 @@ cgrid.lam=linspace(0.1,0.6,10);
 cgrid.alpha_m=linspace(0.5,0.9,10);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% % %Function to wrap the SMM function
-% p_selection={'cost_p','cost_d','lamu','lam','alpha_m'};
-% [p_vec, ps] = param_selection(theta, p_selection);
-% p=p_vec_to_struct(p_vec, p_selection, theta);
-% [v,e,w]=joint_loop(p,ps,tg,"spec3");
-% save('solved_model.mat','v','e','w')
 
 % % Simulations 
 % fs=SimulateFirm_cl(p,ps,tg,sp,v,e,w);
@@ -145,18 +139,20 @@ cgrid.alpha_m=linspace(0.5,0.9,10);
 % % manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'qup');
 
 
-%Costs amd Lambadas to get only NiMi and MiNi
-p_selection={'cost_p','cost_d'};
-[p_vec, ps] = param_selection(theta, p_selection);
-moments_selection = {'NiMi', 'MiNi'};
-cgrid.cost_d=linspace(0.5,1.4,1);
-cgrid.cost_p=linspace(0.01,0.2,1);
-cgrid.lamu=linspace(0.2,0.6,2);
-folder='Calibration_outcomes';
-filename='costs_lamu';
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'costs');
-load('Calibration_outcomes/costs/calibrationv0.mat')
-calibration_report(p_selection,ps ,moments_selection, combinations, data_mom, moments, distances, 0.05, folder, filename)
+% %Costs amd Lambadas to get only NiMi and MiNi
+% p_selection={'cost_p','cost_d'};
+% [p_vec, ps] = param_selection(theta, p_selection);
+% moments_selection = {'NiMi', 'MiNi'};
+
+
+% cgrid.cost_d=linspace(0.5,1.4,1);
+% cgrid.cost_p=linspace(0.01,0.2,1);
+% cgrid.lamu=linspace(0.2,0.6,2);
+% folder='Calibration_outcomes';
+% filename='costs_lamu';
+% manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'costs');
+% load('Calibration_outcomes/costs/calibrationv0.mat')
+% calibration_report(p_selection,ps ,moments_selection, combinations, data_mom, moments, distances, 0.05, folder, filename)
 
 % %% Lets put alpha to the mix
 % p_selection={'alpha_m'};

@@ -1,5 +1,5 @@
-% location = "local";
-location="hpc";
+location = "local";
+% location="hpc";
 if location == "local"
     %Clear all but location variable
     clearvars -except location
@@ -11,106 +11,32 @@ else
     % Add your working directory to MATLAB's path
     addpath('/home/gst247/HPC_Model_Matlab/JMP_Model_Matlab')
 end
-load('xmin_results_combined.mat')
-x=xmin; %Use some values of HLPM to start 
 
-
-%Attempt 0 at calibration for very few parameters
-
-% Learning parameters q_up
-%Cost of demotion and promotion
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Toggles
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-tg.use_guess='no';                %Use guess for value functions
-tg.zero_tol=1e-10;                  %Tolerance for zero
-tg.tr=0;                            %Manager penalty toggle
-tg.speed=1;                         %Convergenge speed
-tg.update_speed_v=1;                %Update speed for value functions
-tg.update_speed=1;                  %Update speed for wages
-tg.display='y';                      %Display iterations
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Simulation parameters
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-sp.seed=1;                          %Seed for random number generator
-sp.n_firms=20000;                      %Number of firms
-sp.n_workers=sp.n_firms;             %Number of workers
-sp.n_months=240;                     %Number of months
-sp.burn_years=1;                  %Number of years to burn
-sp.t_burn=12*sp.burn_years;        %Number of months to burn
-sp.n_years=sp.n_months/12;        %Number of years total
-sp.stable_years = sp.n_years - sp.burn_years; %Number of years to keep the simulation
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Data Moments
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-dm.NiMi                             =0.047+0.009;  %Rate internal promotions to managers (as a fraction of total managers)
-dm.MiNi                             =0.021+0.001;  %Rate internal demotions to non-managers (as a fraction of total non-managers)
-dm.Q5Q1nm_wage                      =6.84;          %Non Manager Wage Ratio quintile 5 to quintile 1 of total avg wage
-dm.Q5Q2nm_wage                      =3.35;          %Non Manager Wage Ratio quintile 5 to quintile 2 of total avg wage
-dm.Q5Q3nm_wage                      =2.30;          %Non Manager Wage Ratio quintile 5 to quintile 3 of total avg wage
-dm.Q5Q4nm_wage                      =1.68;          %Non Manager Wage Ratio quintile 5 to quintile 4 of total avg wage
-dm.Q5Q5nm_wage                      =1;           %Non Manager Wage Ratio quintile 5 to quintile 4 of total avg wage
-dm.ManWorkerRatio                   =1.53;           % Ratio between managers and workers wage/employment ratio
-dm.bcross                           =0.137;         %Cross Section Wage Premium
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Pre-set parameters
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-theta.tpts = 3;                        %Type points space
-theta.ats = 2;                         %Productivity space
-if location == "hpc"
-    theta.ats=5;
-    theta.tpts=7;
-end
-theta.wpts=100;                        %Wage type
-theta.bt=1/(1.1^(1/12));               %beta, discount factor
-theta.death=1/(35*12);                 %Probability agent dies
-theta.bpw=1-xmin(11);                  %bpw is bargaining power of worker
-theta.bpf=1-theta.bpw;                    %Firm bargaining power (1-gamma)
-theta.n=1;                             %Measure of firms
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Parameters
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-theta.aup=0.1;                          %Probability of moving up
-theta.adown=0.3;                        %Probability of moving down
-theta.qdown=0*ones(theta.ats,1);        %Probability of moving down in q
-theta.ulose=x(6);                       %Probability of moving donw in u
-theta.A=x(14);                          %Aggegate productivity parameter, still unsure hor to add this here
-theta.fcomp=x(3);                       %Complementarity in F
-theta.alpha_m=0.7;                      %Manager share
-theta.homeprod=x(12);                   %Home production
-theta.mnew=x(9);                        %Paramter of exponetial dist for newborn workers
-theta.lamu=x(1);                        %Prob of U find a firm
-theta.lam=x(2);                         %Prob of firm find another firm
-theta.del=x(5);                         %Separation rate
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Load baseline parameters
+run baseline_param.m
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+tg.display_iter=1; %Display iterations
+tg.display_iter_v=1;
+tg.display_iter_dist=1;
+% theta.ats=5; %Number of productivity levels
+% theta.tpts=7; %Number of type points
 theta.qup=0.05*ones(theta.ats,1);       %Probability of moving up in q. The qup for the last level of productivity is irrelevant
-theta.cost_d=0.8;                       %cost of demoting a manager to non manager  
-theta.cost_p=0.02;                       %cost of promoting a non manager to manager
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Grids
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-cgrid.cost_d=linspace(0.5,1.4,15);
-cgrid.cost_p=linspace(0.02,0.2,15);
-cgrid.qup = repmat({linspace(0.08, 0.4, 5)},length(theta.qup),1);
-cgrid.lamu=linspace(0.2,0.4,10);
-cgrid.lam=linspace(0.2,0.4,10);
-cgrid.alpha_m=linspace(0.5,0.9,10);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+% %Function to wrap the SMM function
+p_selection={'cost_p','cost_d','lamu','lam','alpha_m'};
+[p_vec, ps] = param_selection(theta, p_selection);
+p=p_vec_to_struct(p_vec, p_selection, theta);
+[a_trans,q_trans,u_trans,fteam,fman,fnman,fe,b,mnew_high,typebirth,wmin,wmax,wgrid] = derivatated_p(p,ps);
+tg.speed=1;
+tg.update_speed_v=1;
+tg.speed_dist=1;
+[v,e,w]=joint_loop(p,ps,tg,"spec3");
+save('solved_model.mat','v','e','w')
 
-% % %Function to wrap the SMM function
-% p_selection={'cost_p','cost_d','lamu','lam','alpha_m'};
-% [p_vec, ps] = param_selection(theta, p_selection);
-% p=p_vec_to_struct(p_vec, p_selection, theta);
-% [v,e,w]=joint_loop(p,ps,tg,"spec3");
-% save('solved_model.mat','v','e','w')
+
+
 
 % % Simulations 
 % fs=SimulateFirm_cl(p,ps,tg,sp,v,e,w);
@@ -132,7 +58,7 @@ moments_selection = {'NiMi', 'MiNi'};
 cgrid.cost_d=linspace(0.5,1.4,12);
 cgrid.cost_p=linspace(0.01,0.2,12);
 cgrid.alpha_m=linspace(0.6,0.9,5);
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'costs');
+manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'costs');
 
 %% Only costs with qup=0.06
 p_selection={'cost_p','cost_d'};
@@ -141,7 +67,7 @@ theta.qup=0.06*ones(theta.ats,1);       %Probability of moving up in q. The qup 
 moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
 cgrid.cost_d=linspace(0.7,2,12);
 cgrid.cost_p=linspace(0.1,0.5,12);
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'costsq06');
+manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'costsq06');
 
 
 %% Only costs with qup=0.055
@@ -151,7 +77,7 @@ theta.qup=0.055*ones(theta.ats,1);       %Probability of moving up in q. The qup
 moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
 cgrid.cost_d=linspace(1,3,12);
 cgrid.cost_p=linspace(0.2,1,12);
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'costsq055');
+manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'costsq055');
 
 
 %% With alpha
@@ -161,7 +87,7 @@ moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
 cgrid.cost_d=linspace(0.5,1.4,12);
 cgrid.cost_p=linspace(0.01,0.2,12);
 cgrid.alpha_m=linspace(0.6,0.9,5);
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'costs_alpha');
+manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'costs_alpha');
 
 
 %% Costs amd Lambadas to get only NiMi and MiNi
@@ -171,7 +97,7 @@ cgrid.cost_d=linspace(0.5,1.4,10);
 cgrid.cost_p=linspace(0.01,0.2,10);
 cgrid.lamu=linspace(0.1,0.6,5);
 cgrid.lam=linspace(0.1,0.6,5);
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'costs_lambdas');
+manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'costs_lambdas');
 
 
 %% Test of Wage moments
@@ -180,7 +106,7 @@ theta.qup=0.05*ones(theta.ats,1);       %Probability of moving up in q. The qup 
 theta.alpha_m=0.8;                      %Manager share
 p_selection={'lamu','lam'};
 moments_selection = {'ManWorkerRatio','bcross'};
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'No_NM');
+manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'No_NM');
 
 
 %% Focus on the rates
@@ -192,7 +118,7 @@ cgrid.cost_p=linspace(0.02,0.2,4);
 cgrid.lamu=linspace(0.2,0.6,5);
 cgrid.lam=linspace(0.2,0.6,5);
 cgrid.alpha_m=linspace(0.5,0.9,2);
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'rates');
+manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'rates');
 
 
 %% Only qup
@@ -201,7 +127,7 @@ moments_selection = {'NiMi', 'MiNi'};
 theta.cost_p=0.25;
 theta.cost_d=1.227;
 cgrid.qup = repmat({linspace(0.05, 0.07, 3)},length(theta.qup),1);
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'qup');
+manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'qup');
 
 
 %% Only lambdas
@@ -212,7 +138,7 @@ theta.cost_p=0.25;
 theta.cost_d=1.5;
 cgrid.lamu=linspace(0.4,0.65,10);
 cgrid.lam=linspace(0.2,0.35,10);
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'lambdas');
+manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'lambdas');
 
 
 
@@ -225,13 +151,13 @@ theta.cost_d=2.5;
 theta.alpha_m=0.75;
 cgrid.lamu=linspace(0.4,0.65,10);
 cgrid.lam=linspace(0.2,0.35,10);
-manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'lmdcd2');
+manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'lmdcd2');
 
 
 % %% Lets put alpha to the mix
 % p_selection={'alpha_m'};
 % moments_selection = {'ManWorkerRatio','b_cross'};
-% manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,location,'alpha_qup_Bcross');
+% manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'alpha_qup_Bcross');
 
 
 

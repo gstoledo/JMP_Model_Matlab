@@ -227,6 +227,8 @@ a_tilda=1;
 q=3;
 z=3;
 
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Plot the allocation policies (that are always conditional on hiring)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -567,6 +569,8 @@ plot_hire_alloc({H_t_nm_pm(:,:,tpts),H_t_nm_pn(:,:,tpts),H_t_nm_pmu(:,:,tpts),H_
 
 a=1;
 a_tilda=1;
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
 % For every ztilde, plot the allocation policies
 for ztilde=1:tpts

@@ -1,5 +1,5 @@
 %Function that runs, simulate compute moments of the model and get the difference with the data moments
-function [distance,model_mom]=f_SMM(p,ps,tg,sp,dm,moments_selection)
+function [distance,model_mom]=f_SMM(p,ps,tg,sp,dm,moments_selection,cw)
     %Solve the model
     [v,e,w]=joint_loop(p,ps,tg,"spec3");
     if v.failed==0
@@ -18,7 +18,9 @@ function [distance,model_mom]=f_SMM(p,ps,tg,sp,dm,moments_selection)
         %Difference
         diff=model_mom-data_mom;
         %Weightning matrix, identity matrix for now
-        WMat= eye(numMoments);
+        weights=data_moments(cw,moments_selection);
+        WMat= diag(weights);
+        % WMat= eye(numMoments);
 
         %Distance
         distance=diff*WMat*diff';
@@ -31,5 +33,5 @@ function [distance,model_mom]=f_SMM(p,ps,tg,sp,dm,moments_selection)
 
 
 
-
+ 
     
