@@ -1,5 +1,5 @@
 % Compute all gains from trade from firms with non-managers
-function [gt_meet_u, gt_meet_m, gt_meet_nm, gt_meet_t_m, gt_meet_t_nm, gt_meet_t] = nf_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,true,cost_p)
+function [gt_meet_u, gt_meet_m, gt_meet_nm, gt_meet_t_m, gt_meet_t_nm, gt_meet_t] = nf_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,nm_penal,cost_p)
     tol=1e-8;
     %Gains from trade from meeting unemployed
     gt_meet_u = zeros(tpts,ats,tpts);
@@ -33,10 +33,10 @@ function [gt_meet_u, gt_meet_m, gt_meet_nm, gt_meet_t_m, gt_meet_t_nm, gt_meet_t
     gt_meet_nm = zeros(ats,tpts,ats,tpts);
     % Compute gt_meet_nm
     %gt_meet_nm(a_tilda,z_tilda,a,q)    
-    %Vmhp=Non_man_penalty_loop(Vmh,tpts,ats,true);
-    Vnhp=Non_man_penalty_loop(Vnh,tpts,ats,true);
-    Vthpm=Non_man_penalty_full_m_loop(Vth,tpts,ats,true);
-    Vthpn=Non_man_penalty_full_n_loop(Vth,tpts,ats,true);
+    %Vmhp=Non_man_penalty_loop(Vmh,tpts,ats,nm_penal);
+    Vnhp=Non_man_penalty_loop(Vnh,tpts,ats,nm_penal);
+    Vthpm=Non_man_penalty_full_m_loop(Vth,tpts,ats,nm_penal);
+    Vthpn=Non_man_penalty_full_n_loop(Vth,tpts,ats,nm_penal);
     for a = 1:ats
         for q = 1:tpts
             for z_tilda = 1:tpts

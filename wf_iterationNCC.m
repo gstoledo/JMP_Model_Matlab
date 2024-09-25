@@ -1,11 +1,11 @@
 %Function for the VF interation of wages
-function [Wm,Wn,Wtm,Wtn,Wmh,Wnh,Wtnh,Wtmh] =wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,Vt,U,Vmh,Vnh,Vth,Veh,Wmini,Wnini,Wtmini,Wtnini,...
-    speed,cost_d,cost_p,wgrid,bt,death,del,lam,lamu,bpw,n,a_trans,q_trans,e_udist,e_edist,e_mdist,e_ndist,e_tdist,display_iter)
+function [Wm,Wn,Wtm,Wtn,Wmh,Wnh,Wtnh,Wtmh] =wf_iterationNCC(wpts,ats,tpts,phim,phin,Ve,Vm,Vn,Vt,U,Vmh,Vnh,Vth,Veh,Wmini,Wnini,Wtmini,Wtnini,...
+    speed,cost_d,cost_p,wgrid,bt,death,del,lam,lamu,bpw,n,a_trans,q_trans,e_udist,e_edist,e_mdist,e_ndist,e_tdist,nm_penal,display_iter)
     Uh=U;
     %% Policy functions    
     % %Hiring policies, looking at origins not allocations yet 
-    [h_e_u, h_e_m, h_e_nm, h_e_t_m, h_e_t_nm, h_m_u, h_m_m, h_m_nm, h_m_t_m, h_m_t_nm, h_nm_u, h_nm_m, h_nm_nm, h_nm_t_m, h_nm_t_nm, h_t_u, h_t_m, h_t_nm, h_t_t_m, h_t_t_nm]...
-            =hire_policies(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,nm_penal,cost_d,cost_p);
+    [h_e_u, h_e_m, h_e_nm, h_e_t_m, h_e_t_nm, h_m_u, h_m_m, h_m_nm, h_m_t_m, h_m_t_nm, h_nm_u, h_nm_m, h_nm_nm, h_nm_t_m, h_nm_t_nm, h_t_u, h_t_m, h_t_nm, h_t_t_m, h_t_t_nm]=...
+    hire_policiesNCC_phi(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,phim,phin,nm_penal,cost_d,cost_p);
             
     % Allocation Policies after hiring at SM
     [p_e_m, p_e_n, p_m_m_u, p_m_m_d, p_m_n, p_n_n_u, p_n_n_p, p_n_m, p_t_m_u, p_t_m_d, p_t_n_u, p_t_n_p]...
@@ -142,7 +142,7 @@ function [Wm,Wn,Wtm,Wtn,Wmh,Wnh,Wtnh,Wtmh] =wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,
                         for atilda=1:ats
                             for qtilda=1:tpts
                                 store_t(atilda,ztilda,qtilda)=e_tdist(atilda,ztilda,qtilda)*(h_m_t_m(atilda,ztilda,qtilda,a,z)*(p_m_m_u(a,z,ztilda)*U(z)+p_m_m_d(a,z,ztilda)*Wtnh(w,a,ztilda,z)+p_m_n(a,z,ztilda)*Wtmh(w,a,z,ztilda)-Wmh(w,a,z))...
-                                    +h_m_t_nm(atilda,ztilda,qtilda,a,z)*(p_m_m_u(a,z,qtilda)*U(z)+p_m_m_d(a,z,qtilda)*Wtnh(w,a,qtilda,z)+p_m_n(a,z,qtilda)*Wtmh(w,a,z,qtilda)-Wmh(w,a,z)));
+                                                                                                +h_m_t_nm(atilda,ztilda,qtilda,a,z)*(p_m_m_u(a,z,qtilda)*U(z)+p_m_m_d(a,z,qtilda)*Wtnh(w,a,qtilda,z)+p_m_n(a,z,qtilda)*Wtmh(w,a,z,qtilda)-Wmh(w,a,z)));
                             end 
                         end
                     end

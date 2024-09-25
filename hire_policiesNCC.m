@@ -1,5 +1,5 @@
 %%Hiring policies, looking at origins not allocations yet 
-function [h_e_u, h_e_m, h_e_nm, h_e_t_m, h_e_t_nm, h_m_u, h_m_m, h_m_nm, h_m_t_m, h_m_t_nm, h_nm_u, h_nm_m, h_nm_nm, h_nm_t_m, h_nm_t_nm, h_t_u, h_t_m, h_t_nm, h_t_t_m, h_t_t_nm]=hire_policies(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,nm_penal,cost_d,cost_p);
+function [h_e_u, h_e_m, h_e_nm, h_e_t_m, h_e_t_nm, h_e_t_nm_Lm, h_e_t_m_Lnm, h_m_u, h_m_m, h_m_nm, h_m_t_m, h_m_t_nm, h_m_t_nm_Lm, h_m_t_m_Lnm,h_nm_u, h_nm_m, h_nm_nm, h_nm_t_m, h_nm_t_nm,h_nm_t_nm_Lm, h_nm_t_m_Lnm,h_t_u, h_t_m, h_t_nm, h_t_t_m, h_t_t_nm, h_t_t_nm_Lm, h_t_t_m_Lnm]=hire_policiesNCC(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,nm_penal,cost_d,cost_p)
     % Gains from trade after convergence
     [gt_ef_meet_u, gt_ef_meet_m, gt_ef_meet_nm, gt_ef_meet_t_m, gt_ef_meet_t_nm, gt_ef_meet_t]=ef_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,nm_penal);
     [gt_em_meet_u, gt_em_meet_m, gt_em_meet_nm, gt_em_meet_t_m, gt_em_meet_t_nm, gt_em_meet_t]=mf_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,nm_penal,cost_d);
@@ -22,7 +22,13 @@ function [h_e_u, h_e_m, h_e_nm, h_e_t_m, h_e_t_nm, h_m_u, h_m_m, h_m_nm, h_m_t_m
     
     %Hire policy by empty firms from teams, hiring their non manager
     h_e_t_nm=double(gt_ef_meet_t_nm>gt_ef_meet_t_m & gt_ef_meet_t_nm>tol);
-    
+
+    %Hire Nm if M is locked
+    h_e_t_nm_Lm=double(gt_ef_meet_t_nm>tol);
+
+    %Hire M if Nm is locked
+    h_e_t_m_Lnm=double(gt_ef_meet_t_m>tol);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %Firm with manager hiring policy
     %Hire policy by firms with manager from unemployed
     h_m_u=double(gt_em_meet_u>tol);
@@ -38,7 +44,15 @@ function [h_e_u, h_e_m, h_e_nm, h_e_t_m, h_e_t_nm, h_m_u, h_m_m, h_m_nm, h_m_t_m
     
     %Hire policy by firms with manager from teams, hiring their non manager
     h_m_t_nm=double(gt_em_meet_t_nm>gt_em_meet_t_m & gt_em_meet_t_nm>tol);
+
+    % Hire Nm if M is locked
+    h_m_t_nm_Lm=double(gt_em_meet_t_nm>tol);
+
+    % Hire M if Nm is locked
+    h_m_t_m_Lnm=double(gt_em_meet_t_m>tol);
     
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %Firm with no manager hiring policy
     %Hire policy by firms with no manager from unemployed
     h_nm_u=double(gt_en_meet_u>tol);
@@ -54,7 +68,15 @@ function [h_e_u, h_e_m, h_e_nm, h_e_t_m, h_e_t_nm, h_m_u, h_m_m, h_m_nm, h_m_t_m
     
     %Hire policy by firms with no manager from teams, hiring their non manager
     h_nm_t_nm=double(gt_en_meet_t_nm>gt_en_meet_t_m & gt_en_meet_t_nm>tol);
+
+    % Hire Nm if M is locked
+    h_nm_t_nm_Lm=double(gt_en_meet_t_nm>tol);
+
+    % Hire M if Nm is locked
+    h_nm_t_m_Lnm=double(gt_en_meet_t_m>tol);
     
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %Team hiring policy
     %Hire policy by teams from unemployed
     h_t_u=double(gt_tf_meet_u>tol);
@@ -70,5 +92,12 @@ function [h_e_u, h_e_m, h_e_nm, h_e_t_m, h_e_t_nm, h_m_u, h_m_m, h_m_nm, h_m_t_m
     
     %Hire policy by teams from teams, hiring their non manager
     h_t_t_nm=double(gt_tf_meet_t_nm>gt_tf_meet_t_m & gt_tf_meet_t_nm>tol);
+
+    %Hire Nm if M is locked
+    h_t_t_nm_Lm=double(gt_tf_meet_t_nm>tol);
+
+    %Hire M if Nm is locked
+    h_t_t_m_Lnm=double(gt_tf_meet_t_m>tol);
+
     
     

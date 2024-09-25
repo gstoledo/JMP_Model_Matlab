@@ -131,7 +131,7 @@ u_trans=create_trans(ulose,ustay,ugain,tpts);
 dayy          ='1'   ; %Version of the code    
 zero_tol      =1e-10 ; %Tolerance for zero
 use_guess     ='y'   ;
-true=0               ; %Manager penalty toggle
+nm_penal=0               ; %Manager penalty toggle
 speed=1              ; %Convergenge speed
 
 

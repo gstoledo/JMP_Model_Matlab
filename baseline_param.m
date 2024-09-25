@@ -7,7 +7,7 @@ x=xmin; %Use some values of HLPM to start
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     tg.use_guess='yes';                %Use guess for value functions
     tg.zero_tol=1e-10;                  %Tolerance for zero
-    tg.tr=0;                            %NManager penalty toggle
+    tg.nm_penal=0;                            %NManager penalty toggle
     tg.speed=1;                        %Convergence speed
     tg.speed_dist=1;                         %Convergenge speed distribution
     tg.update_speed_v=1;                %Update speed for value functions

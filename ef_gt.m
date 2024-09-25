@@ -1,5 +1,5 @@
 % Compute all gains from trade from empty firms
-function [gt_meet_u, gt_meet_m, gt_meet_nm, gt_meet_t_m, gt_meet_t_nm, gt_meet_t] = ef_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,true)
+function [gt_meet_u, gt_meet_m, gt_meet_nm, gt_meet_t_m, gt_meet_t_nm, gt_meet_t] = ef_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,nm_penal)
     tol=1e-8;
     % Initialize gt_meet_u
     gt_meet_u = zeros(tpts,ats);
@@ -25,8 +25,8 @@ function [gt_meet_u, gt_meet_m, gt_meet_nm, gt_meet_t_m, gt_meet_t_nm, gt_meet_t
     gt_meet_nm = zeros(ats,tpts,ats);
     % Compute gt_meet_nm
     %gt_meet_nm(a_tilda,z_tilda,a)
-    Vmhp=Non_man_penalty_loop(Vmh,tpts,ats,true);
-    Vnhp=Non_man_penalty_loop(Vnh,tpts,ats,true);
+    Vmhp=Non_man_penalty_loop(Vmh,tpts,ats,nm_penal);
+    Vnhp=Non_man_penalty_loop(Vnh,tpts,ats,nm_penal);
     for a = 1:ats
         for z_tilda = 1:tpts
             for a_tilda = 1:ats

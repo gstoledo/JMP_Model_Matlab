@@ -112,7 +112,7 @@ ustay=1-ulose-ugain  ; %Probability unemployed stay
 u_trans=create_trans(ulose,ustay,ugain,tpts);
 
 %Manager penalty toggle 
-true=0;
+nm_penal=0;
 %Convergenge speed
 speed=1;
 
@@ -236,7 +236,7 @@ Uini=b/(1-bt);
 
 
 %Value function iteration
-[Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl, Vttl, Utl] = vf_iterationV2(e_edist,e_mdist,e_ndist,e_tdist,e_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,true,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed);
+[Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl, Vttl, Utl] = vf_iterationV2(e_edist,e_mdist,e_ndist,e_tdist,e_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,nm_penal,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed);
 
 Uh=U;
 
@@ -246,7 +246,7 @@ Uh=U;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Hiring policies, looking at origins not allocations yet 
 [h_e_u, h_e_m, h_e_nm, h_e_t_m, h_e_t_nm, h_m_u, h_m_m, h_m_nm, h_m_t_m, h_m_t_nm, h_nm_u, h_nm_m, h_nm_nm, h_nm_t_m, h_nm_t_nm, h_t_u, h_t_m, h_t_nm, h_t_t_m, h_t_t_nm]...
-=hire_policies(Vmh,Vnh,Veh,U,Vth,ats,tpts,true,cost_d,cost_p);
+=hire_policies(Vmh,Vnh,Veh,U,Vth,ats,tpts,nm_penal,cost_d,cost_p);
 
 % Allocation Policies after hiring at SM
 [p_e_m, p_e_n, p_m_m_u, p_m_m_d, p_m_n, p_n_n_u, p_n_n_p, p_n_m, p_t_m_u, p_t_m_d, p_t_n_u, p_t_n_p]...
@@ -342,7 +342,7 @@ pop0=sum(eini_udist)+sum(eini_mdist,"all")+sum(eini_ndist,"all")+2*sum(eini_tdis
 
 
 joint_it=0;
-[e_udist, e_edist, e_mdist, e_ndist, e_tdist,store_n,store_p]=lom_iteration(eini_udist,eini_edist,eini_mdist,eini_ndist,eini_tdist,ats,tpts,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,true,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,joint_it);
+[e_udist, e_edist, e_mdist, e_ndist, e_tdist,store_n,store_p]=lom_iteration(eini_udist,eini_edist,eini_mdist,eini_ndist,eini_tdist,ats,tpts,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,nm_penal,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,joint_it);
 % %Need to fix the e1
 % %Check sum
 %Plot store_n and store_pop
@@ -382,7 +382,7 @@ Vnini=fnman/(1-bt);
 Vtini=fteam/(1-bt);
 Uini=b/(1-bt);
 
-[Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl, Vttl, Utl]= vf_iterationV2(eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist,eplus_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,true,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed);
+[Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl, Vttl, Utl]= vf_iterationV2(eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist,eplus_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,nm_penal,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed);
 
 
 update_speed_v=0.3;
@@ -432,7 +432,7 @@ while (diff_joint>diff_joint_max | diff_joint_lag1>diff_joint_max  | diff_joint_
     end
 
     %Value function iteration
-    [Veplus, Vmplus, Vnplus, Vtplus, Uplus, Vehplus, Vmhplus, Vnhplus, Vthplus, Vetlplus, Vmtlplus, Vntlplus, Vttlplus, Utlplus] = vf_iterationV2(e_edist,e_mdist,e_ndist,e_tdist,e_udist,Ve,Vm,Vn,Vt,U,ats,tpts,cost_d,cost_p,true,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,update_speed_v);
+    [Veplus, Vmplus, Vnplus, Vtplus, Uplus, Vehplus, Vmhplus, Vnhplus, Vthplus, Vetlplus, Vmtlplus, Vntlplus, Vttlplus, Utlplus] = vf_iterationV2(e_edist,e_mdist,e_ndist,e_tdist,e_udist,Ve,Vm,Vn,Vt,U,ats,tpts,cost_d,cost_p,nm_penal,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,update_speed_v);
     %Update the values
     Ve=(1-update_speed_v)*Ve+update_speed_v*Veplus;
     Vm=(1-update_speed_v)*Vm+update_speed_v*Vmplus;
@@ -454,7 +454,7 @@ while (diff_joint>diff_joint_max | diff_joint_lag1>diff_joint_max  | diff_joint_
     eouter_tdist=e_tdist;
 
     %Iterate on masses of workers
-    [eplus_udist,eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist,store_n,store_p]=lom_iteration(e_udist,e_edist,e_mdist,e_ndist,e_tdist,ats,tpts,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,true,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,it_joint);
+    [eplus_udist,eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist,store_n,store_p]=lom_iteration(e_udist,e_edist,e_mdist,e_ndist,e_tdist,ats,tpts,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,nm_penal,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,it_joint);
     nplus=sum(eplus_edist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+sum(eplus_tdist,"all");
     popplus=sum(eplus_udist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+2*sum(eplus_tdist,"all");
     store_n_outer(it_joint)=nplus;
@@ -538,7 +538,7 @@ legend('Empty Firms','Unemployed','Managers','Non Managers','Teams')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Hiring policies, looking at origins not allocations yet 
 [h_e_u, h_e_m, h_e_nm, h_e_t_m, h_e_t_nm, h_m_u, h_m_m, h_m_nm, h_m_t_m, h_m_t_nm, h_nm_u, h_nm_m, h_nm_nm, h_nm_t_m, h_nm_t_nm, h_t_u, h_t_m, h_t_nm, h_t_t_m, h_t_t_nm]...
-=hire_policies(Vmh,Vnh,Veh,U,Vth,ats,tpts,true,cost_d,cost_p);
+=hire_policies(Vmh,Vnh,Veh,U,Vth,ats,tpts,nm_penal,cost_d,cost_p);
 
 % Allocation Policies after hiring at SM
 [p_e_m, p_e_n, p_m_m_u, p_m_m_d, p_m_n, p_n_n_u, p_n_n_p, p_n_m, p_t_m_u, p_t_m_d, p_t_n_u, p_t_n_p]...

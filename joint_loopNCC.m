@@ -1,4 +1,4 @@
-function [v,e,w]=joint_loop(p,ps,tg,spec_name)
+function [v,e,w]=joint_loopNCC(p,ps,tg,spec_name)
     %% Opening up the parameters
     fieldNames = fieldnames(p);
     % Loop over each field and assign it to a variable in the workspace
@@ -132,7 +132,7 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
 
 
     %Initialize the loop with a guess for value functions
-    [Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl, Vttl, Utl]= vf_iterationV2(eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist,eplus_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,nm_penal,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed,display_iter_v);
+    [Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl, Vttl, Utl]= vf_iterationNCC(eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist,eplus_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,phim,phin,cost_d,cost_p,nm_penal,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed,display_iter_v);
 
 
     diff_joint_lag1=0;
@@ -168,7 +168,7 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
         end
 
         %Value function iteration
-        [Veplus, Vmplus, Vnplus, Vtplus, Uplus, Vehplus, Vmhplus, Vnhplus, Vthplus, Vetlplus, Vmtlplus, Vntlplus, Vttlplus, Utlplus] = vf_iterationV2(e_edist,e_mdist,e_ndist,e_tdist,e_udist,Ve,Vm,Vn,Vt,U,ats,tpts,cost_d,cost_p,nm_penal,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed,display_iter_v);
+        [Veplus, Vmplus, Vnplus, Vtplus, Uplus, Vehplus, Vmhplus, Vnhplus, Vthplus, Vetlplus, Vmtlplus, Vntlplus, Vttlplus, Utlplus] = vf_iterationNCC(e_edist,e_mdist,e_ndist,e_tdist,e_udist,Ve,Vm,Vn,Vt,U,ats,tpts,phim,phin,cost_d,cost_p,nm_penal,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed,display_iter_v);
         %Update the values
         Ve=(1-update_speed_v)*Ve+update_speed_v*Veplus;
         Vm=(1-update_speed_v)*Vm+update_speed_v*Vmplus;
@@ -190,7 +190,7 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
         eouter_tdist=e_tdist;
 
         %Iterate on masses of workers
-        [eplus_udist,eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist]=lom_iteration(e_udist,e_edist,e_mdist,e_ndist,e_tdist,ats,tpts,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,it_joint,speed_dist,display_iter_dist,nm_penal);
+        [eplus_udist,eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist]=lom_iterationNCC(e_udist,e_edist,e_mdist,e_ndist,e_tdist,ats,tpts,phim,phin,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,it_joint,speed_dist,display_iter_dist,nm_penal);
 
         %Compare Outer and Inner
         diff_joint_store=max([max(abs(eplus_udist-eouter_udist)),max(abs(eplus_edist-eouter_edist)),max(abs(eplus_mdist-eouter_mdist),[],[1 2]),max(abs(eplus_ndist-eouter_ndist),[],[1 2]),max(abs(eplus_tdist-eouter_tdist),[],[1 2 3])]);
@@ -198,20 +198,27 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
         diff_joint_lag1=diff_joint;
         diff_joint=diff_joint_store;
         if display_iter==1
-            %Print every 100 iterations
-            % if mod(it_joint,10)==0
-            %     fprintf(string(spec_name)+' Joint Iteration %d, error %f \n', it_joint, diff_joint);
-            % end
+            % Print every 10 iterations
+            if mod(it_joint,10)==0
+                fprintf(string(spec_name)+' Joint Iteration %d, error %f \n', it_joint, diff_joint);
+            end
             if diff_joint<diff_joint_max && diff_joint_lag1<diff_joint_max  && diff_joint_lag2<diff_joint_max && it_joint>=it_joint_min
                 fprintf(string(spec_name)+' Joint Converged in %d iterations\n',it_joint);
             end
         end
         if failed==1
-            it_joint=it_joint_max; %Force exit
+            break
         end
         if it_joint==it_joint_max
             fprintf(2,'Joint Failed to converge\n')
             failed=1;
+        end
+
+        %Identify cycling Distributions
+        if diff_joint>.01 && it_joint>100
+            fprintf(2,'Cycling Distributions\n')    
+            failed=1;
+            break
         end
     end
     %Check sum of the eplus final distributions
@@ -299,8 +306,8 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
 
 
         % tic
-        [Wm,Wn,Wtm,Wtn,Wmh,Wnh,Wtnh,Wtmh]=wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,Vt,U,Vmh,Vnh,Vth,Veh,Wmini,Wnini,Wtmini,Wtnini,...
-        speed,cost_d,cost_p,wgrid,bt,death,del,lam,lamu,bpw,n,a_trans,q_trans,e_udist,e_edist,e_mdist,e_ndist,e_tdist,display_iter);
+        [Wm,Wn,Wtm,Wtn,Wmh,Wnh,Wtnh,Wtmh] =wf_iterationNCC(wpts,ats,tpts,phim,phin,Ve,Vm,Vn,Vt,U,Vmh,Vnh,Vth,Veh,Wmini,Wnini,Wtmini,Wtnini,...
+                speed,cost_d,cost_p,wgrid,bt,death,del,lam,lamu,bpw,n,a_trans,q_trans,e_udist,e_edist,e_mdist,e_ndist,e_tdist,nm_penal,display_iter);
         % toc
         %Output the results
         clear v e w

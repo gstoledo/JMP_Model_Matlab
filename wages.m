@@ -121,7 +121,7 @@ u_trans=create_trans(ulose,ustay,ugain,tpts);
 dayy          ='1'   ; %Version of the code    
 zero_tol      =1e-10 ; %Tolerance for zero
 use_guess     ='y'   ;
-true=0               ; %Manager penalty toggle
+nm_penal=0               ; %Manager penalty toggle
 speed=1              ; %Convergenge speed
 
 %Join the loop
@@ -156,7 +156,7 @@ Uini=b/(1-bt);
 
 
 %% VF Iteration
-[Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl, Vttl, Utl]= vf_iterationV2(eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist,eplus_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,true,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed);
+[Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl, Vttl, Utl]= vf_iterationV2(eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist,eplus_udist,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,nm_penal,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed);
 Uh=U;
 
 %%  Wages

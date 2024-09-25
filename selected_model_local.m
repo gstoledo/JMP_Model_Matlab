@@ -16,7 +16,23 @@ end
 %% Load baseline parameters
 run baseline_param.m
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+p_selection={'cost_p','cost_d','lamu','lam','alpha_m'};
+theta.cost_p=0.4;
+theta.cost_d=1.07;
+theta.lamu=0.375;
+theta.lam=0.225;
+theta.A=2.5;
+theta.alpha_m=0.69;
+[p_vec, ps] = param_selection(theta, p_selection);
+p=p_vec_to_struct(p_vec, p_selection, theta);
+% [v,e,w]=joint_loop(p,ps,tg,"StdLunchSelection");
+% save('/home/gst247/HPC_Model_Matlab/Std_Lunch_selec/param_seleczztionSTD_Lunch.mat','p','ps','v','e','w')
+[v,e,w]=joint_loopNCC(p,ps,tg,"NCC");
+if location == "hpc"
+    save('/home/gst247/HPC_Model_Matlab/Std_Lunch_selec/param_selectionNCC.mat','p','ps','v','e','w')
+else
+    save('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/JMP_Model_Matlab/Std_Lunch_selec', 'p','ps','v','e','w')
+end
 
 
 

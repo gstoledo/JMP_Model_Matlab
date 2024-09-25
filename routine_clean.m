@@ -18,7 +18,7 @@ x=xmin; %Use some values of HLPM to start
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 tg.use_guess='y'; 
 tg.zero_tol=1e-10;                  %Tolerance for zero
-tg.tr=0;                            %Manager penalty toggle
+tg.nm_penal=0;                            %Manager penalty toggle
 tg.speed=1;                         %Convergenge speed
 tg.update_speed_v=1;                %Update speed for value functions
 tg.update_speed=1;                  %Update speed for wages

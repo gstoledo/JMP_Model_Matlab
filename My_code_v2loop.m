@@ -99,7 +99,7 @@ ustay=1-ulose-ugain  ; %Probability unemployed stay
 u_trans=create_trans(ulose,ustay,ugain,tpts);
 
 %Manager penalty toggle 
-true=1;
+nm_penal=1;
 
 
 
@@ -195,7 +195,7 @@ Uini=b/(1-bt);
 
 
 %Use the function
-[Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl, Vttl, Utl] = vf_iteration(e_edist,e_mdist,e_ndist,e_tdist,e_udist,n,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,true,lamu, lam, del, bt, death, bpf, bpw, nfirm, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans);
+[Ve, Vm, Vn, Vt, U, Veh, Vmh, Vnh, Vth, Vetl, Vmtl, Vntl, Vttl, Utl] = vf_iteration(e_edist,e_mdist,e_ndist,e_tdist,e_udist,n,Veini,Vmini,Vnini,Vtini,Uini,ats,tpts,cost_d,cost_p,nm_penal,lamu, lam, del, bt, death, bpf, bpw, nfirm, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans);
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %Here is the start of what will be the function to compute the value functions
@@ -273,22 +273,22 @@ Uini=b/(1-bt);
 %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     %%%%Empty firm continuation value Ve(a)
 %     %Gains from trade 
-%     [gt_ef_meet_u, gt_ef_meet_m, gt_ef_meet_nm, gt_ef_meet_t_m, gt_ef_meet_t_nm, gt_ef_meet_t]=ef_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,true);
+%     [gt_ef_meet_u, gt_ef_meet_m, gt_ef_meet_nm, gt_ef_meet_t_m, gt_ef_meet_t_nm, gt_ef_meet_t]=ef_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,nm_penal);
     
 %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     %%% Firm with manager continuation value Vm(a,z)
 %     %Gains from trade
-%     [gt_em_meet_u, gt_em_meet_m, gt_em_meet_nm, gt_em_meet_t_m, gt_em_meet_t_nm, gt_em_meet_t]=mf_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,true,cost_d);
+%     [gt_em_meet_u, gt_em_meet_m, gt_em_meet_nm, gt_em_meet_t_m, gt_em_meet_t_nm, gt_em_meet_t]=mf_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,nm_penal,cost_d);
     
 %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     %%% Firm with no manager continuation value Vn(a,q)
 %     %Gains from trade
-%     [gt_en_meet_u, gt_en_meet_m, gt_en_meet_nm, gt_en_meet_t_m, gt_en_meet_t_nm, gt_en_meet_t]=nf_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,true,cost_p);
+%     [gt_en_meet_u, gt_en_meet_m, gt_en_meet_nm, gt_en_meet_t_m, gt_en_meet_t_nm, gt_en_meet_t]=nf_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,nm_penal,cost_p);
     
 %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %     %%% Firm with team continuation value Vt(a,z,q)
 %     %Gains from trade
-%     [gt_tf_meet_u, gt_tf_meet_m, gt_tf_meet_nm, gt_tf_meet_t_m, gt_tf_meet_t_nm, gt_tf_meet_t]=tf_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,true,cost_p,cost_d);
+%     [gt_tf_meet_u, gt_tf_meet_m, gt_tf_meet_nm, gt_tf_meet_t_m, gt_tf_meet_t_nm, gt_tf_meet_t]=tf_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,nm_penal,cost_p,cost_d);
     
     
 %     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

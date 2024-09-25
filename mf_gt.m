@@ -1,5 +1,5 @@
 % Compute all gains from trade from firms with managers
-function [gt_meet_u, gt_meet_m, gt_meet_nm, gt_meet_t_m, gt_meet_t_nm, gt_meet_t] = mf_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,true,cd)
+function [gt_meet_u, gt_meet_m, gt_meet_nm, gt_meet_t_m, gt_meet_t_nm, gt_meet_t] = mf_gt(Vmh,Vnh,Veh,Uh,Vth,ats,tpts,nm_penal,cd)
     %%% Firm with manager continuation value Vm(a,z)
     tol=1e-8;
 
@@ -35,10 +35,10 @@ function [gt_meet_u, gt_meet_m, gt_meet_nm, gt_meet_t_m, gt_meet_t_nm, gt_meet_t
     
     %Gains from trade from meeting firm with non-manager
     %gt_meet_n(a_tilda,z_tilda,a,z)
-    Vmhp=Non_man_penalty_loop(Vmh,tpts,ats,true);
-    %Vnhp=Non_man_penalty_loop(Vnh,tpts,ats,true);
-    Vthpm=Non_man_penalty_full_m_loop(Vth,tpts,ats,true);
-    Vthpn=Non_man_penalty_full_n_loop(Vth,tpts,ats,true);
+    Vmhp=Non_man_penalty_loop(Vmh,tpts,ats,nm_penal);
+    %Vnhp=Non_man_penalty_loop(Vnh,tpts,ats,nm_penal);
+    Vthpm=Non_man_penalty_full_m_loop(Vth,tpts,ats,nm_penal);
+    Vthpn=Non_man_penalty_full_n_loop(Vth,tpts,ats,nm_penal);
     gt_meet_nm= zeros(ats,tpts,ats,tpts);
     for z = 1:tpts
         for a = 1:ats

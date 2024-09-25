@@ -83,7 +83,7 @@ Vth(:,:,2)=[1 2 2; 2 3 3];
 Uh=[0 1 1];
 
 %Manager penalty toggle 
-true=1;
+nm_penal=1;
 %%%%Empty firm continuation value 
 
 %Gains from trade from meeting unemployed
@@ -99,7 +99,7 @@ gt_meet_m= max(repmat(max(Vmh,Vnh),ats,1) - repmat(reshape(Veh,1,1,ats),ats,tpts
 %Pages are my own a
 %a_tilda are rows
 % Z tilda are columns
-gt_meet_nm= max(repmat(max(Non_man_penalty(Vmh,tpts,ats,true),Non_man_penalty(Vnh,tpts,ats,true)),ats,1) - repmat(reshape(Veh,1,1,ats),ats,tpts)...
+gt_meet_nm= max(repmat(max(Non_man_penalty(Vmh,tpts,ats,nm_penal),Non_man_penalty(Vnh,tpts,ats,nm_penal)),ats,1) - repmat(reshape(Veh,1,1,ats),ats,tpts)...
     - out_opt_lose1(Vnh,Veh,tpts,ats), repmat(zero_tpts_ats,ats,1))
 
 %Gains from trade from meeting firm with team
@@ -111,7 +111,7 @@ gt_meet_nm= max(repmat(max(Non_man_penalty(Vmh,tpts,ats,true),Non_man_penalty(Vn
 gt_meet_t_m= max(permute(repmat(permute(max(Vmh,Vnh),[2 1 3]),1,tpts,1,ats),[1 2 4 3])...
     - permute(repmat(reshape(Veh,1,1,ats),tpts,tpts,1,ats), [1 2 4 3]) - repmat(Vth,1,1,1,ats)+repmat(Vnh,tpts,1,1,ats), repmat(zero_tpts_tpts_ats, 1,1,1,ats));      
 %Meet a team and get the non-manager
-alloc_nm=max(Non_man_penalty(Vmh,tpts,ats,true),Non_man_penalty(Vnh,tpts,ats,true));
+alloc_nm=max(Non_man_penalty(Vmh,tpts,ats,nm_penal),Non_man_penalty(Vnh,tpts,ats,nm_penal));
 gt_meet_t_nm= max(permute(repmat(alloc_nm,tpts,1,1,ats), [1 2 4 3])...
     - permute(repmat(reshape(Veh,1,1,ats),tpts,tpts,1,ats), [1 2 4 3]) - repmat(Vth,1,1,1,ats) + repmat(permute(Vmh, [2 1 3]),1,tpts,1,ats) , repmat(zero_tpts_tpts_ats, 1,1,1,ats));
 
