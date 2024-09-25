@@ -7,7 +7,7 @@ x=xmin; %Use some values of HLPM to start
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     tg.use_guess='yes';                %Use guess for value functions
     tg.zero_tol=1e-10;                  %Tolerance for zero
-    tg.tr=0;                            %Manager penalty toggle
+    tg.tr=0;                            %NManager penalty toggle
     tg.speed=1;                        %Convergence speed
     tg.speed_dist=1;                         %Convergenge speed distribution
     tg.update_speed_v=1;                %Update speed for value functions
@@ -76,6 +76,8 @@ x=xmin; %Use some values of HLPM to start
     theta.qup=0.05*ones(theta.ats,1);       %Probability of moving up in q. The qup for the last level of productivity is irrelevant
     theta.cost_d=2.25;                       %cost of demoting a manager to non manager  
     theta.cost_p=1.09;                       %cost of promoting a non manager to manager
+    theta.phim=0.8;                         %Prob of being free manager (COUNTERFACTUAL)
+    theta.phin=0.8;                         %Prob of being free non manager (COUNTERFACTUAL)
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Grids

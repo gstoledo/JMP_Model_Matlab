@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=Std_Lunch_selec
-#SBATCH --cpus-per-task=32
+#SBATCH --cpus-per-task=10
 #SBATCH --mem=128GB
 #SBATCH --time=10:00:00
 #SBATCH --output=/home/gst247/HPC_Model_Matlab/Calibration_outcomes/%x/%x_%j.out   # Redirect standard output to Calibration_outcomes/filename/MATLAB_jobid.out

@@ -56,6 +56,7 @@ function calibration_jobs(job_name)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     elseif strcmp(job_name, 'costsq05')
         %% Only costs with qup=0.05
+        tg.display_iter=1;
         p_selection={'cost_p','cost_d'};
         theta.qup=0.05*ones(theta.ats,1);   
         theta.lamu=0.45; %Tweaking a bit the rates
