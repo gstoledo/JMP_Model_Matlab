@@ -16,24 +16,105 @@ end
 %% Load baseline parameters
 run baseline_param.m
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-p_selection={'cost_p','cost_d','lamu','lam','alpha_m'};
+tg.display_iter_v=1;                  %Display value function iterations
+tg.display_iter_dist=1;              %Display distribution iterations
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+p_selection={'cost_p','cost_d','alpha_m'};
+moments_selection = {'ManWorkerRatio'};
 theta.cost_p=0.4;
 theta.cost_d=1.07;
 theta.lamu=0.375;
 theta.lam=0.225;
+theta.qupbot=0.045;
+theta.quptop=0.045;
 theta.A=2.5;
 theta.alpha_m=0.69;
 [p_vec, ps] = param_selection(theta, p_selection);
 p=p_vec_to_struct(p_vec, p_selection, theta);
-% [v,e,w]=joint_loop(p,ps,tg,"StdLunchSelection");
-% save('/home/gst247/HPC_Model_Matlab/Std_Lunch_selec/param_seleczztionSTD_Lunch.mat','p','ps','v','e','w')
-[v,e,w]=joint_loopNCC(p,ps,tg,"NCC");
-if location == "hpc"
-    save('/home/gst247/HPC_Model_Matlab/Std_Lunch_selec/param_selectionNCC.mat','p','ps','v','e','w')
-else
-    save('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/JMP_Model_Matlab/Std_Lunch_selec', 'p','ps','v','e','w')
-end
+[v,e,w]=joint_loop(p,ps,tg,"StdLunchSelection");
+fs=SimulateFirm_cl(p,ps,tg,sp,v,e,w);
+ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs);
+mm= model_moments(ps,sp,fs,ws,moments_selection);
 
+% save('/home/gst247/HPC_Model_Matlab/Std_Lunch_selec/param_seleczztionSTD_Lunch.mat','p','ps','v','e','w')
+
+% %This is the coounterfacutal
+% [v,e,w]=joint_loopNCC(p,ps,tg,"NCC");
+% fs=SimulateFirm_cl_NCC(p,ps,tg,sp,v,e,w);
+% ws=SimulateWorker_cl_NCC(p,ps,tg,sp,v,e,w,fs);
+job_name='test';
+hpc_path='/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/JMP_Model_Matlab';
+fullFilePath=fullfile(hpc_path, [job_name, '.pdf'])
+  %% --- First Page: Display calibration variables from the struct 'ps' ---
+  figure;
+  axis off;  % Hide axis for clean presentation
+
+  % Main title at the top of the figure
+  text(0.5, 1.0, 'Minimization Report', 'FontSize', 24, 'FontWeight', 'bold', 'HorizontalAlignment', 'center');
+  text(0.5, 0.9, datestr(now, 'mmmm dd, yyyy'), 'FontSize', 14, 'HorizontalAlignment', 'center');  % Current date
+
+  % Display the preset calibration variables from the struct
+  text(0.1, 0.85, 'Preset Calibration Variables', 'FontSize', 12, 'FontWeight', 'bold');
+
+  % Extract field names and values from the struct 'ps'
+  fields = fieldnames(ps);
+  numFields = length(fields);
+
+  % Define vertical space based on the number of fields to avoid overlap
+  startPosY = 0.85;    % Starting Y position
+  lineSpacing = min(0.05, 0.85/numFields);  % Dynamically adjust line spacing based on field count
+
+  % Loop through each field in the struct and display its value
+  for i = 1:numFields
+      fieldName = fields{i};
+      fieldValue = getfield(ps, fieldName);
+      % Display each field name and value
+      text(0.1, startPosY - i*lineSpacing, sprintf('%s: %s', fieldName, mat2str(fieldValue)), 'FontSize', 10, 'FontName', 'Courier');
+  end
+
+  exportgraphics(gcf, fullFilePath, 'Append', false);  % Overwrite the PDF file
+
+
+   %% --- Second Page: Display min variables from the struct 'p_opt' ---
+
+    % Create a new figure for the second page
+    figure;
+    axis off;  % Hide axis for clean presentation
+    text(0.1, 0.85, 'Minimized Calibration Variables', 'FontSize', 12, 'FontWeight', 'bold');
+
+    % Extract field names and values from the struct 'p_opt'
+    fields = fieldnames(p_opt);
+    numFields = length(fields);
+
+    % Define vertical space based on the number of fields to avoid overlap
+    startPosY = 0.85;    % Starting Y position
+    lineSpacing = min(0.05, 0.85/numFields);  % Dynamically adjust line spacing based on field count
+
+    % Loop through each field in the struct and display its value
+    for i = 1:numFields
+        fieldName = fields{i};
+        fieldValue = getfield(p_opt, fieldName);
+        % Display each field name and value
+        text(0.1, startPosY - i*lineSpacing, sprintf('%s: %s', fieldName, mat2str(fieldValue)), 'FontSize', 10, 'FontName', 'Courier');
+    end
+
+
+
+
+
+% if location == "hpc"
+%     save('/home/gst247/HPC_Model_Matlab/Std_Lunch_selec/param_selectionNCC.mat','p','ps','v','e','w')
+% else
+%     save('/Users/gabrieltoledo/Library/CloudStorage/GoogleDrive-gabrielstoledo.gt@gmail.com/My Drive/PHD NYU/Labor Firm Structure/JMP_Model_Matlab/Std_Lunch_selec', 'p','ps','v','e','w')
+% end
+
+% clear all
+% load('Calibration_outcomes_HPC/min_calib_alpha.mat')
+% load('Calibration_outcomes_HPC/min_calib_al_Bcross.mat')
+
+% [~, ps] = param_selection(theta, p_selection);
+% fs=SimulateFirm_cl(p_opt,ps,tg,sp,v,e,w);
+% ws=SimulateWorker_cl(p_opt,ps,tg,sp,v,e,w,fs);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

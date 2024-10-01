@@ -25,7 +25,7 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
     end
 
     %% Derivated from the main parameters
-    [a_trans,q_trans,u_trans,fteam,fman,fnman,fe,b,mnew_high,typebirth,wmin,wmax,wgrid] = derivatated_p(p,ps);
+    [a_trans,q_trans,u_trans,fteam,fman,fnman,fe,b,mnew_high,typebirth,wmin,wmax,wgrid] = derivatated_p(p,ps,split_top_bot);
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -168,7 +168,10 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
         end
 
         %Value function iteration
-        [Veplus, Vmplus, Vnplus, Vtplus, Uplus, Vehplus, Vmhplus, Vnhplus, Vthplus, Vetlplus, Vmtlplus, Vntlplus, Vttlplus, Utlplus] = vf_iterationV2(e_edist,e_mdist,e_ndist,e_tdist,e_udist,Ve,Vm,Vn,Vt,U,ats,tpts,cost_d,cost_p,nm_penal,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed,display_iter_v);
+        [Veplus, Vmplus, Vnplus, Vtplus, Uplus, Vehplus, Vmhplus, Vnhplus, Vthplus, Vetlplus, Vmtlplus, Vntlplus, Vttlplus, Utlplus,failed] = vf_iterationV2(e_edist,e_mdist,e_ndist,e_tdist,e_udist,Ve,Vm,Vn,Vt,U,ats,tpts,cost_d,cost_p,nm_penal,lamu, lam, del, bt, death, bpf, bpw, n, b, fteam,fman,fnman,fe, u_trans, a_trans,q_trans,speed,display_iter_v);
+        if failed==1
+            break
+        end
         %Update the values
         Ve=(1-update_speed_v)*Ve+update_speed_v*Veplus;
         Vm=(1-update_speed_v)*Vm+update_speed_v*Vmplus;
@@ -187,11 +190,13 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
         eouter_edist=e_edist;
         eouter_mdist=e_mdist;
         eouter_ndist=e_ndist;
-        eouter_tdist=e_tdist;
+        eouter_tdist=e_tdist; 
 
         %Iterate on masses of workers
-        [eplus_udist,eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist]=lom_iteration(e_udist,e_edist,e_mdist,e_ndist,e_tdist,ats,tpts,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,it_joint,speed_dist,display_iter_dist,nm_penal);
-
+        [eplus_udist,eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist,failed]=lom_iteration(e_udist,e_edist,e_mdist,e_ndist,e_tdist,ats,tpts,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,it_joint,speed_dist,display_iter_dist,nm_penal);
+        if failed==1
+            break
+        end
         %Compare Outer and Inner
         diff_joint_store=max([max(abs(eplus_udist-eouter_udist)),max(abs(eplus_edist-eouter_edist)),max(abs(eplus_mdist-eouter_mdist),[],[1 2]),max(abs(eplus_ndist-eouter_ndist),[],[1 2]),max(abs(eplus_tdist-eouter_tdist),[],[1 2 3])]);
         diff_joint_lag2=diff_joint_lag1;
@@ -206,8 +211,11 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
                 fprintf(string(spec_name)+' Joint Converged in %d iterations\n',it_joint);
             end
         end
-        if failed==1
-            it_joint=it_joint_max; %Force exit
+        %Identify cycling Distributions
+        if diff_joint>.01 && it_joint>70
+            fprintf(2,'Cycling Distributions\n')    
+            failed=1;
+            break
         end
         if it_joint==it_joint_max
             fprintf(2,'Joint Failed to converge\n')
@@ -218,52 +226,7 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
     nplus=sum(eplus_edist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+sum(eplus_tdist,"all");
     popplus=sum(eplus_udist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+2*sum(eplus_tdist,"all");
 
-    % toc;
-
-    % %% Wage iteration
-    % %Inital guesses for wages
-    % model_file = 'solution_wages.mat';
-    % if exist(model_file, 'file')==2 && use_guess(1)=='y'
-    %     load(model_file, 'Wm', 'Wn', 'Wtm', 'Wtn');
-    %     if size(Wm,1)==wpts && size(Wm,2)==ats && size(Wm,3)==tpts 
-    %         Wmini=Wm;
-    %         Wnini=Wn;
-    %         Wtmini=Wtm;
-    %         Wtnini=Wtn;
-    %     else
-    %         Wmini=ones(wpts,ats,tpts)*wmin;
-    %         Wnini=ones(wpts,ats,tpts)*wmin;
-    %         Wtmini=ones(wpts,ats,tpts,tpts)*wmin;
-    %         Wtnini=ones(wpts,ats,tpts,tpts)*wmin;
-    %     end
-    % else
-    %     Wmini=ones(wpts,ats,tpts)*wmin;
-    %     Wnini=ones(wpts,ats,tpts)*wmin;
-    %     Wtmini=ones(wpts,ats,tpts,tpts)*wmin;
-    %     Wtnini=ones(wpts,ats,tpts,tpts)*wmin;
-    % end
-
-    % if exist(model_file, 'file')==2 && use_guess(1)=='y'
-    %     load(model_file, 'w');
-    %     if size(w.Wm,1)==wpts && size(w.Wm,2)==ats && size(w.Wm,3)==tpts && ~isempty(w.Wm) && ~isempty(w.Wn) && ~isempty(w.Wtm) && ~isempty(w.Wtn)
-    %         Wmini=w.Wm;
-    %         Wnini=w.Wn;
-    %         Wtmini=w.Wtm;
-    %         Wtnini=w.Wtn;
-    %     else
-    %         % clear w
-    %         Wmini=ones(wpts,ats,tpts)*wmin;
-    %         Wnini=ones(wpts,ats,tpts)*wmin;
-    %         Wtmini=ones(wpts,ats,tpts,tpts)*wmin;
-    %         Wtnini=ones(wpts,ats,tpts,tpts)*wmin;
-    %     end
-    % else
-    %     Wmini=ones(wpts,ats,tpts)*wmin;
-    %     Wnini=ones(wpts,ats,tpts)*wmin;
-    %     Wtmini=ones(wpts,ats,tpts,tpts)*wmin;
-    %     Wtnini=ones(wpts,ats,tpts,tpts)*wmin;
-    % end
-
+    %% Wage iteration
     if failed==0
         try
             if exist(model_file, 'file') == 2 && use_guess(1) == 'y'
@@ -300,7 +263,7 @@ function [v,e,w]=joint_loop(p,ps,tg,spec_name)
 
         % tic
         [Wm,Wn,Wtm,Wtn,Wmh,Wnh,Wtnh,Wtmh]=wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,Vt,U,Vmh,Vnh,Vth,Veh,Wmini,Wnini,Wtmini,Wtnini,...
-        speed,cost_d,cost_p,wgrid,bt,death,del,lam,lamu,bpw,n,a_trans,q_trans,e_udist,e_edist,e_mdist,e_ndist,e_tdist,display_iter);
+        speed,cost_d,cost_p,wgrid,bt,death,del,lam,lamu,bpw,n,a_trans,q_trans,e_udist,e_edist,e_mdist,e_ndist,e_tdist,display_iter,nm_penal);
         % toc
         %Output the results
         clear v e w

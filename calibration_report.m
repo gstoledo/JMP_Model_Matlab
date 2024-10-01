@@ -173,7 +173,7 @@ function calibration_report(p_selection,ps ,moments_selection, combinations, dat
                 failedCombination = combinations(rowIdx, :);
 
                 % Display the combination label and values
-                text(0.1, startY - (i-1)*lineSpacing, sprintf('Combination %d:', rowIdx), 'FontSize', 12, 'FontWeight', 'bold', 'FontName', 'Courier');
+                text(0.1, startY - (i-1)*lineSpacing, sprintf('Cb %d:', rowIdx), 'FontSize', 12, 'FontWeight', 'bold', 'FontName', 'Courier');
                 formattedCombination = num2str(failedCombination, '%.4f    ');
 
                 % Check for NaN in the combination and highlight it

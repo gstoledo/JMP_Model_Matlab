@@ -36,10 +36,13 @@ function calibration_jobs(job_name)
         theta.qup=0.06*ones(theta.ats,1);       %Probability of moving up in q. The qup for the last level of productivity is irrelevant
         theta.lamu=0.45; %Tweaking a bit the rates
         theta.lam=0.3;
+        theta.alpha_m=0.8;
+        theta.A=3;
+        theta.fcomp=0.7556;
         [p_vec, ps] = param_selection(theta, p_selection);
         moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
-        cgrid.cost_d=linspace(1.5,4,12);
-        cgrid.cost_p=linspace(0.01,0.5,12);
+        cgrid.cost_d=linspace(1,3.5,12);
+        cgrid.cost_p=linspace(0.05,0.5,12);
         manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'costsq06');
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     elseif strcmp(job_name, 'costsq055')
@@ -48,10 +51,13 @@ function calibration_jobs(job_name)
         theta.qup=0.055*ones(theta.ats,1);       %Probability of moving up in q. The qup for the last level of productivity is irrelevant
         theta.lamu=0.45; %Tweaking a bit the rates
         theta.lam=0.3;
+        theta.alpha_m=0.8;
+        theta.A=3;
+        theta.fcomp=0.7556;
         [p_vec, ps] = param_selection(theta, p_selection);
         moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
-        cgrid.cost_d=linspace(1.5,4,12);
-        cgrid.cost_p=linspace(0.01,1,12);
+        cgrid.cost_d=linspace(1,3.5,12);
+        cgrid.cost_p=linspace(0.05,0.5,12);
         manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'costsq055');
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     elseif strcmp(job_name, 'costsq05')
@@ -61,32 +67,39 @@ function calibration_jobs(job_name)
         theta.qup=0.05*ones(theta.ats,1);   
         theta.lamu=0.45; %Tweaking a bit the rates
         theta.lam=0.3;
+        theta.alpha_m=0.8;
+        theta.A=3;
+        theta.fcomp=0.7556;
         [p_vec, ps] = param_selection(theta, p_selection);
         moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
-        cgrid.cost_d=linspace(1.5,4,12);
-        cgrid.cost_p=linspace(0.01,1,12);
+        cgrid.cost_d=linspace(1,3.5,12);
+        cgrid.cost_p=linspace(0.05,0.5,12);
         manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'costsq05');
     elseif strcmp(job_name, 'costsq04')
         %% Only costs with qup=0.04
         p_selection={'cost_p','cost_d'};
         theta.qup=0.04*ones(theta.ats,1);   
-        theta.lamu=0.45; %Tweaking a bit the rates
+        theta.lamu=0.475; %Tweaking a bit the rates
         theta.lam=0.3;
+        theta.alpha_m=0.8;
+        theta.A=3;
+        theta.fcomp=0.7556;
         [p_vec, ps] = param_selection(theta, p_selection);
         moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
-        cgrid.cost_d=linspace(1.5,4,12);
-        cgrid.cost_p=linspace(0.01,1,12);
+        cgrid.cost_d=linspace(1,3.5,12);
+        cgrid.cost_p=linspace(0.05,0.5,12);
         manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'costsq04');
     elseif strcmp(job_name, 'costsq02')
         %% Only costs with qup=0.02
         p_selection={'cost_p','cost_d'};
         theta.qup=0.02*ones(theta.ats,1);
-        theta.lamu=0.475; %Tweaking a bit the rates
-        theta.lam=0.255;
-        cgrid.cost_d=linspace(0.5,3.3,12);
-        cgrid.cost_p=linspace(0.3,1.2,12);
+        theta.alpha_m=0.8;
+        theta.A=3;
+        theta.fcomp=0.7556;
         [p_vec, ps] = param_selection(theta, p_selection);
         moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
+        cgrid.cost_d=linspace(1,3.5,12);
+        cgrid.cost_p=linspace(0.05,0.5,12);
         manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'costsq02');
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % elseif strcmp(job_name, 'costs_alpha')
@@ -150,17 +163,19 @@ function calibration_jobs(job_name)
         cgrid.lamu=linspace(0.3,0.45,10);
         cgrid.lam=linspace(0.2,0.35,10);
         manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'lmdcd2');
-    elseif strcmp(job_name, 'lmdcd1')
+    elseif strcmp(job_name, 'lambdas_star')
         %% Only lambdas with cost_d=1
         p_selection={'lamu','lam'};
         moments_selection ={ 'NiMi', 'MiNi', 'ManWorkerRatio'};
         theta.qup=0.04*ones(theta.ats,1);
-        theta.cost_p=0.4;
-        theta.cost_d=1;
-        theta.alpha_m=0.65;
+        theta.cost_p=0.3;
+        theta.cost_d=3.227;
+        theta.alpha_m=0.75;
+        theta.A=3;
+        theta.fcomp=0.7556;
         cgrid.lamu=linspace(0.3,0.45,10);
         cgrid.lam=linspace(0.2,0.35,10);
-        manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'lmdcd1');
+        manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'lambdas_star');
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     elseif strcmp(job_name, 'cost_a05')
         %% Costs tweatking a_up
@@ -181,7 +196,8 @@ function calibration_jobs(job_name)
         theta.qup=0.045*ones(theta.ats,1);
         theta.cost_p=0.3;
         theta.cost_d=3.227;
-        cgrid.alpha_m=linspace(0.6,0.8,10);
+        theta.fcomp=0.7556;
+        cgrid.alpha_m=linspace(0.7,0.95,10);
         cgrid.A=linspace(1,3,10);
         manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'alpha_A');
     elseif strcmp(job_name, 'alpha_rho')
@@ -191,9 +207,37 @@ function calibration_jobs(job_name)
         theta.qup=0.045*ones(theta.ats,1);
         theta.cost_p=0.3;
         theta.cost_d=3.227;
-        cgrid.alpha_m=linspace(0.6,0.8,10);
-        cgrid.fcomp=linspace(0.7,1.2,10);
+        theta.A=3;
+        cgrid.alpha_m=linspace(0.7,0.95,10);
+        cgrid.fcomp=linspace(0.3,0.85,10);
         manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'alpha_rho');
+    elseif strcmp(job_name, 'the5')
+        p_selection={'cost_p','cost_d','alpha_m','quptop','qupbot'};
+        moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
+        cgrid.cost_d=linspace(1,3.5,5);
+        cgrid.cost_p=linspace(1,3.5,5);
+        cgrid.alpha_m=linspace(0.6,0.8,2);
+        cgrid.quptop=linspace(0.02,0.04,2);
+        cgrid.qupbot=linspace(0.02,0.04,2);
+        manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'the5');
+    elseif strcmp(job_name, 'the5_costs')
+        p_selection={'cost_p','cost_d'};
+        moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
+        cgrid.cost_d=linspace(1,3.5,10);
+        cgrid.cost_p=linspace(1,3.5,10);
+        theta.quptop=0.045;
+        theta.qupbot=0.035;
+        theta.alpha_m=0.665;
+        manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'the5_costs');
+    elseif strcmp(job_name, 'the5_qup')
+        p_selection={'quptop','qupbot'};
+        moments_selection = {'NiMi', 'MiNi', 'ManWorkerRatio'};
+        cgrid.quptop=linspace(0.03,0.05,10);
+        cgrid.qupbot=linspace(0.03,0.05,10);
+        theta.cost_p=1.18;
+        theta.cost_d=2.49;
+        theta.alpha_m=0.665;
+        manual_calib(moments_selection, p_selection, cgrid, theta, tg, sp, dm,cw,location,'the5_qup');
     else
         error('Unknown job name: %s', job_name);
     end

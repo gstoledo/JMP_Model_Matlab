@@ -25,7 +25,7 @@ function [v,e,w]=joint_loopNCC(p,ps,tg,spec_name)
     end
 
     %% Derivated from the main parameters
-    [a_trans,q_trans,u_trans,fteam,fman,fnman,fe,b,mnew_high,typebirth,wmin,wmax,wgrid] = derivatated_p(p,ps);
+    [a_trans,q_trans,u_trans,fteam,fman,fnman,fe,b,mnew_high,typebirth,wmin,wmax,wgrid] = derivatated_p(p,ps,split_top_bot);
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -213,9 +213,8 @@ function [v,e,w]=joint_loopNCC(p,ps,tg,spec_name)
             fprintf(2,'Joint Failed to converge\n')
             failed=1;
         end
-
         %Identify cycling Distributions
-        if diff_joint>.01 && it_joint>100
+        if diff_joint>.01 && it_joint>70
             fprintf(2,'Cycling Distributions\n')    
             failed=1;
             break

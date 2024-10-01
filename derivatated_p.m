@@ -1,5 +1,5 @@
 %Refere to this function to change prod fucntion and trantisiton matrices
-function [a_trans,q_trans,u_trans,fteam,fman,fnman,fe,b,mnew_high,typebirth,wmin,wmax,wgrid] = derivatated_p(p,ps)
+function [a_trans,q_trans,u_trans,fteam,fman,fnman,fe,b,mnew_high,typebirth,wmin,wmax,wgrid] = derivatated_p(p,ps,split_top_bot)
     %% Opening up the parameters
     fieldNames = fieldnames(p);
     % Loop over each field and assign it to a variable in the workspace
@@ -28,12 +28,26 @@ function [a_trans,q_trans,u_trans,fteam,fman,fnman,fe,b,mnew_high,typebirth,wmin
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %Process for q (Later we need one value for each a)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    qstay=1-qup-qdown;                        %Probability of staying
-    q_trans=zeros(tpts,tpts,ats);         %Transition matrix for q
+    if split_top_bot==0
+        qstay=1-qup-qdown;                        %Probability of staying
+        q_trans=zeros(tpts,tpts,ats);         %Transition matrix for q
 
-    for a=1:ats
-        q_trans(:,:,a)=create_trans(qdown(a),qstay(a),qup(a),tpts);
+        for a=1:ats
+            q_trans(:,:,a)=create_trans(qdown(a),qstay(a),qup(a),tpts);
+        end
+    else
+        qstaytop=1-quptop-qdowntop;              %Probability of staying
+        qstaybot=1-qupbot-qdownbot;              %Probability of staying
+        q_trans=zeros(tpts,tpts,ats);         %Transition matrix for q
+
+        for a=1:ceil(ats/2)
+            q_trans(:,:,a)=create_trans(qdownbot,qstaybot,qupbot,tpts);
+        end
+        for a=ceil(ats/2)+1:ats
+            q_trans(:,:,a)=create_trans(qdowntop,qstaytop,quptop,tpts);
+        end
     end
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %Process for u
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -54,15 +68,29 @@ function [a_trans,q_trans,u_trans,fteam,fman,fnman,fe,b,mnew_high,typebirth,wmin
     fman=zeros(ats,tpts);                                  %Production of manager
     fnman=zeros(ats,tpts);                                 %Production of non manager
     fe=zeros(1,ats);                                          %Production of unemployed
-    for a=1:ats
-        for z=1:tpts
-            for q=1:tpts
-                fteam(a,z,q)=A*((alpha_m*a_type(a)*type(z)^fcomp + (1-alpha_m)*type(q)^fcomp))^(1/fcomp);
+    
+    if fcomp>0.1
+        for a=1:ats
+            for z=1:tpts
+                for q=1:tpts
+                    fteam(a,z,q)=A*((alpha_m*a_type(a)*type(z)^fcomp + (1-alpha_m)*type(q)^fcomp))^(1/fcomp);
+                end
+                fman(a,z)=(1/2)*A*a_type(a)*(alpha_m*type(z)^fcomp+ (1-alpha_m)*type(1)^fcomp)^(1/fcomp);
+                fnman(a,z)=0;
             end
-            fman(a,z)=(1/2)*A*a_type(a)*(alpha_m*type(z)^fcomp+ (1-alpha_m)*type(1)^fcomp)^(1/fcomp);
-            fnman(a,z)=0;
+            fe(a)=0;
         end
-        fe(a)=0;
+    else %Cobb-Douglas
+        for a=1:ats
+            for z=1:tpts
+                for q=1:tpts
+                    fteam(a,z,q)=A*(a_type(a)*(type(z)^(alpha_m))*((type(q))^(1-alpha_m)))
+                end
+                fman(a,z)=A*(a_type(a)*(type(z)^(alpha_m))*((type(1))^(1-alpha_m)));
+                fnman(a,z)=0;
+            end
+            fe(a)=0;
+        end
     end
     b=homeprod*fman(1,:) ;                                    %Type home production vector
 

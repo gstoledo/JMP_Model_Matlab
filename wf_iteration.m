@@ -1,6 +1,6 @@
 %Function for the VF interation of wages
 function [Wm,Wn,Wtm,Wtn,Wmh,Wnh,Wtnh,Wtmh] =wf_iteration(wpts,ats,tpts,Ve,Vm,Vn,Vt,U,Vmh,Vnh,Vth,Veh,Wmini,Wnini,Wtmini,Wtnini,...
-    speed,cost_d,cost_p,wgrid,bt,death,del,lam,lamu,bpw,n,a_trans,q_trans,e_udist,e_edist,e_mdist,e_ndist,e_tdist,display_iter)
+    speed,cost_d,cost_p,wgrid,bt,death,del,lam,lamu,bpw,n,a_trans,q_trans,e_udist,e_edist,e_mdist,e_ndist,e_tdist,display_iter,nm_penal)
     Uh=U;
     %% Policy functions    
     % %Hiring policies, looking at origins not allocations yet 

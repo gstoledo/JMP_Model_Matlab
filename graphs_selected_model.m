@@ -67,7 +67,7 @@ function graphs_selected_model(p,ps,v,e,w,job_name)
     a_tilda=1; %Set the productivity level of the firm
     events_alloc ={'Hire as M', 'Hire as NM', 'Hire as M w/ fire', 'Hire as M w/ demotion','Hire as NM w/ fire', 'Hire as NM w/ promotion'};
     markers_alloc={'d', 's', 'd', 'd', 's', 's'};
-    colors_alloc={bluecbp1, orangecbp1, greencbp1, greycbp1, pinkcbp1, redcbp1}
+    colors_alloc={bluecbp1, orangecbp1, greencbp1, greycbp1, pinkcbp1, redcbp1};
 
     %Run below for ztilde=1,4,7
     for ztilde=1:3:7

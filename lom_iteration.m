@@ -1,5 +1,5 @@
 %LOM interation for SS 
-function [e_udist, e_edist, e_mdist, e_ndist, e_tdist,store_n,store_p,failed]=lom_iteration(eini_udist,eini_edist,eini_mdist,eini_ndist,eini_tdist,ats,tpts,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,it_joint,speed_dist,display_iter_dist,nm_penal)
+function [e_udist, e_edist, e_mdist, e_ndist, e_tdist,failed]=lom_iteration(eini_udist,eini_edist,eini_mdist,eini_ndist,eini_tdist,ats,tpts,Veh,Vmh,Vnh,U,Vth,Ve,Vm,Vn,Vt,cost_d,cost_p,lamu, lam, del, death, n,u_trans, a_trans,q_trans,typebirth,it_joint,speed_dist,display_iter_dist,nm_penal)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     %Lets do the iteration of the LOMs
@@ -54,7 +54,7 @@ function [e_udist, e_edist, e_mdist, e_ndist, e_tdist,store_n,store_p,failed]=lo
             [e1_udist,e1_edist, e1_mdist, e1_ndist,e1_tdist]=e1_distV3(Veh,Vmh,Vnh,U,Vth,ats,tpts,cost_d,cost_p,e_udist,e_edist,e_mdist,e_ndist,e_tdist,lamu,lam,n,del,nm_penal);
             
             %It is not really getting to one...
-            sum(e1_edist)+sum(e1_mdist,"all")+sum(e1_ndist,"all")+sum(e1_tdist,"all"); % We are probabily missing a flow somewhere, that we will check later 
+            % sum(e1_edist)+sum(e1_mdist,"all")+sum(e1_ndist,"all")+sum(e1_tdist,"all"); % We are probabily missing a flow somewhere, that we will check later 
             
             
             % Distributions before productions (reallocation policies)
@@ -62,24 +62,24 @@ function [e_udist, e_edist, e_mdist, e_ndist, e_tdist,store_n,store_p,failed]=lo
             [e2_udist,e2_edist,e2_mdist,e2_ndist,e2_tdist]=e2_dist(Ve,Vm,Vn,U,Vt,ats,tpts,cost_d,cost_p,e1_udist,e1_edist,e1_mdist,e1_ndist,e1_tdist);
             
             %Check sum
-            sum(e2_edist,"all")+sum(e2_mdist,"all")+sum(e2_ndist,"all")+sum(e2_tdist,"all"); %This is summing up to one if the fed in dist sums to 1 
+            % sum(e2_edist,"all")+sum(e2_mdist,"all")+sum(e2_ndist,"all")+sum(e2_tdist,"all"); %This is summing up to one if the fed in dist sums to 1 
             
             %Disrtribtuions after shocks 
             %e3 distributions
             [e3_udist,e3_edist,e3_mdist,e3_ndist,e3_tdist]=e3_dist(ats,tpts,e2_udist,e2_edist,e2_mdist,e2_ndist,e2_tdist,u_trans,a_trans,q_trans);
             
             %Check sum
-            sum(e3_edist)+sum(e3_mdist,"all")+sum(e3_ndist,"all")+sum(e3_tdist,"all"); %This is summing up to one if the fed in dist sums to 1
+            % sum(e3_edist)+sum(e3_mdist,"all")+sum(e3_ndist,"all")+sum(e3_tdist,"all"); %This is summing up to one if the fed in dist sums to 1
             
             %Dist after entry and exit
             %eplus Distributions
             [eplus_udist,eplus_edist,eplus_mdist,eplus_ndist,eplus_tdist]=eplus_dist(ats,tpts,e3_udist,e3_edist,e3_mdist,e3_ndist,e3_tdist,death,typebirth);
             
             %Check sum
-            nplus=sum(eplus_edist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+sum(eplus_tdist,"all"); %This is summing up to one if the fed in dist sums to 1
-            popplus=sum(eplus_udist)+ sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+2*sum(eplus_tdist,"all");
-            store_n(it_dist-1)=nplus;
-            store_p(it_dist-1)=popplus;
+            % nplus=sum(eplus_edist)+sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+sum(eplus_tdist,"all"); %This is summing up to one if the fed in dist sums to 1
+            % popplus=sum(eplus_udist)+ sum(eplus_mdist,"all")+sum(eplus_ndist,"all")+2*sum(eplus_tdist,"all");
+            % store_n(it_dist-1)=nplus;
+            % store_p(it_dist-1)=popplus;
 
 
             %%Error

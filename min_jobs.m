@@ -11,7 +11,6 @@ function min_jobs(job_name)
         % Add your working directory to MATLAB's path
         addpath('/home/gst247/HPC_Model_Matlab/JMP_Model_Matlab')
     end
- 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Load baseline parameters
     run baseline_param.m
@@ -22,29 +21,39 @@ function min_jobs(job_name)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
     if strcmp(job_name, 'min_cp_al')
         p_selection={'cost_p','alpha_m'};
-        [~, ps] = param_selection(theta, p_selection);
         moments_selection = {'NiMi', 'ManWorkerRatio'};
-        %Number of parameters
-        nvars=length(p_selection);
         lb.cost_p=0.01;
         ub.cost_p=0.5;
         lb.alpha_m=0.6;
         ub.alpha_m=0.9;
-
-        lb=[lb.cost_p, lb.alpha_m];
-        ub=[ub.cost_p, ub.alpha_m];
         %Initial guess
         pvec0=[0.1, theta.alpha_m];
-        options = optimoptions('ga', 'Display', 'iter', ...
-                            'UseParallel', true, 'PopulationSize', 10, 'InitialPopulationMatrix', pvec0);
-        %Run the optimization
-        [pvec_opt, fval] = ga(@(p_vec) wrapperSMM(p_vec, p_selection, theta, ps, tg, sp, dm, moments_selection), nvars, ...
-                        [], [], [], [], lb, ub, [], [], options);
-        p_opt=p_vec_to_struct(pvec_opt, p_selection, theta);
-        [v,e,w]=joint_loop(p_opt,ps,tg,"spec3");
-        hpc_path='/home/gst247/HPC_Model_Matlab/Calibration_outcomes/'+string(job_name);    
-        save(fullfile(hpc_path, 'min_calib_all.mat'),'p_opt','fval','p_selection','moments_selection','lb','ub','v','e','w')
-        graphs_selected_model(p_opt,ps,v,e,w,job_name)
+        min_routine(pvec0,p_selection, theta, lb,ub ,tg, sp, dm, moments_selection,cw,job_name)
+        
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%       
+    elseif strcmp(job_name, 'min_alpha')
+        tg.use_guess='no';
+        p_selection={'alpha_m'};
+        moments_selection = {'ManWorkerRatio'};
+        cw.ManWorkerRatio=1; 
+        lb.alpha_m=0.6;
+        ub.alpha_m=0.95;
+        %Inital guess
+        pvec0=[0.6654];
+        min_routine(pvec0,p_selection, theta, lb,ub ,tg, sp, dm, moments_selection,cw,job_name)
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    elseif strcmp(job_name, 'min_al_Bcross')
+        tg.use_guess='no';
+        %Selections
+        p_selection={'alpha_m'};
+        moments_selection = {'bcross'};
+        cw.bcross=1;
+        %Bounds
+        lb.alpha_m=0.6;
+        ub.alpha_m=0.95;
+        %Inital guess
+        pvec0=[theta.alpha_m];
+        min_routine(pvec0,p_selection, theta, lb,ub ,tg, sp, dm, moments_selection,cw,job_name)
     else 
         disp('Job name not recognized')
     end

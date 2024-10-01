@@ -62,7 +62,7 @@ for i = 1:length(fieldNames)% Dynamically create the variable name
 end
 
 %% Derivated from the main parameters
-[a_trans,q_trans,u_trans,fteam,fman,fnman,fe,b,mnew_high,typebirth,wmin,wmax,wgrid] = derivatated_p(p,ps);
+[a_trans,q_trans,u_trans,fteam,fman,fnman,fe,b,mnew_high,typebirth,wmin,wmax,wgrid] = derivatated_p(p,ps,split_top_bot);
 
 
 Veini = zeros(1, ats);

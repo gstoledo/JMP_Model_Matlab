@@ -66,7 +66,7 @@ function ws=SimulateWorker_cl(p,ps,tg,sp,v,e,w,fs)
     end
 
     %% Derivated from the main parameters
-    [a_trans,q_trans,u_trans,fteam,fman,fnman,fe,b,mnew_high,typebirth,wmin,wmax,wgrid] = derivatated_p(p,ps);
+    [a_trans,q_trans,u_trans,fteam,fman,fnman,fe,b,mnew_high,typebirth,wmin,wmax,wgrid] = derivatated_p(p,ps,split_top_bot);
 
     %Policy functions
     %Get the policy functions

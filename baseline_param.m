@@ -5,7 +5,7 @@ x=xmin; %Use some values of HLPM to start
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Toggles
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    tg.use_guess='yes';                %Use guess for value functions
+    tg.use_guess='no';                %Use guess for value functions
     tg.zero_tol=1e-10;                  %Tolerance for zero
     tg.nm_penal=0;                            %NManager penalty toggle
     tg.speed=1;                        %Convergence speed
@@ -15,6 +15,8 @@ x=xmin; %Use some values of HLPM to start
     tg.display_iter=0;                      %Display iterations in joint loop
     tg.display_iter_v=0;                  %Display value function iterations
     tg.display_iter_dist=0;              %Display distribution iterations
+    tg.split_top_bot=1;                 %Split top and bottom of distribution for the qup
+    tg.annual=0;                        %Annual calibration
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Simulation parameters
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -31,8 +33,13 @@ x=xmin; %Use some values of HLPM to start
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Data Moments
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    dm.NiMi                             =0.047+0.009;  %Rate internal promotions to managers (as a fraction of total managers)
-    dm.MiNi                             =0.021+0.001;  %Rate internal demotions to non-managers (as a fraction of total non-managers)
+    if tg.annual==1
+        dm.NiMi                             =0.047+0.009;  %Rate internal promotions to managers (as a fraction of total managers)
+        dm.MiNi                             =0.021+0.001;  %Rate internal demotions to non-managers (as a fraction of total non-managers)
+    else
+        dm.NiMi                             = (0.047+0.009)/12;  %Rate internal promotions to managers (as a fraction of total managers)
+        dm.MiNi                             = (0.021+0.001)/12;  %Rate internal demotions to non-managers (as a fraction of total non-managers)
+    end
     dm.Q5Q1nm_wage                      =6.84;          %Non Manager Wage Ratio quintile 5 to quintile 1 of total avg wage
     dm.Q5Q2nm_wage                      =3.35;          %Non Manager Wage Ratio quintile 5 to quintile 2 of total avg wage
     dm.Q5Q3nm_wage                      =2.30;          %Non Manager Wage Ratio quintile 5 to quintile 3 of total avg wage
@@ -50,9 +57,14 @@ x=xmin; %Use some values of HLPM to start
         theta.ats=5;
         theta.tpts=7;
     end
-    theta.wpts=75;                        %Wage type
-    theta.bt=1/(1.1^(1/12));               %beta, discount factor
-    theta.death=1/(35*12);                 %Probability agent dies
+    theta.wpts=75;                       %Wage type
+    if tg.annual==1
+        theta.bt=1/(1.13^(1/12))^12;              %beta, discount factor (annual)
+        theta.death=1/(40);                 %Probability agent dies (annual)
+    else
+        theta.bt=1/(1.13^(1/12));                %beta, discount factor (monthly)
+        theta.death=1/(40*12);                 %Probability agent dies (monthly)
+    end
     theta.bpw=1-xmin(11);                  %bpw is bargaining power of worker
     theta.bpf=1-theta.bpw;                    %Firm bargaining power (1-gamma)
     theta.n=1;                             %Measure of firms
@@ -63,17 +75,30 @@ x=xmin; %Use some values of HLPM to start
 
     theta.aup=0.05;                          %Probability of moving up
     theta.adown=0.05;                        %Probability of moving down
-    theta.qdown=0*ones(theta.ats,1);        %Probability of moving down in q
     theta.ulose=x(6);                       %Probability of moving donw in u
     theta.A=x(14);                          %Aggegate productivity parameter, still unsure hor to add this here
     theta.fcomp=x(3);                       %Complementarity in F
     theta.alpha_m=0.67;                      %Manager share
-    theta.homeprod=x(12);                   %Home production
+    theta.homeprod=0.7;                   %Home production
     theta.mnew=x(9);                        %Paramter of exponetial dist for newborn workers
-    theta.lamu=x(1);                        %Prob of U find a firm
-    theta.lam=x(2);                         %Prob of firm find another firm
-    theta.del=x(5);                         %Separation rate
-    theta.qup=0.05*ones(theta.ats,1);       %Probability of moving up in q. The qup for the last level of productivity is irrelevant
+    if tg.annual==1
+        theta.lamu=1-(1-x(1))^12;                        %Prob of U find a firm
+        theta.lam=1-(1-x(2))^12;                        %Prob of firm find another firm
+        theta.del=1-(1-x(5))^12;                         %Separation rate
+    else
+        theta.lamu=1-(1-x(1));                        %Prob of U find a firm
+        theta.lam=1-(1-x(2));                        %Prob of firm find another firm
+        theta.del=1-(1-x(5));                         %Separation rate
+    end
+    if tg.split_top_bot==0
+        theta.qup=0.05*ones(theta.ats,1);       %Probability of moving up in q. The qup for the last level of productivity is irrelevant
+        theta.qdown=0*ones(theta.ats,1);        %Probability of moving down in q
+    else
+        theta.quptop=0.02;                     %Probability of moving up in q. The qup for the last level of productivity is irrelevant
+        theta.qupbot=0.02;                     %Probability of moving up in q. The qup for the last level of productivity is irrelevant
+        theta.qdowntop=0;                      %Probability of moving down in q
+        theta.qdownbot=0;                      %Probability of moving down in q
+    end
     theta.cost_d=2.25;                       %cost of demoting a manager to non manager  
     theta.cost_p=1.09;                       %cost of promoting a non manager to manager
     theta.phim=0.8;                         %Prob of being free manager (COUNTERFACTUAL)
@@ -84,7 +109,12 @@ x=xmin; %Use some values of HLPM to start
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     cgrid.cost_d=linspace(0.5,1.4,15);
     cgrid.cost_p=linspace(0.02,0.2,15);
-    cgrid.qup = repmat({linspace(0.08, 0.4, 5)},length(theta.qup),1);
+    if tg.split_top_bot==0
+        cgrid.qup = repmat({linspace(0.08, 0.4, 5)},length(theta.qup),1);
+    else
+        cgrid.quptop=linspace(0.02,0.06,5);
+        cgrid.qupbot=linspace(0.02,0.06,5);
+    end
     cgrid.lamu=linspace(0.2,0.4,10);
     cgrid.lam=linspace(0.2,0.4,10);
     cgrid.alpha_m=linspace(0.5,0.9,10);
